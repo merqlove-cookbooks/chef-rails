@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe "rails::vcs_keys"
-
 directory node['rails']['path'] do
   mode      '0755'
   owner     node['rails']['user']['main']
