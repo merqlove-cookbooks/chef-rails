@@ -32,7 +32,7 @@ begin
   #   content item['file-content']
   # end
   deploy_key "github_key" do
-    provider Chef::Provider::DeployKeyBitbucket
+    provider Chef::Provider::DeployKeyGithub
     path "/home/node['user']['main']}/.ssh" 
     credentials({
       :token => key['github']
