@@ -7,7 +7,7 @@ long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 
 depends "nginx"
 depends "deploy_key"
-recommend "postgresql"
+recommends "postgresql"
 
 # attribute "hub/install_path",
 #   display_name: "Install path",
