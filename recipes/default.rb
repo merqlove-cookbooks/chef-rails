@@ -27,12 +27,12 @@ directory node['rails']['path'] do
   recursive true
 end
 
-node['rails']['apps']['production'].each do |path|
-  directory "#{node['rails']['path']}/#{path}" do
-    owner node['rails']['user']['main']
-    group node['rails']['user']['main']
-    mode "0755"
-    action :create
-    recursive true
-  end
-end
+# node['rails']['apps']['production'].each do |path|
+#   directory "#{node['rails']['path']}/#{path}" do
+#     owner node['rails']['user']['main']
+#     group node['rails']['user']['main']
+#     mode "0755"
+#     action :create
+#     recursive true
+#   end
+# end
