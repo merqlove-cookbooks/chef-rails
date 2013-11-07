@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Attributes:: rbenv
+# Attributes:: default
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,5 +17,4 @@
 # limitations under the License.
 #
 
-default['rails']['path']      = '/srv/apps'
-default['rails']['user']['main']      = 'vagrant'
+default['rails']['rbenv']['version']      = '2.0.0-p247'

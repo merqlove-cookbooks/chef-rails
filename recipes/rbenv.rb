@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Attributes:: rbenv
+# Recipe:: default
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,5 +17,11 @@
 # limitations under the License.
 #
 
-default['rails']['path']      = '/srv/apps'
-default['rails']['user']['main']      = 'vagrant'
+rbenv_ruby "Ruby Install" do
+  ruby_version "#{node['rails']['rbenv']['version']}"
+  global true
+end
+
+rbenv_gem "bundler" do
+  ruby_version "#{node['rails']['rbenv']['version']}"
+end

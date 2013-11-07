@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+include_recipe "rails::rbenv"
+
 directory node['rails']['path'] do
   mode      '0755'
   owner     node['rails']['user']['main']
