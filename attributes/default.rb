@@ -17,5 +17,6 @@
 # limitations under the License.
 #
 
-default['rails']['path']      = '/srv/apps'
+default['rails']['base_path']      = '/srv/apps'
+default['rails']['apps']      = []
 default['rails']['user']['main']      = 'vagrant'

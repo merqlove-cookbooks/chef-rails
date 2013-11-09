@@ -19,7 +19,7 @@
 
 include_recipe "rails::rbenv"
 
-directory node['rails']['path'] do
+directory node['rails']['base_path'] do
   mode      '0755'
   owner     node['rails']['user']['main']
   group     node['rails']['user']['main']
