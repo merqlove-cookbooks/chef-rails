@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: rbenv
+# Attributes:: vcs
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,11 +17,5 @@
 # limitations under the License.
 #
 
-rbenv_ruby "#{node['rails']['rbenv']['version']}" do
-  ruby_version "#{node['rails']['rbenv']['version']}"
-  global true
-end
+default['rails']['secrets']['default']      = nil
 
-rbenv_gem "bundler" do
-  ruby_version "#{node['rails']['rbenv']['version']}"
-end

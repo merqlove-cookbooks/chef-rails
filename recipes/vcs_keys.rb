@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: default
+# Recipe:: vcs_keys
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,33 +17,26 @@
 # limitations under the License.
 #
 
-chef_gem 'chef-vault'
-require 'chef-vault'
+if node['rails']['secrets']['default']
+  if File.exists? node['rails']['secrets']['default']
+    directory "/home/vagrant/.ssh" do
+      owner "vagrant"
+      group "vagrant"
+      mode 0700
+    end
+    
+    vcs = data_bag("vcs_keys")
+    default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
 
-# Decrypt certificate
-puts "Deploy key on Github."
-begin
-  key = ChefVault::Item.load('tokens','github')
-  # file "github" do
-  #   path  "/home/#{node['user']['main']}/.ssh"
-  #   owner 'root'
-  #   group 'root'
-  #   mode '0444'
-  #   content item['file-content']
-  # end
-  deploy_key "github_key" do
-    provider Chef::Provider::DeployKeyGithub
-    path "/home/node['user']['main']}/.ssh" 
-    credentials({
-      :token => key['github']
-    })
-    # repo 'organization/million_dollar_app'
-    owner node['user']['main']
-    group node['user']['main']
-    mode 00640
-    action :add
+    vcs.each do |item|
+      key = Chef::EncryptedDataBagItem.load("vcs_keys", item, default_secret)
+
+      file "/home/vagrant/.ssh/#{key["file-name"]}" do
+        content key['file-content']
+        owner "vagrant"
+        group "vagrant"
+        mode 0600
+      end
+    end
   end
-rescue ChefVault::Exceptions::KeysNotFound
-  raise ChefVault::Exceptions::ItemNotFound,
-    "Key not found at tokens/github!"
-end
+end  

@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: rbenv
+# Recipe:: secrets
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,11 +17,24 @@
 # limitations under the License.
 #
 
-rbenv_ruby "#{node['rails']['rbenv']['version']}" do
-  ruby_version "#{node['rails']['rbenv']['version']}"
-  global true
+c = chef_gem 'chef-vault'
+c.run_action(:install)
+
+require 'chef-vault'
+
+data_bag("secrets").each do |item|
+  unless item.include? "_keys"
+    key = ChefVault::Item.load("secrets", item)    
+
+    f = file "#{key["file-name"]}" do
+      path "/etc/chef/#{key["file-name"]}"
+      owner "root"
+      group "root"
+      mode "0600"
+      content "#{key['file-content']}"
+    end
+    f.run_action(:create)
+  end
 end
 
-rbenv_gem "bundler" do
-  ruby_version "#{node['rails']['rbenv']['version']}"
-end
+include_recipe "rails::vcs_keys"

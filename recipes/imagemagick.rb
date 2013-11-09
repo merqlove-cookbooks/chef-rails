@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: rbenv
+# Recipe:: imagemagick
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,11 +17,14 @@
 # limitations under the License.
 #
 
-rbenv_ruby "#{node['rails']['rbenv']['version']}" do
-  ruby_version "#{node['rails']['rbenv']['version']}"
-  global true
+imagemagick_package = "imagemagick"
+
+if platform_family?('rhel')
+  include_recipe 'yum::remi'
+  imagemagick_package = "ImageMagick-last"  
 end
 
-rbenv_gem "bundler" do
-  ruby_version "#{node['rails']['rbenv']['version']}"
+package "imagemagick" do
+  package_name imagemagick_package
+  action :install
 end
