@@ -17,4 +17,4 @@
 # limitations under the License.
 #
 
-iptables_rule 'port_nginx'
+iptables_rule 'port_rails'
