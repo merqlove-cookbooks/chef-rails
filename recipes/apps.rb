@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Attributes:: users
+# Recipe:: apps
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,4 +17,28 @@
 # limitations under the License.
 #
 
-default['rails']['users']      = []
+if node['rails']['apps']
+  users = node['rails']['apps'].map do |a|
+    directory "#{node['rails']['base_path']}/#{a["name"]}" do
+      owner a["user"]
+      group a["user"]
+      mode "0755"
+      action :create
+      recursive true
+    end
+
+    #set ruby
+    unless a["rbenv"]["version"].include? node['rails']['rbenv']['version']
+      rbenv_ruby "#{a["rbenv"]["version"]}" do
+        ruby_version "#{a["rbenv"]["version"]}"
+      end      
+    end
+
+    #add gems
+    a["rbenv"]["gems"].each do |g|
+      rbenv_gem "#{g}" do
+        ruby_version "#{a["rbenv"]["version"]}"
+      end
+    end
+  end
+end

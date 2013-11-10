@@ -23,6 +23,10 @@ default['rails']['apps']      = {
   #   "name" => "rails",
   #   "user" => "merkulov",
   #   "folders" => [],
+  #   "rbenv" => {
+  #     "version"=> "2.0.0-p247",
+  #     "gems"=> ["bundler"]   
+  #   } 
   # }
 }
 default['rails']['user']['deploy']      = 'deploy'

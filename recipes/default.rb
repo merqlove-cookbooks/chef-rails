@@ -27,6 +27,9 @@ directory node['rails']['base_path'] do
   recursive true
 end
 
+include_recipe "rails::apps"
+
+
 # node['rails']['apps']['production'].each do |path|
 #   directory "#{node['rails']['path']}/#{path}" do
 #     owner node['rails']['user']['main']
