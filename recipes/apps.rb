@@ -18,7 +18,7 @@
 #
 
 if node['rails']['apps']
-  users = node['rails']['apps'].map do |a|
+  node['rails']['apps'].each do |k, a|
     directory "#{node['rails']['base_path']}/#{a["name"]}" do
       owner a["user"]
       group a["user"]
