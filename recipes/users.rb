@@ -20,7 +20,7 @@
 if node['rails']['apps']
   users = node['rails']['apps'].map do |a|
     a["user"]
-  end.compact
+  end.push("deploy").uniq.compact
   
   if File.exists? node['rails']['secrets']['default']
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
