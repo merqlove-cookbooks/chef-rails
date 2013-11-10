@@ -31,12 +31,24 @@ if node['rails']['apps']
     users.each do |u|
       data = Chef::EncryptedDataBagItem.load('users', u, default_secret)
       if data
+
         user u do
           home      "/home/#{u}"
           shell     data["shell"]
-          groups    data["groups"].push("rbenv")
           comment   data["comment"]
           supports  :manage_home => true
+        end
+
+        if u == node['rails']['user']['deploy']
+          group "admin" do
+            append true
+            members [node['rails']['user']['deploy']]            
+          end
+        end
+
+        group node[:rbenv][:group] do
+          append true
+          members [u]        
         end
 
         directory "/home/#{u}/.ssh" do
