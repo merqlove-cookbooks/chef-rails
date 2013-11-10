@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-if node.recipes.include? "role[vagrant]"
+if node.role? "vagrant"
   if node['rails']['secrets']['default']
     if File.exists? node['rails']['secrets']['default']
       directory "/home/vagrant/.ssh" do
