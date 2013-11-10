@@ -63,7 +63,7 @@ if node['rails']['apps']
           owner  u
           group  u
           mode  '0600'
-          variables :keys => data["ssh_keys"]
+          variables :keys => data["ssh-keys"]
         end
 
         if data["vcs"]
