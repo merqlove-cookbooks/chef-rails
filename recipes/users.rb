@@ -71,7 +71,7 @@ if node['rails']['apps']
             if vcs.include? v
               key = Chef::EncryptedDataBagItem.load("vcs_keys", v, default_secret)
 
-              file "/home/vagrant/.ssh/#{key["file-name"]}" do
+              file "/home/#{u}/.ssh/#{key["file-name"]}" do
                 content key['file-content']
                 owner u
                 group u
