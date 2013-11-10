@@ -17,26 +17,28 @@
 # limitations under the License.
 #
 
-if node['rails']['secrets']['default']
-  if File.exists? node['rails']['secrets']['default']
-    directory "/home/vagrant/.ssh" do
-      owner "vagrant"
-      group "vagrant"
-      mode 0700
-    end
-    
-    vcs = data_bag("vcs_keys")
-    default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
-
-    vcs.each do |item|
-      key = Chef::EncryptedDataBagItem.load("vcs_keys", item, default_secret)
-
-      file "/home/vagrant/.ssh/#{key["file-name"]}" do
-        content key['file-content']
+if node.recipes.include? "role[vagrant]"
+  if node['rails']['secrets']['default']
+    if File.exists? node['rails']['secrets']['default']
+      directory "/home/vagrant/.ssh" do
         owner "vagrant"
         group "vagrant"
-        mode 0600
+        mode 0700
+      end
+      
+      vcs = data_bag("vcs_keys")
+      default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
+
+      vcs.each do |item|
+        key = Chef::EncryptedDataBagItem.load("vcs_keys", item, default_secret)
+
+        file "/home/vagrant/.ssh/#{key["file-name"]}" do
+          content key['file-content']
+          owner "vagrant"
+          group "vagrant"
+          mode 0600
+        end
       end
     end
   end
-end  
+end

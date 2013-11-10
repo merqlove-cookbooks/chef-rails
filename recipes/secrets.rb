@@ -37,4 +37,6 @@ data_bag("secrets").each do |item|
   end
 end
 
+include_recipe "rails::users"
 include_recipe "rails::vcs_keys"
+

@@ -18,5 +18,11 @@
 #
 
 default['rails']['base_path']      = '/srv/apps'
-default['rails']['apps']      = []
-default['rails']['user']['main']      = 'vagrant'
+default['rails']['apps']      = {
+  # "default" => {
+  #   "name" => "rails",
+  #   "user" => "merkulov",
+  #   "folders" => [],
+  # }
+}
+default['rails']['user']['deploy']      = 'deploy'
