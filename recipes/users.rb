@@ -18,9 +18,11 @@
 #
 
 if node['rails']['apps']
-  users = node['rails']['apps'].map do |a|
-    a["user"]
-  end.push(node['rails']['user']['deploy']).uniq.compact
+  users = []
+  node['rails']['apps'].each do |k, a|
+    users.push a["user"]
+  end
+  users = users.push(node['rails']['user']['deploy']).uniq.compact
   
   if File.exists? node['rails']['secrets']['default']
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
