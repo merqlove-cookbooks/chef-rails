@@ -32,7 +32,7 @@ if node['rails']['apps']
         user u do
           home      "/home/#{u}"
           shell     data["shell"]
-          groups    data["groups"]
+          groups    data["groups"].push("rbenv")
           comment   data["comment"]
           supports  :manage_home => true
         end
@@ -69,6 +69,6 @@ if node['rails']['apps']
 
       end
     end
-    
+
   end
 end
