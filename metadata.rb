@@ -9,7 +9,7 @@ version           '0.0.6'
 depends "iptables"
 depends "nginx"
 depends "rbenv"
-depends "ssh-util"
+depends "ssh_known_hosts"
 #depends "deploy_key"
 depends "postgresql"
 
