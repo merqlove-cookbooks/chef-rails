@@ -28,15 +28,23 @@ if node.role? "vagrant"
       
       vcs = data_bag("vcs_keys")
       default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
+      if vcs
+        vcs.each do |item|
+          key = Chef::EncryptedDataBagItem.load("vcs_keys", item, default_secret)
 
-      vcs.each do |item|
-        key = Chef::EncryptedDataBagItem.load("vcs_keys", item, default_secret)
-
-        file "/home/vagrant/.ssh/#{key["file-name"]}" do
-          content key['file-content']
-          owner "vagrant"
-          group "vagrant"
-          mode 0600
+          file "/home/vagrant/.ssh/#{key["file-name"]}" do
+            content key['file-content']
+            owner "vagrant"
+            group "vagrant"
+            mode 0600
+          end
+        end
+        template "/home/vagrant/.ssh/config" do
+          source 'ssh_config.erb'
+          owner  "vagrant"
+          group  "vagrant"
+          mode  '0600'
+          variables :vcs => vcs
         end
       end
     end

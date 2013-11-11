@@ -34,6 +34,7 @@ if node['rails']['apps']
 
         user u do
           home      "/home/#{u}"
+          password  data["password"]
           shell     data["shell"]
           comment   data["comment"]
           supports  :manage_home => true
@@ -78,6 +79,13 @@ if node['rails']['apps']
                 mode 0600
               end
             end
+          end
+          template "/home/#{u}/.ssh/config" do
+            source 'ssh_config.erb'
+            owner  u
+            group  u
+            mode  '0600'
+            variables :vcs => data["vcs"]
           end
         end
 

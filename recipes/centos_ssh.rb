@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: default
+# Recipe:: centos_ssh
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,14 +17,11 @@
 # limitations under the License.
 #
 
-include_recipe "rails::rbenv"
-
-directory node['rails']['base_path'] do
-  mode      '0755'
-  owner     node['rails']['user']['deploy']
-  group     node['rails']['user']['deploy']
-  action    :create
-  recursive true
+if platform_family?('rhel')
+  package "authconfig"
+  execute "ssh_fix" do
+    command "authconfig --disablefingerprint --update"
+    user "root"
+    group "root"
+  end
 end
-
-include_recipe "rails::apps"
