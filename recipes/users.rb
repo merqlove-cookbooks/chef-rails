@@ -66,7 +66,9 @@ if node['rails']['apps']
           mode  '0600'
           variables :keys => data["ssh-keys"]
         end
-
+        ohai "reload_passwd" do
+          plugin "passwd"
+        end
         if data["vcs"]
           data["vcs"].each do |v|
             if vcs.include? v
@@ -78,17 +80,26 @@ if node['rails']['apps']
                 group u
                 mode 0600
               end
+
+              ssh_known_hosts "#{key["hostname"]}" do
+                hashed true
+                user u
+              end
+
+              ssh_config "#{key["hostname"]}" do
+                options 'User' => 'git', 'IdentityFile' => "/home/#{u}/.ssh/#{key["file-name"]}"
+                user u
+              end
             end
           end
-          template "/home/#{u}/.ssh/config" do
-            source 'ssh_config.erb'
-            owner  u
-            group  u
-            mode  '0600'
-            variables :vcs => data["vcs"]
-          end
+          # template "/home/#{u}/.ssh/config" do
+          #   source 'ssh_config.erb'
+          #   owner  u
+          #   group  u
+          #   mode  '0600'
+          #   variables :vcs => data["vcs"]
+          # end
         end
-
       end
     end
 
