@@ -17,7 +17,8 @@
 # limitations under the License.
 #
 
-default['rails']['base_path']      = '/srv/apps'
+default['rails']['apps_base_path']      = '/srv/apps'
+default['rails']['sites_base_path']      = '/srv/apps'
 default['rails']['apps']      = {
   # "default" => {
   #   "name" => "rails",
@@ -29,4 +30,5 @@ default['rails']['apps']      = {
   #   } 
   # }
 }
+default['rails']['sites'] = {}
 default['rails']['user']['deploy']      = 'deploy'
