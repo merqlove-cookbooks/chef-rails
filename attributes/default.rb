@@ -18,7 +18,7 @@
 #
 
 default['rails']['apps_base_path']      = '/srv/apps'
-default['rails']['sites_base_path']      = '/srv/apps'
+default['rails']['sites_base_path']      = '/srv/sites'
 default['rails']['apps']      = {
   # "default" => {
   #   "name" => "rails",
