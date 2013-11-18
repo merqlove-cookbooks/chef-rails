@@ -18,7 +18,7 @@
 #
 
 if node['rails']['apps']
-  node.default['php-fpm']['pools'] = {}
+  node.default['php-fpm']['pools'] = []
   node['rails']['apps'].each do |k, a|
     directory "#{node['rails']['base_path']}/#{a["name"]}" do
       owner a["user"]
