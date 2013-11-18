@@ -33,7 +33,15 @@ end
 
 include_recipe "rails::rbenv"
 
-directory node['rails']['base_path'] do
+directory node['rails']['apps_base_path'] do
+  mode      '0755'
+  owner     node['rails']['user']['deploy']
+  group     node['rails']['user']['deploy']
+  action    :create
+  recursive true
+end
+
+directory node['rails']['sites_base_path'] do
   mode      '0755'
   owner     node['rails']['user']['deploy']
   group     node['rails']['user']['deploy']
