@@ -38,6 +38,11 @@ if node.role? "vagrant"
             group "vagrant"
             mode 0600
           end
+
+          ssh_known_hosts_entry "#{key["host"]}" do
+            file "/home/vagrant/.ssh/known_hosts"
+            owner "vagrant"
+          end
         end
         template "/home/vagrant/.ssh/config" do
           source 'ssh_config.erb'
@@ -45,6 +50,17 @@ if node.role? "vagrant"
           group  "vagrant"
           mode  '0600'
           variables :vcs => vcs
+        end
+        template "/home/vagrant/.gitconfig" do          
+          source 'gitconfig.erb'
+          owner 'vagrant'
+          group 'vagrant'
+          mode '0644'
+
+          variables(
+            :name  => 'vagrant',
+            :email => "vagrant@#{node['fqdn']}"
+          )
         end
       end
     end
