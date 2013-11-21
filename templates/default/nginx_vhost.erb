@@ -1,0 +1,116 @@
+  # Maintained by Chef.  Local changes will be overwritten
+
+  <% if @php %>
+    upstream php_<%= @name %> {
+      server unix:/var/run/php-fpm-<%= @name %>.sock;
+    }
+  <% end %>
+  <% unless node.role? "vagrant" %>
+  <% if @disable_www %>
+  server {
+    listen <%= @listen %>;    
+    server_name www.<%= Array(@server_name)[0] %>;
+    return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;    
+  }
+  <% end %>
+  <% end %>
+
+  server {
+    listen <%= @listen %> <%= "default" if @default %> <%= "deferred" if @deferred %>;
+    <% if node.role? "vagrant" %>
+      server_name <%= @name %>.<%= node["vagrant"]["fqdn"] %>, <%= Array(@server_name).join(', ') %>;
+    <% else %>
+      server_name <%= Array(@server_name).join(', ') %>;
+    <% end %>
+    
+    root   <%= @path %>/docs;
+    autoindex off;
+    charset utf-8;
+
+    <% if @rewrites %> 
+      <% @rewrites.each do |rewrite| %>
+        rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+      <% end %>
+    <% end %>
+
+    <% if @access_log %>
+    access_log <%= @path %>/log/access.log;# multi;
+    <% end %>
+
+    <% if @error_log %>
+    error_log <%= @path %>/log/error.log error;
+    <% end %>
+    
+    <% if @hidden %>
+      <% hidden_paths = "|" %>
+      <% hidden_paths << Array(@hidden).join('|') %>
+    <% end %>
+
+    location ~ (/(include/|cache/|modules/|uploads/|ini.php)|/\.svn/|/\.git/|/.hta.+<%=hidden_paths%>){
+      deny all; # закрываем от посторонних
+    }
+
+    #location / {               
+    #  index   index.php index.html;
+    #  if (!-e $request_filename) {     
+    #    rewrite ^(.*)$ /index.php last;
+    #  }
+    #  #limit_req zone=antiddos burst=10;
+    #}
+
+    location / {    
+      try_files $uri/index.html $uri @website;
+    }
+
+    location /admin {    
+      try_files $uri/index.html $uri @website;
+    }
+
+    <% if @php %>
+    
+      <% if @min %>
+      location /min {
+        fastcgi_pass  php_<%= @name %>; 
+        fastcgi_index index.php;        
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include fastcgi_params;
+        
+        # Nginx caching.
+        #fastcgi_cache fastcgi_cache;
+        #fastcgi_cache_valid 200 304 404 240h;
+        #fastcgi_cache_key "$request_method|$http_if_modified_since|$http_if_none_match|$host|$request_uri";
+      }
+      <% end %>
+
+      location ~ \.php$ {       
+        try_files $uri =404;    
+        fastcgi_pass  php_<%= @name %>; 
+        #fastcgi_index index.php;      
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;     
+        include fastcgi_params;
+      }    
+
+      location @website {
+        fastcgi_pass  php_<%= @name %>; 
+        fastcgi_index index.php;      
+        fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;     
+        include fastcgi_params;
+      }
+
+    <% end %>
+
+    location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|txt|syx)$ {
+      <% if @file_rewrites %>      
+      if (!-f $request_filename) {  
+      <% @file_rewrites.each do |rewrite| %>
+        rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+      <% end %>
+      }
+      <% end %>
+    }
+    
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+      root   /var/www/html;
+    }
+  }

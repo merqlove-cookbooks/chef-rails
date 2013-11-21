@@ -1,0 +1,100 @@
+  server {
+    listen 443;
+    server_name <%= Array(@server_name).join(', ') %>;
+    
+    ssl on; 
+    ssl_protocols SSLv3 TLSv1;
+    ssl_ciphers HIGH:!ADH:!MD5;
+    ssl_prefer_server_ciphers on;
+     
+    ssl_certificate server.crt;
+    ssl_certificate_key server.key;
+     
+    ssl_session_cache    shared:SSL:10m;
+    ssl_session_timeout  10m;
+    
+    <% if @rewrites %> 
+      <% @rewrites.each do |rewrite| %>
+        rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+      <% end %>
+    <% end %>
+    
+    root   <% @path %>/docs;
+    autoindex off;
+    charset utf-8;
+    
+    <% if @access_log %>
+    access_log <%= @path %>/log/access.log;# multi;
+    %>
+
+    <% if @error_log %>
+    error_log <%= @path %>/log/error.log error;
+    <% end %>
+    
+    <% if @hidden %>
+    <% hidden_paths = "|#{Array(@hidden).join('|')}" %>
+    <% end %>
+
+    location ~ (/(include/|cache/|modules/|uploads/|ini.php)|/\.svn/|/\.git/|/.hta.+<%=hidden_paths%>){
+      deny all; # закрываем от посторонних
+    }
+
+    #location / {               
+    #  index   index.php index.html;
+    #  if (!-e $request_filename) {     
+    #    rewrite ^(.*)$ /index.php last;
+    #  }
+    #  #limit_req zone=antiddos burst=10;
+    #}
+
+    location / {
+      try_files $uri $uri/ @website;
+    }
+
+    <% if @php %>
+    
+      <% if @min %>
+      location /min {
+        fastcgi_pass  php_<%= @name %>; 
+        fastcgi_index index.php;        
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include fastcgi_params;
+        
+        # Nginx caching.
+        #fastcgi_cache fastcgi_cache;
+        #fastcgi_cache_valid 200 304 404 240h;
+        #fastcgi_cache_key "$request_method|$http_if_modified_since|$http_if_none_match|$host|$request_uri";
+      }
+      <% end %>
+
+      location ~ \.php$ {           
+        fastcgi_pass  php_<%= @name %>; 
+        #fastcgi_index index.php;      
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;     
+        include fastcgi_params;
+      }    
+
+      location @website {
+        fastcgi_pass  php_<%= @name %>; 
+        fastcgi_index index.php;      
+        fastcgi_param  SCRIPT_FILENAME  $document_rootindex.php;     
+        include fastcgi_params;
+      }
+
+    <% end %>
+
+    location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|txt|syx)$ {
+      <% if @file_rewrites %>      
+      if (!-f $request_filename) {  
+      <% @file_rewrites.each do |rewrite| %>
+        rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+      <% end %>
+      }
+      <% end %>
+    }
+    
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+      root   /var/www/html;
+    }
+  }

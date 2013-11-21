@@ -24,10 +24,14 @@ define :app, application: false, type: "apps" do
     directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}" do
       owner a["user"]
       group a["user"]
-      mode "0755"
-      action :create
+      mode "0750"
       recursive true
     end
+
+    group a["user"] do
+      append true
+      members [node['nginx']['user']]
+    end  
 
     if a.include? "rbenv"
       #set ruby
@@ -69,14 +73,16 @@ define :app, application: false, type: "apps" do
           if !File.exist?("mongo")
             include_recipe "mongodb::default"          
           end
+          package "php-pecl-mongo" if a.include? "php"
           execute d["name"] do
             command "mongo #{d["name"]} --eval 'db.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"
             action :run
           end        
         when "postgresql"
-          if !File.exist?("pg")
+          if !File.exist?("psql")
             include_recipe "postgresql::server"
           end
+          package "php-postgresql" if a.include? "php"
           include_recipe "postgresql::config_initdb"
           include_recipe "postgresql::config_pgtune"          
           include_recipe "postgresql::ruby"
@@ -103,6 +109,7 @@ define :app, application: false, type: "apps" do
             include_recipe "mysql::client"
             include_recipe "mysql::server"
           end
+          package "php-mysql" if a.include? "php"
           include_recipe "mysql::ruby"
           mysql_database_user d["user"] do
             connection mysql_connection_info
@@ -129,6 +136,30 @@ define :app, application: false, type: "apps" do
     if a.include? "php"
       if !File.exist?("php")
         include_recipe "php"
+        include_recipe "composer"                        
+        package "php-gd"
+        package "php-pecl-memcached"
+        package "php-pecl-apcu"
+        package "php-mbstring" do
+          action :install
+          notifies :reload, 'service[php-fpm]', :delayed
+        end
+      end      
+
+      directory "/var/lib/php/session/#{a["name"]}" do
+        owner a["user"]
+        group a["user"]
+        mode "0700"
+        action :create
+        recursive true
+      end
+      
+      template "/etc/php.d/php_fix.ini" do
+        owner "root"
+        group "root"
+        mode '755'
+        source 'php_fix.erb'
+        notifies :reload, 'service[php-fpm]', :delayed
       end
       node.default['php-fpm']['pools'].push(a["name"])
       node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-fpm-#{a["name"]}.sock"
@@ -142,6 +173,39 @@ define :app, application: false, type: "apps" do
       node.default['php-fpm']['pool'][a["name"]]['max_spare_servers'] = 35
       node.default['php-fpm']['pool'][a["name"]]['max_requests'] = 500
       node.default['php-fpm']['pool'][a["name"]]['catch_workers_output'] = "no"      
+      node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"
     end
+    
+    if type.include? "sites" and a.include? "nginx"
+      directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/docs" do
+        mode      '0755'
+        owner     a['user']
+        group     a['user']
+        action    :create
+        recursive true
+      end
+      directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log" do
+        mode      '0755'
+        owner     a['user']
+        group     a['user']
+        action    :create
+        recursive true
+      end
+      rails_nginx_vhost a["name"] do
+        access_log a["nginx"]["access_log"]
+        error_log a["nginx"]["error_log"]
+        default a["nginx"]["default"] unless node.role? "vagrant"
+        deferred a["nginx"]["deferred"] unless node.role? "vagrant"
+        hidden a["nginx"]["hidden"]
+        disable_www a["nginx"]["disable_www"]
+        php a.include? "php"
+        listen a["nginx"]["listen"]
+        server_name a["nginx"]["server_name"]
+        path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
+        rewrites a["nginx"]["rewrites"]
+        file_rewrites a["nginx"]["file_rewrites"]
+        action :create
+      end
+    end 
   end
 end

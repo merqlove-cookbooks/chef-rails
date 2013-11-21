@@ -18,7 +18,11 @@
 #
 
 if node['rails']['apps']
-  
+  #Fix nginx
+  file "#{node['nginx']['dir']}/conf.d/default.conf" do
+    action :delete
+  end  
+
   #PHP fpm fix
   node.default['php-fpm']['pools'] = []
 
@@ -39,5 +43,10 @@ if node['rails']['apps']
   #PHP pools
   if node.default['php-fpm']['pools'].count > 0
     include_recipe "php-fpm"
+    directory "/var/lib/php/session" do
+      owner "root"
+      group "root"
+      mode "0777"      
+    end
   end
 end
