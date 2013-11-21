@@ -50,3 +50,5 @@ directory node['rails']['sites_base_path'] do
 end
 
 include_recipe "rails::apps"
+include_recipe "rails::database_admin"
+

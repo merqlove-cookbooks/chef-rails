@@ -70,7 +70,7 @@ define :app, application: false, type: "apps" do
       a["db"].each do |d|
         case d["type"]
         when "mongodb"
-          if !File.exist?("mongo")
+          if !File.exist?("/usr/bin/mongo")
             include_recipe "mongodb::default"          
           end
           package "php-pecl-mongo" if a.include? "php"
@@ -79,7 +79,7 @@ define :app, application: false, type: "apps" do
             action :run
           end        
         when "postgresql"
-          if !File.exist?("psql")
+          if !File.exist?("/usr/bin/psql")
             include_recipe "postgresql::server"
           end
           package "php-postgresql" if a.include? "php"
@@ -105,7 +105,7 @@ define :app, application: false, type: "apps" do
           #   action     :grant
           # end
         when "mysql"
-          if !File.exist?("mysqladmin")
+          if !File.exist?("/usr/bin/mysqladmin")
             include_recipe "mysql::client"
             include_recipe "mysql::server"
           end
@@ -134,9 +134,8 @@ define :app, application: false, type: "apps" do
     end
 
     if a.include? "php"
-      if !File.exist?("php")
-        include_recipe "php"
-        include_recipe "composer"                        
+      if !File.exist?("/usr/bin/php")
+        include_recipe "php"          
         package "php-gd"
         package "php-pecl-memcached"
         package "php-pecl-apcu"
@@ -144,7 +143,9 @@ define :app, application: false, type: "apps" do
           action :install
           notifies :reload, 'service[php-fpm]', :delayed
         end
-      end      
+      end
+
+      include_recipe "composer"
 
       directory "/var/lib/php/session/#{a["name"]}" do
         owner a["user"]
@@ -167,13 +168,18 @@ define :app, application: false, type: "apps" do
       node.default['php-fpm']['pool'][a["name"]]['user'] = a["user"]
       node.default['php-fpm']['pool'][a["name"]]['group'] = a["user"]
       node.default['php-fpm']['pool'][a["name"]]['process_manager'] = "dynamic"
-      node.default['php-fpm']['pool'][a["name"]]['max_children'] = 50
-      node.default['php-fpm']['pool'][a["name"]]['start_servers'] = 5
-      node.default['php-fpm']['pool'][a["name"]]['min_spare_servers'] = 5
-      node.default['php-fpm']['pool'][a["name"]]['max_spare_servers'] = 35
-      node.default['php-fpm']['pool'][a["name"]]['max_requests'] = 500
+      node.default['php-fpm']['pool'][a["name"]]['max_children'] = 4
+      node.default['php-fpm']['pool'][a["name"]]['start_servers'] = 2
+      node.default['php-fpm']['pool'][a["name"]]['min_spare_servers'] = 1
+      node.default['php-fpm']['pool'][a["name"]]['max_spare_servers'] = 3
+      node.default['php-fpm']['pool'][a["name"]]['max_requests'] = 200
       node.default['php-fpm']['pool'][a["name"]]['catch_workers_output'] = "no"      
       node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"
+      node.default['php-fpm']['pool'][a["name"]]['request_slowlog_timeout'] = "5s"
+      node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-slowlog.log"
+      node.default['php-fpm']['pool'][a["name"]]['backlog'] = "-1"
+      node.default['php-fpm']['pool'][a["name"]]['rlimit_files'] = "131072"
+      node.default['php-fpm']['pool'][a["name"]]['rlimit_core'] = "unlimited"
     end
     
     if type.include? "sites" and a.include? "nginx"

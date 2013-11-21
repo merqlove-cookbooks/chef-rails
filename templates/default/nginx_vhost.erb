@@ -47,6 +47,8 @@
     <% end %>
 
     location ~ (/(include/|cache/|modules/|uploads/|ini.php)|/\.svn/|/\.git/|/.hta.+<%=hidden_paths%>){
+      access_log off;
+      log_not_found off;
       deny all; # закрываем от посторонних
     }
 
@@ -107,6 +109,9 @@
       <% end %>
       }
       <% end %>
+      access_log        off;
+      log_not_found     off;
+      expires           360d;
     }
     
     error_page  500 502 503 504  /50x.html;
