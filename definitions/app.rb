@@ -49,36 +49,51 @@ define :app, application: false, type: "apps" do
       end
     end
 
-    if node['mysql']['server_root_password']
-      mysql_connection_info = {
-        :host     => 'localhost',
-        :username => 'root',
-        :password => node['mysql']['server_root_password']
-      }
-    end
-
-    if node['postgresql']['password']['postgres']
-      postgresql_connection_info = {
-        :host     => '127.0.0.1',
-        :port     => node['postgresql']['config']['port'],
-        :username => 'postgres',
-        :password => node['postgresql']['password']['postgres']
-      }
-    end
-
     if a.include? "db"
+      default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
       a["db"].each do |d|
         case d["type"]
-        when "mongodb"
+        when "mongodb"        
+          admin = Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
           if !File.exist?("/usr/bin/mongo")
-            include_recipe "mongodb::default"          
-          end
+            include_recipe "mongodb::default"  
+            auth = template node['mongodb']['dbconfig_file'] do
+              cookbook node['mongodb']['template_cookbook']
+              source node['mongodb']['dbconfig_file_template']
+              group node['mongodb']['root_group']
+              owner "root"
+              mode "0644"
+              variables({
+                "auth" => true
+              })
+              action :nothing
+              notifies :restart, "service[mongod]"
+            end           
+            execute "create-mongodb-root-user" do              
+              command "mongo admin --eval 'db.addUser(\"#{admin["id"]}\",\"#{admin["password"]}\")'"
+              action :run
+              not_if "mongo admin --eval 'db.auth(\"#{admin["id"]}\",\"#{admin["password"]}\")' | grep -q ^1$"
+              notifies :create, auth, :immediately
+            end                   
+          end          
           package "php-pecl-mongo" if a.include? "php"
           execute d["name"] do
-            command "mongo #{d["name"]} --eval 'db.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"
+            command "mongo admin -u #{admin["id"]} -p #{admin["password"]} --eval '#{d["name"]}=db.getSiblingDB(\"#{d["name"]}\"); #{d["name"]}.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"
             action :run
-          end        
-        when "postgresql"
+          end     
+        when "postgresql"          
+          postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
+          if postgres
+            node.default['postgresql']['password']['postgres'] = postgres["password"]            
+          end
+
+          postgresql_connection_info = {
+            :host     => '127.0.0.1',
+            :port     => node['postgresql']['config']['port'],
+            :username => 'postgres',
+            :password => postgres["password"]
+          }
+
           if !File.exist?("/usr/bin/psql")
             include_recipe "postgresql::server"
           end
@@ -98,13 +113,20 @@ define :app, application: false, type: "apps" do
             connection_limit '-1'
             action     :create       
           end
-          # postgresql_database_user d["user"] do
-          #   connection postgresql_connection_info
-          #   database_name d["name"]
-          #   privileges [:all]#:create,:delete,:execute,:truncate,:references,:trigger,:usage,:temp,:temporary]
-          #   action     :grant
-          # end
         when "mysql"
+          root = Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
+          if root
+            node.normal['mysql']['server_debian_password'] = root["debian_password"]
+            node.normal['mysql']['server_root_password']   = root["password"]
+            node.normal['mysql']['server_repl_password']   = root["replication_password"]
+          end
+
+          mysql_connection_info = {
+            :host     => 'localhost',
+            :username => 'root',
+            :password => root["password"]
+          }
+
           if !File.exist?("/usr/bin/mysqladmin")
             include_recipe "mysql::client"
             include_recipe "mysql::server"

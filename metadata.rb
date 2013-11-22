@@ -4,7 +4,7 @@ maintainer_email 'sasha@merqlove.ru'
 license          'Apache 2.0'
 description      'Installs/Configures rails'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           '0.1.8'
+version           '0.2.1'
 
 supports "centos"
 supports "ubuntu"
@@ -20,7 +20,6 @@ depends "database"
 depends "php"
 depends "php-fpm"
 depends "composer"
-#depends "deploy_key"
 
 # attribute "hub/install_path",
 #   display_name: "Install path",

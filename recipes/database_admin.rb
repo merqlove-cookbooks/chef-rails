@@ -17,54 +17,76 @@
 # limitations under the License.
 #
 
-# if File.exist? "mysqladmin"
-#   include_recipe "mysql::ruby"
-#   mysql_connection_info = {
-#     :host     => 'localhost',
-#     :username => 'root',
-#     :password => node['mysql']['server_root_password']
-#   }
-#   mysql_database_user 'admin' do
-#     connection mysql_connection_info
-#     password   node['mysql']['server_root_password']
-#     action     [:create, :grant]
-#   end
-# end
+default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
+
+if File.exist? "/usr/bin/mysqladmin"
+  mysql = data_bag("mysql")
+  if mysql
+    root = Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
+    mysql_connection_info = {
+      :host     => 'localhost',
+      :username => root['id'],
+      :password => root["password"]
+    }
+    include_recipe "mysql::ruby"
+    (mysql-["root"]).each do |m|
+      u = Chef::EncryptedDataBagItem.load("mysql", m, default_secret)
+      mysql_database_user u["id"] do
+        connection mysql_connection_info
+        password   u["password"]
+        action     [:create, :grant]
+      end
+    end
+  end
+end
 
 if File.exist? "/usr/bin/psql"
-
-  postgresql_connection_info = {
-    :host     => '127.0.0.1',
-    :port     => node['postgresql']['config']['port'],
-    :username => 'postgres',
-    :password => node['postgresql']['password']['postgres']
-  }
-
-  postgresql_database "template1" do
-    connection postgresql_connection_info
-    sql <<-EOH
-    DO
-    $body$
-    BEGIN
-       IF NOT EXISTS (
-          SELECT *
-          FROM   pg_catalog.pg_user
-          WHERE  usename = 'admin') THEN
-
-          CREATE ROLE admin WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{node['postgresql']['password']['admin']}';
-       END IF;
-    END
-    $body$
-    EOH
-    action     :query
+  psql = data_bag("postgresql")
+  if psql
+    postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
+    postgresql_connection_info = {
+      :host     => '127.0.0.1',
+      :port     => node['postgresql']['config']['port'],
+      :username => postgres["id"],
+      :password => postgres["password"]
+    }
+    (psql-["postgres"]).each do |p|
+      u = Chef::EncryptedDataBagItem.load("postgresql", p, default_secret)
+      postgresql_database "template1" do
+        connection postgresql_connection_info
+        sql <<-EOH
+        DO
+        $body$
+        BEGIN
+           IF NOT EXISTS (
+              SELECT *
+              FROM   pg_catalog.pg_user
+              WHERE  usename = '#{u["id"]}') 
+           THEN
+              CREATE ROLE #{u["id"]} WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{u["password"]}';
+           ELSE
+              ALTER ROLE #{u["id"]} WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{u["password"]}';   
+           END IF;
+        END
+        $body$
+        EOH
+        action :query
+      end
+    end
   end
 end
 
 if File.exist? "/usr/bin/mongo"
-
-  execute "create-mongodb-root-user" do
-    command "mongo admin --eval 'db.addUser(\"admin\",\"#{node['postgresql']['password']['postgres']}\")'"
-    action :run
-    not_if "mongo admin --eval 'db.auth(\"admin\",\"#{node['postgresql']['password']['postgres']}\")' | grep -q ^1$"
+  mongo = data_bag("mongodb")
+  if mongo
+    admin = Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
+    (mongo-["admin"]).each do |m|
+      u = Chef::EncryptedDataBagItem.load("mongodb", m, default_secret)
+      execute "create-mongodb-admin-user" do
+        command "mongo admin -u #{admin["id"]} -p #{admin["password"]} --eval 'db.addUser(\"#{u["id"]}\",\"#{u["password"]}\")'"
+        action :run
+        not_if "mongo admin --eval 'db.auth(\"#{u["id"]}\",\"#{u["password"]}\")' | grep -q ^1$"
+      end
+    end
   end
 end
