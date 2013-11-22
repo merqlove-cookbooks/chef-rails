@@ -195,7 +195,7 @@ define :app, application: false, type: "apps" do
       node.default['php-fpm']['pool'][a["name"]]['min_spare_servers'] = 1
       node.default['php-fpm']['pool'][a["name"]]['max_spare_servers'] = 3
       node.default['php-fpm']['pool'][a["name"]]['max_requests'] = 200
-      node.default['php-fpm']['pool'][a["name"]]['catch_workers_output'] = "no"      
+      node.default['php-fpm']['pool'][a["name"]]['catch_workers_output'] = "yes"      
       node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"
       node.default['php-fpm']['pool'][a["name"]]['request_slowlog_timeout'] = "5s"
       node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-slowlog.log"
