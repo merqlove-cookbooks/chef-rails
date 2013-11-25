@@ -31,7 +31,12 @@ define :app, application: false, type: "apps" do
     group a["user"] do
       append true
       members [node['nginx']['user']]
-    end  
+    end 
+
+    if a.include? "smtp"      
+      node.default['msmtp']['accounts'][a['user']][a["name"]]= a[:smtp]
+      node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
+    end 
 
     if a.include? "rbenv"
       #set ruby
@@ -202,6 +207,7 @@ define :app, application: false, type: "apps" do
       node.default['php-fpm']['pool'][a["name"]]['backlog'] = "-1"
       node.default['php-fpm']['pool'][a["name"]]['rlimit_files'] = "131072"
       node.default['php-fpm']['pool'][a["name"]]['rlimit_core'] = "unlimited"
+      node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "unlimited"
     end
     
     if type.include? "sites" and a.include? "nginx"
@@ -218,6 +224,13 @@ define :app, application: false, type: "apps" do
         group     a['user']
         action    :create
         recursive true
+      end
+      if a.include? "smtp"
+        node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "off"
+        node.default['msmtp']['accounts'][a['user']][a["name"]][:log] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/msmtp.log"        
+        if a.include? "php"
+          node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "/usr/bin/msmtp -a #{a['name']} -t"
+        end
       end
       rails_nginx_vhost a["name"] do
         access_log a["nginx"]["access_log"]

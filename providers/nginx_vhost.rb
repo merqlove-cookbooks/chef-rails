@@ -87,7 +87,7 @@ action :create do
   template "#{node[:nginx][:dir]}/sites-available/#{name}" do
     owner "root" 
     group "root"
-    mode '755'
+    mode 00644
     source(new_resource.template || 'nginx_vhost.erb')
     cookbook new_resource.template ? new_resource.cookbook_name.to_s : 'rails'
     variables(
@@ -111,7 +111,6 @@ action :create do
       :hidden => new_resource.hidden,
       :ssl => ssl
     )
-
     notifies :run, test_nginx, new_resource.reload
   end
 

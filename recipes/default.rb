@@ -51,4 +51,5 @@ end
 
 include_recipe "rails::apps"
 include_recipe "rails::database_admin"
+include_recipe "msmtp"
 
