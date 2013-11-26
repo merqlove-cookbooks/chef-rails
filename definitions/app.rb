@@ -72,19 +72,24 @@ define :app, application: false, type: "apps" do
                 "auth" => true
               })
               action :nothing
-              notifies :restart, "service[mongod]"
+              notifies :restart, "service[#{node[:mongodb][:instance_name]}]"
             end           
             execute "create-mongodb-root-user" do              
               command "mongo admin --eval 'db.addUser(\"#{admin["id"]}\",\"#{admin["password"]}\")'"
               action :run
               not_if "mongo admin --eval 'db.auth(\"#{admin["id"]}\",\"#{admin["password"]}\")' | grep -q ^1$"
               notifies :create, auth, :immediately
+            end
+          else
+            service node[:mongodb][:instance_name] do
+              action :start
             end                   
           end          
           package "php-pecl-mongo" if a.include? "php"
           execute d["name"] do
-            command "mongo admin -u #{admin["id"]} -p #{admin["password"]} --eval '#{d["name"]}=db.getSiblingDB(\"#{d["name"]}\"); #{d["name"]}.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"
+            command "mongo admin -u #{admin["id"]} -p #{admin["password"]} --eval '#{d["name"]}=db.getSiblingDB(\"#{d["name"]}\"); #{d["name"]}.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"            
             action :run
+            not_if "mongo #{d["name"]} --eval 'db.auth(\"#{d["user"]}\",\"#{d["password"]}\")' | grep -q ^1$"
           end     
         when "postgresql"          
           postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
@@ -101,6 +106,10 @@ define :app, application: false, type: "apps" do
 
           if !File.exist?("/usr/bin/psql")
             include_recipe "postgresql::server"
+          else
+            service node['postgresql']['server']['service_name'] do
+              action :start
+            end            
           end
           package "php-postgresql" if a.include? "php"
           include_recipe "postgresql::config_initdb"
@@ -148,13 +157,13 @@ define :app, application: false, type: "apps" do
             owner d["user"]
             action :create
           end
-          mysql_database_user d["user"] do
-            connection    mysql_connection_info
-            password      d["password"]
-            database_name d["name"]
-            privileges    [:all]
-            action        :grant
-          end
+          # mysql_database_user d["user"] do
+          #   connection    mysql_connection_info
+          #   password      d["password"]
+          #   database_name d["name"]
+          #   privileges    [:all]
+          #   action        :grant
+          # end
 
         end        
       end
@@ -190,24 +199,20 @@ define :app, application: false, type: "apps" do
         notifies :reload, 'service[php-fpm]', :delayed
       end
       node.default['php-fpm']['pools'].push(a["name"])
+      node.default['php-fpm']['pool'][a["name"]] = node['php-fpm']['default']['pool']
+
       node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-fpm-#{a["name"]}.sock"
-      node.default['php-fpm']['pool'][a["name"]]['allowed_clients'] = ["127.0.0.1"]
       node.default['php-fpm']['pool'][a["name"]]['user'] = a["user"]
       node.default['php-fpm']['pool'][a["name"]]['group'] = a["user"]
-      node.default['php-fpm']['pool'][a["name"]]['process_manager'] = "dynamic"
-      node.default['php-fpm']['pool'][a["name"]]['max_children'] = 4
-      node.default['php-fpm']['pool'][a["name"]]['start_servers'] = 2
-      node.default['php-fpm']['pool'][a["name"]]['min_spare_servers'] = 1
-      node.default['php-fpm']['pool'][a["name"]]['max_spare_servers'] = 3
-      node.default['php-fpm']['pool'][a["name"]]['max_requests'] = 200
-      node.default['php-fpm']['pool'][a["name"]]['catch_workers_output'] = "yes"      
-      node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"
-      node.default['php-fpm']['pool'][a["name"]]['request_slowlog_timeout'] = "5s"
+      node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"      
       node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-slowlog.log"
-      node.default['php-fpm']['pool'][a["name"]]['backlog'] = "-1"
-      node.default['php-fpm']['pool'][a["name"]]['rlimit_files'] = "131072"
-      node.default['php-fpm']['pool'][a["name"]]['rlimit_core'] = "unlimited"
-      node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "unlimited"
+      
+      if a[:php][:pool]
+        a[:php][:pool].each do |key, value|
+          node.default['php-fpm']['pool'][a["name"]][:"#{key}"] = value
+        end
+      end
+    
     end
     
     if type.include? "sites" and a.include? "nginx"
