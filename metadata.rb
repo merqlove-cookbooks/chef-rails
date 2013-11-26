@@ -2,9 +2,9 @@ name             'rails'
 maintainer       'Alexander Merkulov'
 maintainer_email 'sasha@merqlove.ru'
 license          'Apache 2.0'
-description      'Installs/Configures rails'
+description      'Installs/Configures ruby/rails, php, databases and so on'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           '0.2.1'
+version           '0.2.2'
 
 supports "centos"
 supports "ubuntu"

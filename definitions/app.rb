@@ -37,19 +37,21 @@ define :app, application: false, type: "apps" do
       node.default['msmtp']['accounts'][a['user']][a["name"]]= a[:smtp]
       node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
     end 
+    
+    if node.role? "base_ruby"
+      if a.include? "rbenv"
+        #set ruby
+        unless a["rbenv"]["version"].include? node['rails']['rbenv']['version']
+          rbenv_ruby "#{a["rbenv"]["version"]}" do
+            ruby_version "#{a["rbenv"]["version"]}"
+          end      
+        end
 
-    if a.include? "rbenv"
-      #set ruby
-      unless a["rbenv"]["version"].include? node['rails']['rbenv']['version']
-        rbenv_ruby "#{a["rbenv"]["version"]}" do
-          ruby_version "#{a["rbenv"]["version"]}"
-        end      
-      end
-
-      #add gems
-      a["rbenv"]["gems"].each do |g|
-        rbenv_gem "#{g}" do
-          ruby_version "#{a["rbenv"]["version"]}"
+        #add gems
+        a["rbenv"]["gems"].each do |g|
+          rbenv_gem "#{g}" do
+            ruby_version "#{a["rbenv"]["version"]}"
+          end
         end
       end
     end

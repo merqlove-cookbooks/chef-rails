@@ -31,7 +31,9 @@ when 'rhel', 'fedora', 'suse'
   node.default['postgresql']['contrib']['packages'] = ["postgresql#{version_merge}-contrib"]
 end
 
-include_recipe "rails::rbenv"
+if node.role? "base_ruby"
+  include_recipe "rails::rbenv"
+end
 
 directory node['rails']['apps_base_path'] do
   mode      '0755'
@@ -52,4 +54,3 @@ end
 include_recipe "rails::apps"
 include_recipe "rails::database_admin"
 include_recipe "msmtp"
-
