@@ -16,12 +16,8 @@
   <% end %>
 
   server {
-    listen <%= @listen %> <%= "default" if @default %> <%= "deferred" if @deferred %>;
-    <% if node.role? "vagrant" %>
-      server_name <%= @name %>.<%= node["vagrant"]["fqdn"] %>, <%= Array(@server_name).join(', ') %>;
-    <% else %>
-      server_name <%= Array(@server_name).join(', ') %>;
-    <% end %>
+    listen <%= @listen %> <%= "default" if @default %> <%= "deferred" if @deferred %>;    
+    server_name <%= Array(@server_name).join(', ') %>;    
     
     root   <%= @path %>/docs;
     autoindex off;

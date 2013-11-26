@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: apps
+# Recipe:: vagrant
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
@@ -17,37 +17,16 @@
 # limitations under the License.
 #
 
-#Fix nginx
-file "#{node['nginx']['dir']}/conf.d/default.conf" do
-  action :delete
-end  
-
-#PHP fpm fix
-node.default['php-fpm']['pools'] = []
-
-#Useful databases
-node.default["rails"]["databases"] = []
-
-node['rails']['sites'].each do |k, a|
-  app k do
-    application a
-    type "sites"
+if node.role? "vagrant"
+  if node.role? "base_ruby"
+    group node[:rbenv][:group] do
+      append true
+      members ["vagrant"]
+    end
   end
-end
 
-node['rails']['apps'].each do |k, a|
-  app k do
-    application a
-    type "apps"
-  end
-end
-
-#PHP pools
-if node.default['php-fpm']['pools'].count > 0
-  include_recipe "php-fpm"
-  directory "/var/lib/php/session" do
-    owner "root"
-    group "root"
-    mode "0777"      
+  group node[:msmtp][:group] do
+    append true
+    members ["vagrant"]        
   end
 end

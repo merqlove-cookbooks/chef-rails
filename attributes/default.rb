@@ -33,3 +33,4 @@ default['rails']['apps']      = {
 default['rails']['sites'] = {}
 default['rails']['user']['deploy']      = 'deploy'
 default['vagrant']['fqdn'] = "merq.dev"
+default["rails"]["databases"] = []

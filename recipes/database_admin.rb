@@ -19,7 +19,7 @@
 
 default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
 
-if File.exist? "/usr/bin/mysqladmin"
+if File.exist? "/usr/bin/mysqladmin" and node.default["rails"]["databases"].include? "mysql"
   mysql = data_bag("mysql")
   if mysql
     root = Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
@@ -40,7 +40,7 @@ if File.exist? "/usr/bin/mysqladmin"
   end
 end
 
-if File.exist? "/usr/bin/psql"
+if File.exist? "/usr/bin/psql" and node.default["rails"]["databases"].include? "postgresql"
   psql = data_bag("postgresql")
   if psql
     postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
@@ -76,7 +76,7 @@ if File.exist? "/usr/bin/psql"
   end
 end
 
-if File.exist? "/usr/bin/mongo"
+if File.exist? "/usr/bin/mongo" and node.default["rails"]["databases"].include? "mongodb"
   mongo = data_bag("mongodb")
   if mongo
     admin = Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)

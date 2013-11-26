@@ -17,9 +17,12 @@
 # limitations under the License.
 #
 
-if node['rails']['apps']
+if node['rails']['apps'] or node['rails']['sites']
   users = []
   node['rails']['apps'].each do |k, a|
+    users.push a["user"]
+  end
+  node['rails']['sites'].each do |k, a|
     users.push a["user"]
   end
   users = users.push(node['rails']['user']['deploy']).uniq.compact
@@ -47,7 +50,14 @@ if node['rails']['apps']
           end
         end
 
-        group node[:rbenv][:group] do
+        if node.role? "base_ruby"
+          group node[:rbenv][:group] do
+            append true
+            members [u]        
+          end
+        end
+
+        group node[:msmtp][:group] do
           append true
           members [u]        
         end

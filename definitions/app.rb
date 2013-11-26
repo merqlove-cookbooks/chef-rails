@@ -37,7 +37,7 @@ define :app, application: false, type: "apps" do
       node.default['msmtp']['accounts'][a['user']][a["name"]]= a[:smtp]
       node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
     end 
-    
+
     if node.role? "base_ruby"
       if a.include? "rbenv"
         #set ruby
@@ -82,16 +82,33 @@ define :app, application: false, type: "apps" do
               not_if "mongo admin --eval 'db.auth(\"#{admin["id"]}\",\"#{admin["password"]}\")' | grep -q ^1$"
               notifies :create, auth, :immediately
             end
+            node.default["rails"]["databases"].push "mongodb"
+            node.default["rails"]["databases"] = node.default["rails"]["databases"].uniq
           else
             service node[:mongodb][:instance_name] do
-              action :start
+              [:enable, :start]
             end                   
           end          
+
+          rails_db_yml "#{d["name"]}_#{d["type"]}" do  
+            database_name d["name"]          
+            database_user d["user"]
+            database_password d["password"]
+            type d["type"]
+            port "#{node['mongodb']['config']['port']}"
+            host node['mongodb']['config']['bind_ip']
+            path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
+            owner a["user"]
+            group a["user"]
+            action :nothing
+          end
+
           package "php-pecl-mongo" if a.include? "php"
           execute d["name"] do
             command "mongo admin -u #{admin["id"]} -p #{admin["password"]} --eval '#{d["name"]}=db.getSiblingDB(\"#{d["name"]}\"); #{d["name"]}.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"            
             action :run
             not_if "mongo #{d["name"]} --eval 'db.auth(\"#{d["user"]}\",\"#{d["password"]}\")' | grep -q ^1$"
+            notifies :create, "rails_db_yml[#{d["name"]}_#{d["type"]}]", :immediately
           end     
         when "postgresql"          
           postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
@@ -108,11 +125,27 @@ define :app, application: false, type: "apps" do
 
           if !File.exist?("/usr/bin/psql")
             include_recipe "postgresql::server"
+            node.default["rails"]["databases"].push "mysql"
+            node.default["rails"]["databases"] = node.default["rails"]["databases"].uniq
           else
             service node['postgresql']['server']['service_name'] do
-              action :start
+              action [:enable, :start]
             end            
           end
+
+          rails_db_yml "#{d["name"]}_#{d["type"]}" do  
+            database_name d["name"]          
+            database_user d["user"]
+            database_password d["password"]
+            type d["type"]
+            port "#{node['postgresql']['config']['port']}"
+            host node['postgresql']['config']['listen_addresses']
+            path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
+            owner a["user"]
+            group a["user"]
+            action :nothing
+          end
+
           package "php-postgresql" if a.include? "php"
           include_recipe "postgresql::config_initdb"
           include_recipe "postgresql::config_pgtune"          
@@ -123,11 +156,13 @@ define :app, application: false, type: "apps" do
             password   d["password"]
             action     :create
           end
+
           postgresql_database d["name"] do
             connection postgresql_connection_info
             owner d["user"]            
             connection_limit '-1'
             action     :create       
+            notifies :create, "rails_db_yml[#{d["name"]}_#{d["type"]}]", :immediately
           end
         when "mysql"
           root = Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
@@ -146,26 +181,45 @@ define :app, application: false, type: "apps" do
           if !File.exist?("/usr/bin/mysqladmin")
             include_recipe "mysql::client"
             include_recipe "mysql::server"
+            node.default["rails"]["databases"].push "mysql"
+            node.default["rails"]["databases"] = node.default["rails"]["databases"].uniq
           end
+          
+          rails_db_yml "#{d["name"]}_#{d["type"]}" do  
+            database_name d["name"]          
+            database_user d["user"]
+            database_password d["password"]
+            type d["type"]
+            port "#{node['mysql']['port']}"
+            host node['mysql']['bind_address']
+            path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
+            owner a["user"]
+            group a["user"]
+            action :nothing
+          end
+
           package "php-mysql" if a.include? "php"
           include_recipe "mysql::ruby"
+
           mysql_database_user d["user"] do
             connection mysql_connection_info
             password   d["password"]
             action     :create
-          end
+          end          
+
           mysql_database d["name"] do
             connection mysql_connection_info
             owner d["user"]
             action :create
+            notifies :create, "rails_db_yml[#{d["name"]}_#{d["type"]}]", :immediately
           end
-          # mysql_database_user d["user"] do
-          #   connection    mysql_connection_info
-          #   password      d["password"]
-          #   database_name d["name"]
-          #   privileges    [:all]
-          #   action        :grant
-          # end
+          mysql_database_user d["user"] do
+            connection    mysql_connection_info
+            password      d["password"]
+            database_name d["name"]
+            privileges    [:all]
+            action        :grant
+          end
 
         end        
       end
@@ -239,6 +293,10 @@ define :app, application: false, type: "apps" do
           node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "/usr/bin/msmtp -a #{a['name']} -t"
         end
       end
+      server_name = a["nginx"]["server_name"].dup
+      if node.role? "vagrant"
+        server_name.push "#{a["nginx"]["vagrant_server_name"]}.#{node["vagrant"]["fqdn"]}" if a["nginx"]["vagrant_server_name"]
+      end
       rails_nginx_vhost a["name"] do
         access_log a["nginx"]["access_log"]
         error_log a["nginx"]["error_log"]
@@ -248,7 +306,7 @@ define :app, application: false, type: "apps" do
         disable_www a["nginx"]["disable_www"]
         php a.include? "php"
         listen a["nginx"]["listen"]
-        server_name a["nginx"]["server_name"]
+        server_name server_name
         path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
         rewrites a["nginx"]["rewrites"]
         file_rewrites a["nginx"]["file_rewrites"]
