@@ -41,13 +41,44 @@ node['rails']['apps'].each do |k, a|
     type "apps"
   end
 end
-
+  
 #PHP pools
 if node.default['php-fpm']['pools'].count > 0
   include_recipe "php-fpm"
+  
+  if Dir.exist? "#{node['php-fpm']['conf_dir']}/pools"
+    deleted = false
+    Dir.foreach("#{node['php-fpm']['conf_dir']}/pools") do |pool|
+      next if pool == '.' or pool == '..'
+      if pool.include? ".conf"
+        unless node['php-fpm']['pools'].include? pool.gsub(/\.conf/, '')
+          File.delete("#{node['php-fpm']['conf_dir']}/pools/#{pool}") 
+          deleted = true
+        end
+      end
+    end
+
+    service node['php-fpm']['service'] do
+      action :restart
+      only_if { deleted }
+    end      
+  end
+
   directory "/var/lib/php/session" do
     owner "root"
     group "root"
     mode "0777"      
+  end
+else
+  if Dir.exist? "#{node['php-fpm']['conf_dir']}/pools"  
+    Dir.foreach("#{node['php-fpm']['conf_dir']}/pools") do |pool|
+      next if pool == '.' or pool == '..'
+      if pool.include? ".conf"
+        File.delete("#{node['php-fpm']['conf_dir']}/pools/#{pool}")
+      end
+    end
+    service node['php-fpm']['service'] do
+      action [:disable, :stop]
+    end
   end
 end

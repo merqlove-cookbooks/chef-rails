@@ -172,7 +172,7 @@ action :enable do
 end
 
 action :disable do
-  conf_name = new_resource.name
+  name = new_resource.name
 
   nginx_site name do
     enable false  

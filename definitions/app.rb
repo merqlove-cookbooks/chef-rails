@@ -21,6 +21,29 @@ define :app, application: false, type: "apps" do
     a = params[:application]
     type = params[:type]
 
+    if a[:delete]
+      if type.include? "sites" and a.include? "nginx"
+        rails_nginx_vhost a["name"] do
+          action :delete
+        end
+      end
+
+      directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}" do
+        action :delete
+      end
+
+      next
+    end
+
+    if type.include? "sites" and a.include? "nginx"
+      unless a[:enable]      
+        rails_nginx_vhost a["name"] do
+          action :disable
+        end        
+        next
+      end      
+    end 
+
     directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}" do
       owner a["user"]
       group a["user"]
@@ -312,6 +335,6 @@ define :app, application: false, type: "apps" do
         file_rewrites a["nginx"]["file_rewrites"]
         action :create
       end
-    end 
+    end
   end
 end
