@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Attributes:: vcs
+# Attributes:: secrets
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 

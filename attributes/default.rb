@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Attributes:: rbenv
+# Attributes:: default
 #
 # Copyright (C) 2013 Alexander Merkulov
 # 
