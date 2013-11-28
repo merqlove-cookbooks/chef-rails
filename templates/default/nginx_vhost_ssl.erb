@@ -98,3 +98,71 @@
       root   /var/www/html;
     }
   }
+
+
+
+  #SSL
+  
+  server {
+    listen  443; # SSL port
+    server_name  midictrl.com;
+    root   /web/mrcr/data/www/midictrl.com;
+    autoindex off;
+    charset utf-8;
+ 
+    ssl on; 
+    ssl_protocols SSLv3 TLSv1;
+    ssl_ciphers HIGH:!ADH:!MD5;
+    ssl_prefer_server_ciphers on;
+     
+    ssl_certificate server.crt;
+    ssl_certificate_key server.key;
+     
+    ssl_session_cache    shared:SSL:10m;
+    ssl_session_timeout  10m;
+     
+    keepalive_timeout 65;
+    
+    location / { 
+       root   /var/www/html;
+           index   index.html;
+       #limit_req zone=antiddos burst=10;
+        }
+
+  location /admin {                
+           index   index.php index.html;
+       if (!-e $request_filename) {     
+            rewrite ^(/[a-zA-Z0-9_-]*\.html.*)$ /index.php last;
+       }
+       #limit_req zone=antiddos burst=10;
+        }
+    location ~ \.php$ {       
+      fastcgi_pass  php_cluster; 
+      fastcgi_index index.php;      
+      fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+      fastcgi_param HTTPS on;
+      include fastcgi_params;
+      
+      #fastcgi_cache_key $request_uri|$cookie_phpsessid;
+      #fastcgi_cache fastcgi_cache;           
+      
+      #limit_req zone=antiddosphp burst=2;
+    }
+
+    location ~* ^/(components/|backup/|content/) { 
+           index   index.html;
+       #limit_req zone=antiddos burst=10;
+        }
+    
+    location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|txt)$ {
+      access_log /srv/log/midictrl.com.access.log ;
+      #access_log /web/nginx-logs/mrcr isp;
+      #limit_req zone=antiddos burst=10;
+    }
+    
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+      root   /var/www/html;
+      #limit_req zone=antiddos burst=10;
+    }
+  }

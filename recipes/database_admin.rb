@@ -37,7 +37,7 @@ if File.exist? "/usr/bin/mysqladmin" and node.default["rails"]["databases"].incl
         action     [:create, :grant]
       end
     end
-  end
+  end  
 end
 
 if File.exist? "/usr/bin/psql" and node.default["rails"]["databases"].include? "postgresql"

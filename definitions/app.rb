@@ -82,169 +82,14 @@ define :app, application: false, type: "apps" do
     if a.include? "db"
       default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
       a["db"].each do |d|
-        case d["type"]
-        when "mongodb"        
-          admin = Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
-          if !File.exist?("/usr/bin/mongo")
-            include_recipe "mongodb::default"  
-            auth = template node['mongodb']['dbconfig_file'] do
-              cookbook node['mongodb']['template_cookbook']
-              source node['mongodb']['dbconfig_file_template']
-              group node['mongodb']['root_group']
-              owner "root"
-              mode "0644"
-              variables({
-                "auth" => true
-              })
-              action :nothing
-              notifies :restart, "service[#{node[:mongodb][:instance_name]}]"
-            end           
-            execute "create-mongodb-root-user" do              
-              command "mongo admin --eval 'db.addUser(\"#{admin["id"]}\",\"#{admin["password"]}\")'"
-              action :run
-              not_if "mongo admin --eval 'db.auth(\"#{admin["id"]}\",\"#{admin["password"]}\")' | grep -q ^1$"
-              notifies :create, auth, :immediately
-            end
-            node.default["rails"]["databases"].push "mongodb"
-            node.default["rails"]["databases"] = node.default["rails"]["databases"].uniq
-          else
-            service node[:mongodb][:instance_name] do
-              [:enable, :start]
-            end                   
-          end          
-
-          rails_db_yml "#{d["name"]}_#{d["type"]}" do  
-            database_name d["name"]          
-            database_user d["user"]
-            database_password d["password"]
-            type d["type"]
-            port "#{node['mongodb']['config']['port']}"
-            host node['mongodb']['config']['bind_ip']
-            path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
-            owner a["user"]
-            group a["user"]
-            action :nothing
-          end
-
-          package "php-pecl-mongo" if a.include? "php"
-          execute d["name"] do
-            command "mongo admin -u #{admin["id"]} -p #{admin["password"]} --eval '#{d["name"]}=db.getSiblingDB(\"#{d["name"]}\"); #{d["name"]}.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"            
-            action :run
-            not_if "mongo #{d["name"]} --eval 'db.auth(\"#{d["user"]}\",\"#{d["password"]}\")' | grep -q ^1$"
-            notifies :create, "rails_db_yml[#{d["name"]}_#{d["type"]}]", :immediately
-          end     
-        when "postgresql"          
-          postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
-          if postgres
-            node.default['postgresql']['password']['postgres'] = postgres["password"]            
-          end
-
-          postgresql_connection_info = {
-            :host     => '127.0.0.1',
-            :port     => node['postgresql']['config']['port'],
-            :username => 'postgres',
-            :password => postgres["password"]
-          }
-
-          if !File.exist?("/usr/bin/psql")
-            include_recipe "postgresql::server"
-            node.default["rails"]["databases"].push "mysql"
-            node.default["rails"]["databases"] = node.default["rails"]["databases"].uniq
-          else
-            service node['postgresql']['server']['service_name'] do
-              action [:enable, :start]
-            end            
-          end
-
-          rails_db_yml "#{d["name"]}_#{d["type"]}" do  
-            database_name d["name"]          
-            database_user d["user"]
-            database_password d["password"]
-            type d["type"]
-            port "#{node['postgresql']['config']['port']}"
-            host node['postgresql']['config']['listen_addresses']
-            path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
-            owner a["user"]
-            group a["user"]
-            action :nothing
-          end
-
-          package "php-postgresql" if a.include? "php"
-          include_recipe "postgresql::config_initdb"
-          include_recipe "postgresql::config_pgtune"          
-          include_recipe "postgresql::ruby"
-
-          postgresql_database_user d["user"] do
-            connection postgresql_connection_info
-            password   d["password"]
-            action     :create
-          end
-
-          postgresql_database d["name"] do
-            connection postgresql_connection_info
-            owner d["user"]            
-            connection_limit '-1'
-            action     :create       
-            notifies :create, "rails_db_yml[#{d["name"]}_#{d["type"]}]", :immediately
-          end
-        when "mysql"
-          root = Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
-          if root
-            node.normal['mysql']['server_debian_password'] = root["debian_password"]
-            node.normal['mysql']['server_root_password']   = root["password"]
-            node.normal['mysql']['server_repl_password']   = root["replication_password"]
-          end
-
-          mysql_connection_info = {
-            :host     => 'localhost',
-            :username => 'root',
-            :password => root["password"]
-          }
-
-          if !File.exist?("/usr/bin/mysqladmin")
-            include_recipe "mysql::client"
-            include_recipe "mysql::server"
-            node.default["rails"]["databases"].push "mysql"
-            node.default["rails"]["databases"] = node.default["rails"]["databases"].uniq
-          end
-          
-          rails_db_yml "#{d["name"]}_#{d["type"]}" do  
-            database_name d["name"]          
-            database_user d["user"]
-            database_password d["password"]
-            type d["type"]
-            port "#{node['mysql']['port']}"
-            host node['mysql']['bind_address']
-            path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
-            owner a["user"]
-            group a["user"]
-            action :nothing
-          end
-
-          package "php-mysql" if a.include? "php"
-          include_recipe "mysql::ruby"
-
-          mysql_database_user d["user"] do
-            connection mysql_connection_info
-            password   d["password"]
-            action     :create
-          end          
-
-          mysql_database d["name"] do
-            connection mysql_connection_info
-            owner d["user"]
-            action :create
-            notifies :create, "rails_db_yml[#{d["name"]}_#{d["type"]}]", :immediately
-          end
-          mysql_database_user d["user"] do
-            connection    mysql_connection_info
-            password      d["password"]
-            database_name d["name"]
-            privileges    [:all]
-            action        :grant
-          end
-
-        end        
+        node.default["rails"]["databases"][d["type"]][d["name"]] = {
+          name: d["name"],
+          user: d["user"],
+          password: d["password"],
+          app_type: type,
+          app_name: a["name"],
+          app_user: a["user"]                      
+        }          
       end
     end
 
@@ -282,9 +127,10 @@ define :app, application: false, type: "apps" do
 
       node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-fpm-#{a["name"]}.sock"
       node.default['php-fpm']['pool'][a["name"]]['user'] = a["user"]
-      node.default['php-fpm']['pool'][a["name"]]['group'] = a["user"]
+      node.default['php-fpm']['pool'][a["name"]]['group'] = a["user"]     
       node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"      
       node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-slowlog.log"
+      node.default['php-fpm']['pool'][a["name"]]['error_log'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-error_log.log"
       
       if a[:php][:pool]
         a[:php][:pool].each do |key, value|
@@ -328,7 +174,9 @@ define :app, application: false, type: "apps" do
         hidden a["nginx"]["hidden"]
         disable_www a["nginx"]["disable_www"]
         php a.include? "php"
+        block a["nginx"]["block"]
         listen a["nginx"]["listen"]
+        admin a["nginx"]["admin"]
         server_name server_name
         path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
         rewrites a["nginx"]["rewrites"]

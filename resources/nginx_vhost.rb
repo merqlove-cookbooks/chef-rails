@@ -32,6 +32,7 @@ attribute :disable_www, :kind_of => [TrueClass, FalseClass], :default => true #R
 attribute :access_log, :kind_of => [TrueClass, FalseClass], :default => false  # Access log
 attribute :error_log, :kind_of => [TrueClass, FalseClass], :default => true  # Error log
 attribute :php, :kind_of => [TrueClass, FalseClass], :default => false #PHP code
+attribute :admin, :kind_of => [TrueClass, FalseClass], :default => false  # Access log
 attribute :min, :kind_of => [TrueClass, FalseClass], :default => false #PHP code
 attribute :locations, :kind_of => [Hash, NilClass], :default => {} # Locations to include.
 attribute :rewrites, :kind_of => [Array, NilClass], :default => [] # Server rewrites

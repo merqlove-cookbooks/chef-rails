@@ -24,7 +24,6 @@ action :create do
   # upstream = JSON.parse(node.send(new_resource.precedence)[:nginx_conf][:upstream].to_hash.merge(new_resource.upstream).to_json)
   server_name = new_resource.server_name || new_resource.name
   name = new_resource.name
-  ssl = false
 
   # if site_type == :dynamic
   #   locations.each do |name, location|
@@ -102,6 +101,7 @@ action :create do
       :access_log => new_resource.access_log,
       :error_log => new_resource.error_log,
       :name => name,
+      :admin => new_resource.admin,
       :path =>  new_resource.path,      
       :server_name => server_name,
       :php =>  new_resource.php,
@@ -109,7 +109,7 @@ action :create do
       :rewrites =>  new_resource.rewrites,
       :file_rewrites =>  new_resource.file_rewrites,
       :hidden => new_resource.hidden,
-      :ssl => ssl
+      :ssl => new_resource.ssl
     )
     notifies :run, test_nginx, new_resource.reload
   end

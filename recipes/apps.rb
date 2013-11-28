@@ -26,7 +26,7 @@ end
 node.default['php-fpm']['pools'] = []
 
 #Useful databases
-node.default["rails"]["databases"] = []
+node.default["rails"]["databases"] = {}
 
 node['rails']['sites'].each do |k, a|
   app k do
@@ -80,5 +80,28 @@ else
     service node['php-fpm']['service'] do
       action [:disable, :stop]
     end
+  end
+end
+
+#Sites cleanup
+if node['rails']['sites'].count > 0
+  execute "deny site groups from write" do
+    command "chmod -R g-w #{node['rails']['sites_base_path']}/*/docs"
+    action :run
+  end
+
+  execute "deny site others from read" do
+    command "chmod -R o-r #{node['rails']['sites_base_path']}/*/docs"
+    action :run
+  end
+
+  execute "deny site others from execute" do
+    command "chmod -R o-x #{node['rails']['sites_base_path']}/*/docs"
+    action :run
+  end
+
+  execute "deny site others from write" do
+    command "chmod -R o-w #{node['rails']['sites_base_path']}/*/docs"
+    action :run
   end
 end

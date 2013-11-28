@@ -19,9 +19,17 @@
     listen <%= @listen %> <%= "default" if @default %> <%= "deferred" if @deferred %>;    
     server_name <%= Array(@server_name).join(', ') %>;    
     
+    <% if @ssl %>ssl on;
+    ssl_certificate <%= @ssl[:certificate] %>;
+    ssl_certificate_key <%= @ssl[:certificate_key] %>;<% end %>
+
     root   <%= @path %>/docs;
     autoindex off;
     charset utf-8;
+
+    <% Array(@block).each do |b| %>
+    <%= b %>
+    <% end %>
 
     <% if @rewrites %> 
       <% @rewrites.each do |rewrite| %>
@@ -30,7 +38,9 @@
     <% end %>
 
     <% if @access_log %>
-    access_log <%= @path %>/log/access.log;# multi;
+    access_log <%= @path %>/log/access.log multi;
+    <% else %>
+    access_log off;
     <% end %>
 
     <% if @error_log %>
@@ -45,7 +55,7 @@
     location ~ (/(include/|cache/|modules/|uploads/|ini.php)|/\.svn/|/\.git/|/.hta.+<%=hidden_paths%>){
       access_log off;
       log_not_found off;
-      deny all; # закрываем от посторонних
+      deny all;
     }
 
     #location / {               
@@ -56,20 +66,22 @@
     #  #limit_req zone=antiddos burst=10;
     #}
 
-    location / {    
-      try_files $uri/index.html $uri @website;
+    location / {
+      try_files $uri/index.html $uri /index.php?$args;
     }
 
-    location /admin {    
-      try_files $uri/index.html $uri @website;
+    <% if @admin %>
+    location /admin/ {    
+      root   <%= @path %>/docs/admin;
+      try_files $uri $uri/ /admin/index.php?$args;
     }
+    <% end %>
 
     <% if @php %>
-    
       <% if @min %>
       location /min {
         fastcgi_pass  php_<%= @name %>; 
-        fastcgi_index index.php;        
+        #fastcgi_index index.php;        
         fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
         include fastcgi_params;
         
@@ -83,7 +95,7 @@
       location ~ \.php$ {       
         try_files $uri =404;    
         fastcgi_pass  php_<%= @name %>; 
-        #fastcgi_index index.php;      
+        fastcgi_index index.php;      
         fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;     
         include fastcgi_params;
       }    
@@ -94,7 +106,6 @@
         fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;     
         include fastcgi_params;
       }
-
     <% end %>
 
     location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|txt|syx)$ {
