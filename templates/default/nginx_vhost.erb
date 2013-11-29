@@ -5,14 +5,12 @@
       server unix:/var/run/php-fpm-<%= @name %>.sock;
     }
   <% end %>
-  <% unless node.role? "vagrant" %>
-  <% if @disable_www %>
+  <% unless node.role? "vagrant" and not @disable_www %>
   server {
     listen <%= @listen %>;    
     server_name www.<%= Array(@server_name)[0] %>;
     return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;    
   }
-  <% end %>
   <% end %>
 
   server {
@@ -80,10 +78,10 @@
     <% if @php %>
       <% if @min %>
       location /min {
-        fastcgi_pass  php_<%= @name %>; 
-        #fastcgi_index index.php;        
-        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
         include fastcgi_params;
+        fastcgi_pass  php_<%= @name %>; 
+        fastcgi_index index.php;        
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
         
         # Nginx caching.
         #fastcgi_cache fastcgi_cache;
@@ -93,32 +91,36 @@
       <% end %>
 
       location ~ \.php$ {       
-        try_files $uri =404;    
+        try_files $uri =404;
+        include fastcgi_params;    
         fastcgi_pass  php_<%= @name %>; 
         fastcgi_index index.php;      
-        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;     
-        include fastcgi_params;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;             
       }    
 
       location @website {
+        include fastcgi_params;
         fastcgi_pass  php_<%= @name %>; 
         fastcgi_index index.php;      
-        fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;     
-        include fastcgi_params;
+        fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;      
       }
     <% end %>
 
     location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|txt|syx)$ {
-      <% if @file_rewrites %>      
-      if (!-f $request_filename) {  
-      <% @file_rewrites.each do |rewrite| %>
-        rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
-      <% end %>
-      }
+      <% if @file_rewrites %>
+      try_files $uri @file_rewrite;
       <% end %>
       access_log        off;
       log_not_found     off;
       expires           360d;
+    }
+
+    location @file_rewrite {
+      <% if @file_rewrites %>
+      <% @file_rewrites.each do |rewrite| %>
+      rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+      <% end %>
+      <% end %>     
     }
     
     error_page  500 502 503 504  /50x.html;
