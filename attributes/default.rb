@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+default['rails']['swap']['size'] = "512" # MBs
+default['rails']['swap']['enable'] = false
 default['rails']['apps_base_path']      = '/srv/apps'
 default['rails']['sites_base_path']      = '/srv/sites'
 default['rails']['apps']      = {
@@ -76,7 +78,8 @@ default['rails']['sites'] = {
   #       "request_slowlog_timeout": "5s",
   #       "backlog": "-1",
   #       "rlimit_files": "131072",
-  #       "rlimit_core": "unlimited"
+  #       "rlimit_core": "unlimited",
+  #       "production": true
   #     }
   #   },
   #   "smtp": {
@@ -88,14 +91,42 @@ default['rails']['sites'] = {
   #     "password": "pass"
   #   },
   #   "nginx": {
+  #     "vagrant_server": "somedomain",
   #     "access_log": false,
   #     "error_log": true,
   #     "default": true,
   #     "deferred": true,
   #     "disable_www": true,
+  #     "admin": true,
   #     "server_name": [
   #       "mrcr.ru"
-  #     ]
+  #     ],
+  #     "min": false,  
+  #     "error_pages": [
+  #       {
+  #         "code": "404",
+  #         "location": "/404.html"
+  #       }
+  #     ],
+  #     "php_rewrites": [
+  #       {
+  #         "ext": "html"
+  #       }
+  #     ],
+  #     "rewrites": [
+  #       {
+  #         "query": "^(/update.*|/KnMp8rPwy9t33a2Fversion1104.*|/image.*)$",
+  #         "uri": "/index.php",
+  #         "options": "permanent"
+  #       },
+  #     ],
+  #     "file_rewrites": [
+  #       {
+  #         "query": "^(/update.*|/KnMp8rPwy9t33a2Fversion1104.*|/image.*)$",
+  #         "uri": "/index.php",
+  #         "options": "permanent"
+  #       },
+  #     ],
   #   },
   #   "db": [
   #     {

@@ -69,9 +69,16 @@ end
 
 if node.default["rails"]["databases"].include? "postgresql"          
   postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
-  if postgres
-    node.default['postgresql']['password']['postgres'] = postgres["password"]            
-  end
+  node.normal['postgresql']['password']['postgres'] = postgres["password"]
+
+  include_recipe "postgresql::server"            
+  
+  package "php-postgresql" if FileTest.exist?("/usr/bin/php")
+
+  include_recipe "postgresql::config_initdb"
+  include_recipe "postgresql::config_pgtune"
+
+  include_recipe "postgresql::ruby"
 
   postgresql_connection_info = {
     :host     => '127.0.0.1',
@@ -79,15 +86,7 @@ if node.default["rails"]["databases"].include? "postgresql"
     :username => 'postgres',
     :password => postgres["password"]
   }
-
-  include_recipe "postgresql::server"            
   
-  package "php-postgresql" if FileTest.exist?("/usr/bin/php")
-
-  include_recipe "postgresql::config_initdb"
-  include_recipe "postgresql::config_pgtune"          
-  include_recipe "postgresql::ruby"
-
   node.default["rails"]["databases"]["postgresql"].each do |k,d|
     rails_db_yml "#{d["name"]}_postgresql" do  
       database_name d["name"]          
@@ -113,7 +112,7 @@ if node.default["rails"]["databases"].include? "postgresql"
       owner d["user"]            
       connection_limit '-1'
       action     :create       
-      notifies :create, "rails_db_yml[#{d["name"]}_postgresql", :immediately
+      notifies :create, "rails_db_yml[#{d["name"]}_postgresql]", :immediately
     end
   end  
 end
@@ -126,17 +125,17 @@ if node.default["rails"]["databases"].include? "mysql"
     node.normal['mysql']['server_repl_password']   = root["replication_password"]
   end
 
-  mysql_connection_info = {
-    :host     => 'localhost',
-    :username => 'root',
-    :password => root["password"]
-  }
-
   include_recipe "mysql::client"
   include_recipe "mysql::server"            
   
   package "php-mysql" if FileTest.exist?("/usr/bin/php")
   include_recipe "mysql::ruby"  
+
+  mysql_connection_info = {
+    :host     => 'localhost',
+    :username => 'root',
+    :password => root["password"]
+  }
 
   node.default["rails"]["databases"]["mysql"].each do |k,d|
     rails_db_yml "#{d["name"]}_mysql" do  

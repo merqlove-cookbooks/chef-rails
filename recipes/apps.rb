@@ -105,3 +105,8 @@ if node['rails']['sites'].count > 0
     action :run
   end
 end
+
+include_recipe "rails::databases"
+include_recipe "rails::database_admin"
+include_recipe "msmtp"
+include_recipe "rails::cleanup"

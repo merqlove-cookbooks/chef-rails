@@ -22,13 +22,13 @@ when "debian"
   node.default['postgresql']['enable_pgdg_apt'] = true
 when 'rhel', 'fedora', 'suse'
   node.default['postgresql']['enable_pgdg_yum'] = true
-  version = node['postgresql']['version']
-  version_merge = version.gsub /\./, '' 
-  node.default['postgresql']['dir'] = "/var/lib/pgsql/#{version}/data"
-  node.default['postgresql']['client']['packages'] = ["postgresql#{version_merge}", "postgresql#{version_merge}-devel"]
-  node.default['postgresql']['server']['packages'] = ["postgresql#{version_merge}-server"]
-  node.default['postgresql']['server']['service_name'] = "postgresql-#{version}"
-  node.default['postgresql']['contrib']['packages'] = ["postgresql#{version_merge}-contrib"]
+  # version = node['postgresql']['version']
+  # version_merge = version.gsub /\./, '' 
+  # node.default['postgresql']['dir'] = "/var/lib/pgsql/#{version}/data"
+  # node.default['postgresql']['client']['packages'] = ["postgresql#{version_merge}", "postgresql#{version_merge}-devel"]
+  # node.default['postgresql']['server']['packages'] = ["postgresql#{version_merge}-server"]
+  # node.default['postgresql']['server']['service_name'] = "postgresql-#{version}"
+  # node.default['postgresql']['contrib']['packages'] = ["postgresql#{version_merge}-contrib"]
 end
 
 if node.role? "base_ruby"
@@ -52,7 +52,3 @@ directory node['rails']['sites_base_path'] do
 end
 
 include_recipe "rails::apps"
-include_recipe "rails::databases"
-include_recipe "rails::database_admin"
-include_recipe "msmtp"
-include_recipe "rails::cleanup"

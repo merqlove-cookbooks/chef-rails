@@ -4,11 +4,12 @@ maintainer_email 'sasha@merqlove.ru'
 license          'Apache 2.0'
 description      'Installs/Configures ruby/rails, php, databases and so on'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           '0.2.5'
+version           '0.2.6'
 
 supports "centos"
 supports "ubuntu"
 
+depends "swap"
 depends "iptables"
 depends "nginx"
 depends "rbenv"
@@ -21,7 +22,6 @@ depends "php"
 depends "php-fpm"
 depends "composer"
 depends "msmtp"
-depends "vagrant-ohai"
 
 # attribute "hub/install_path",
 #   display_name: "Install path",

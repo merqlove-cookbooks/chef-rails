@@ -55,43 +55,48 @@
       log_not_found off;
       deny all;
     }
-
-    #location / {               
-    #  index   index.php index.html;
-    #  if (!-e $request_filename) {     
-    #    rewrite ^(.*)$ /index.php last;
-    #  }
-    #  #limit_req zone=antiddos burst=10;
-    #}
-
-    location / {
-      try_files $uri/index.html $uri /index.php?$args;
-    }
-
-    <% if @admin %>
-    location /admin/ {    
-      root   <%= @path %>/docs/admin;
-      try_files $uri $uri/ /admin/index.php?$args;
-    }
-    <% end %>
-
+    
     <% if @php %>
+      location = / {
+        try_files @website @website;
+      }
+      
+      <% if @php_rewrites %>
+      <% @php_rewrites.each do |r| %>  
+      <% if r[:ext] %>      
+      location ~ \.<%= r[:ext] %>$ {
+          try_files $uri @website;
+      }
+      <% elsif r[:location] %>
+      location <%= r[:location] %> {    
+        index index.html index.php
+        try_files $uri $uri/ =404;
+      }
+      <% end %>
+      <% end %>      
+      <% else %>
+      location / {
+          try_files $uri $uri/ /index.php?$args;
+      }
+      <% end %>
+
+      <% if @admin %>
+      location /admin/ {    
+        index index.html index.php
+        try_files $uri $uri/ =404;
+      }
+      <% end %>
+
       <% if @min %>
-      location /min {
-        include fastcgi_params;
-        fastcgi_pass  php_<%= @name %>; 
-        fastcgi_index index.php;        
-        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
-        
-        # Nginx caching.
-        #fastcgi_cache fastcgi_cache;
-        #fastcgi_cache_valid 200 304 404 240h;
-        #fastcgi_cache_key "$request_method|$http_if_modified_since|$http_if_none_match|$host|$request_uri";
+      location /min/ {
+        index index.html index.php
+        try_files $uri $uri/ =404;
       }
       <% end %>
 
       location ~ \.php$ {       
         try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
         include fastcgi_params;    
         fastcgi_pass  php_<%= @name %>; 
         fastcgi_index index.php;      
@@ -100,13 +105,24 @@
 
       location @website {
         include fastcgi_params;
-        fastcgi_pass  php_<%= @name %>; 
-        fastcgi_index index.php;      
+        fastcgi_pass  php_<%= @name %>;       
         fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;      
+      }
+
+      #location @admin_website {
+      #  include fastcgi_params;
+      #  fastcgi_pass  php_<%= @name %>; 
+       ## fastcgi_index index.php;      
+      #  fastcgi_param  SCRIPT_FILENAME  $document_root/admin/index.php;      
+      #}
+    <% else %>
+      location / {
+        index index.html;
+        try_files $uri $uri/ =404;
       }
     <% end %>
 
-    location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|txt|syx)$ {
+    location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|pdf|doc|docx|xls|xlsx|ppt|pptx|dmg|tgz|tar.gz|zip|gz|bz2?|rar|txt|syx)$ {
       <% if @file_rewrites %>
       try_files $uri @file_rewrite;
       <% end %>
@@ -122,9 +138,15 @@
       <% end %>
       <% end %>     
     }
-    
+
+    <% if @error_pages %>
+      <% @error_pages.each do |p| %>
+        error_page <%= p[:code] %> <%= p[:location] %>;
+      <% end %>
+    <% else %>
     error_page  500 502 503 504  /50x.html;
     location = /50x.html {
       root   /var/www/html;
-    }
+    }  
+    <% end %>
   }

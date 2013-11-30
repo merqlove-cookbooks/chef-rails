@@ -80,7 +80,6 @@ define :app, application: false, type: "apps" do
     end
 
     if a.include? "db"
-      default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
       a["db"].each do |d|
         node.default["rails"]["databases"][d["type"]][d["name"]] = {
           name: d["name"],
@@ -120,7 +119,7 @@ define :app, application: false, type: "apps" do
         group "root"
         mode '755'
         source 'php_fix.erb'
-        notifies :reload, 'service[php-fpm]', :delayed
+        notifies :restart, 'service[php-fpm]', :delayed
       end
       node.default['php-fpm']['pools'].push(a["name"])
       node.default['php-fpm']['pool'][a["name"]] = node['php-fpm']['default']['pool']
@@ -175,12 +174,15 @@ define :app, application: false, type: "apps" do
         disable_www a["nginx"]["disable_www"]
         php a.include? "php"
         block a["nginx"]["block"]
-        listen a["nginx"]["listen"]
+        listen a["nginx"]["listen"]        
         admin a["nginx"]["admin"]
+        min a["nginx"]["min"]
         server_name server_name
         path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
-        rewrites a["nginx"]["rewrites"]
+        rewrites a["nginx"]["rewrites"]        
         file_rewrites a["nginx"]["file_rewrites"]
+        php_rewrites a["nginx"]["php_rewrites"]
+        error_pages a["nginx"]["error_pages"]
         action :create
       end
     end

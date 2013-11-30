@@ -108,6 +108,8 @@ action :create do
       :min =>  new_resource.min,
       :rewrites =>  new_resource.rewrites,
       :file_rewrites =>  new_resource.file_rewrites,
+      :php_rewrites => new_resource.php_rewrites,
+      :error_pages => new_resource.error_pages,
       :hidden => new_resource.hidden,
       :ssl => new_resource.ssl
     )
