@@ -61,7 +61,7 @@ define :app, application: false, type: "apps" do
       node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
     end 
 
-    if node.role? "base_ruby"
+    if node.run_list? "base_ruby"
       if a.include? "rbenv"
         #set ruby
         unless a["rbenv"]["version"].include? node['rails']['rbenv']['version']
