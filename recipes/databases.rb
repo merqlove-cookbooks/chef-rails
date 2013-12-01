@@ -162,13 +162,15 @@ if node.default["rails"]["databases"].include? "mysql"
       owner d["user"]
       action :create
       notifies :create, "rails_db_yml[#{d["name"]}_mysql]", :immediately
+      notifies :grant, "mysql_database_user[grant_#{d["user"]}_#{d["name"]}]", :immediately
     end
-    mysql_database_user d["user"] do
+    mysql_database_user "grant_#{d["user"]}_#{d["name"]}" do
+      username  d["user"]
       connection    mysql_connection_info
       password      d["password"]
       database_name d["name"]
       privileges    [:all]
-      action        :grant
+      action        :nothing
     end
   end  
 end

@@ -17,18 +17,19 @@
 # limitations under the License.
 #
 
+ruby_exists = search(:node, "roles:*ruby AND name:#{node.name}")
+
+unless ruby_exists.count > 0
+  node.default['rails']['ruby'] = true
+else
+  node.default['rails']['ruby'] = false
+end
+
 case node['platform_family']
 when "debian"
   node.default['postgresql']['enable_pgdg_apt'] = true
 when 'rhel', 'fedora', 'suse'
   node.default['postgresql']['enable_pgdg_yum'] = true
-  # version = node['postgresql']['version']
-  # version_merge = version.gsub /\./, '' 
-  # node.default['postgresql']['dir'] = "/var/lib/pgsql/#{version}/data"
-  # node.default['postgresql']['client']['packages'] = ["postgresql#{version_merge}", "postgresql#{version_merge}-devel"]
-  # node.default['postgresql']['server']['packages'] = ["postgresql#{version_merge}-server"]
-  # node.default['postgresql']['server']['service_name'] = "postgresql-#{version}"
-  # node.default['postgresql']['contrib']['packages'] = ["postgresql#{version_merge}-contrib"]
 end
 
 if node.role? "base_ruby"

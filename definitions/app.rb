@@ -61,7 +61,7 @@ define :app, application: false, type: "apps" do
       node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
     end 
 
-    if node.run_list? "base_ruby"
+    if node.default['rails']['ruby']
       if a.include? "rbenv"
         #set ruby
         unless a["rbenv"]["version"].include? node['rails']['rbenv']['version']
@@ -141,7 +141,7 @@ define :app, application: false, type: "apps" do
     
     if type.include? "sites" and a.include? "nginx"
       directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/docs" do
-        mode      '0755'
+        mode      '0750'
         owner     a['user']
         group     a['user']
         action    :create
