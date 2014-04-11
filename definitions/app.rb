@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 define :app, application: false, type: "apps" do
   if params[:application]
     a = params[:application]
@@ -72,8 +73,9 @@ define :app, application: false, type: "apps" do
 
         #add gems
         a["rbenv"]["gems"].each do |g|
-          rbenv_gem "#{g}" do
+          rbenv_gem "#{g[:name]}" do
             ruby_version "#{a["rbenv"]["version"]}"
+            version g[:version] if g[:version]
           end
         end
       end
@@ -139,6 +141,14 @@ define :app, application: false, type: "apps" do
     
     end
     
+    directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/backup" do
+      mode      '0700'
+      owner     a['user']
+      group     a['user']
+      action    :create
+      recursive true
+    end
+
     if type.include? "sites" and a.include? "nginx"
       directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/docs" do
         mode      '0750'
