@@ -20,7 +20,7 @@
 imagemagick_package = "imagemagick"
 
 if platform_family?('rhel')
-  include_recipe 'yum::remi'
+  include_recipe 'yum-remi::default'
   imagemagick_package = "ImageMagick-last"  
 end
 
