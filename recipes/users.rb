@@ -117,7 +117,6 @@ if node['rails']['apps'] or node['rails']['sites']
       end
     end
     
-    depends "etc/passwd"
     #Reload OHAI
     ohai "reload_passwd" do
       plugin "passwd"
