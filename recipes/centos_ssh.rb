@@ -18,10 +18,12 @@
 #
 
 if platform_family?('rhel')
-  package "authconfig"
-  execute "ssh_fix" do
-    command "authconfig --disablefingerprint --update"
-    user "root"
-    group "root"
+  if node['platform_version'].to_i > 5
+    package "authconfig"
+    execute "ssh_fix" do
+      command "authconfig --disablefingerprint --update"
+      user "root"
+      group "root"
+    end
   end
 end
