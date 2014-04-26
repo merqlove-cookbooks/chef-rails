@@ -117,7 +117,7 @@ if node['rails']['apps'] or node['rails']['sites']
       end
     end
     
-    #Reload OHAI
+    #Reload OHAI 7
     ohai "reload_passwd" do
       action :nothing
       plugin "etc"
