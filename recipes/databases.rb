@@ -126,10 +126,9 @@ if node.default["rails"]["databases"].include? "mysql"
   end
 
   include_recipe "mysql::client"
-  include_recipe "mysql::server"            
+  include_recipe "mysql::server"           
   
   package "php-mysql" if FileTest.exist?("/usr/bin/php")
-  include_recipe "mysql::ruby"  
 
   mysql_connection_info = {
     :host     => 'localhost',
