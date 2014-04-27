@@ -27,8 +27,9 @@ if File.exist? "/usr/bin/mysqladmin" and node.default["rails"]["databases"].incl
       :host     => 'localhost',
       :username => root['id'],
       :password => root["password"]
-    }
-    include_recipe "mysql::ruby"
+    }   
+
+    include_recipe "database::mysql"
     (mysql-["root"]).each do |m|
       u = Chef::EncryptedDataBagItem.load("mysql", m, default_secret)
       mysql_database_user u["id"] do
