@@ -126,7 +126,9 @@ if node.default["rails"]["databases"].include? "mysql"
   end
 
   include_recipe "mysql::client"
-  include_recipe "mysql::server"           
+  include_recipe "mysql::server"      
+
+  include_recipe "database::mysql"
   
   package "php-mysql" if FileTest.exist?("/usr/bin/php")
 
