@@ -65,11 +65,11 @@ define :app, application: false, type: "apps" do
     if node.default['rails']['ruby']
       if a.include? "rbenv"
         #set ruby
-        unless a["rbenv"]["version"].include? node['rails']['rbenv']['version']
+        # unless a["rbenv"]["version"].include? node['rails']['rbenv']['version']
           rbenv_ruby "#{a["rbenv"]["version"]}" do
             ruby_version "#{a["rbenv"]["version"]}"
           end      
-        end
+        # end
 
         #add gems
         a["rbenv"]["gems"].each do |g|
