@@ -187,6 +187,7 @@ define :app, application: false, type: "apps" do
         listen a["nginx"]["listen"]        
         admin a["nginx"]["admin"]
         min a["nginx"]["min"]
+        wordpress a["nginx"]["wordpress"]
         server_name server_name
         path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
         rewrites a["nginx"]["rewrites"]        

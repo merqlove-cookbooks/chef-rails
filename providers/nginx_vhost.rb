@@ -106,6 +106,7 @@ action :create do
       :server_name => server_name,
       :php =>  new_resource.php,
       :min =>  new_resource.min,
+      :wordpress =>  new_resource.wordpress,
       :rewrites =>  new_resource.rewrites,
       :file_rewrites =>  new_resource.file_rewrites,
       :php_rewrites => new_resource.php_rewrites,

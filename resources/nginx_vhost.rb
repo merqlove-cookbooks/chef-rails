@@ -34,6 +34,7 @@ attribute :error_log, :kind_of => [TrueClass, FalseClass], :default => true  # E
 attribute :php, :kind_of => [TrueClass, FalseClass], :default => false #PHP code
 attribute :admin, :kind_of => [TrueClass, FalseClass], :default => false  # Access log
 attribute :min, :kind_of => [TrueClass, FalseClass], :default => false #PHP code
+attribute :wordpress, :kind_of => [TrueClass, FalseClass], :default => false #Wordpress
 attribute :locations, :kind_of => [Hash, NilClass], :default => {} # Locations to include.
 attribute :rewrites, :kind_of => [Array, NilClass], :default => nil # Server rewrites
 attribute :file_rewrites, :kind_of => [Array, NilClass], :default => nil # Server files rewrites
