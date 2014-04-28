@@ -126,7 +126,7 @@ if node.default["rails"]["databases"].include? "mysql"
   end
 
   include_recipe "mysql::client"
-  include_recipe "mysql::server_deprecated"      
+  include_recipe "mysql::server"      
 
   include_recipe "database::mysql"
   
