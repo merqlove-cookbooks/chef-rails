@@ -3,13 +3,13 @@
 # Recipe:: vcs_keys
 #
 # Copyright (C) 2013 Alexander Merkulov
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,41 +26,43 @@ if node.role? "vagrant"
         mode 0700
       end
       
-      vcs = data_bag("vcs_keys")
-      default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
-      if vcs
-        vcs.each do |item|
-          key = Chef::EncryptedDataBagItem.load("vcs_keys", item, default_secret)
+      if Chef.const_defined? "EncryptedDataBagItem"
+        vcs = data_bag("vcs_keys")
+        default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
+        if vcs
+          vcs.each do |item|
+            key = Chef::EncryptedDataBagItem.load("vcs_keys", item, default_secret)
 
-          file "/home/vagrant/.ssh/#{key["file-name"]}" do
-            content key['file-content']
-            owner "vagrant"
-            group "vagrant"
-            mode 0600
+            file "/home/vagrant/.ssh/#{key["file-name"]}" do
+              content key['file-content']
+              owner "vagrant"
+              group "vagrant"
+              mode 0600
+            end
+
+            ssh_known_hosts_entry "#{key["host"]}" do
+              file "/home/vagrant/.ssh/known_hosts"
+              owner "vagrant"
+            end
           end
-
-          ssh_known_hosts_entry "#{key["host"]}" do
-            file "/home/vagrant/.ssh/known_hosts"
-            owner "vagrant"
+          template "/home/vagrant/.ssh/config" do
+            source 'ssh_config.erb'
+            owner  "vagrant"
+            group  "vagrant"
+            mode  '0600'
+            variables :vcs => vcs
           end
-        end
-        template "/home/vagrant/.ssh/config" do
-          source 'ssh_config.erb'
-          owner  "vagrant"
-          group  "vagrant"
-          mode  '0600'
-          variables :vcs => vcs
-        end
-        template "/home/vagrant/.gitconfig" do          
-          source 'gitconfig.erb'
-          owner 'vagrant'
-          group 'vagrant'
-          mode '0644'
+          template "/home/vagrant/.gitconfig" do
+            source 'gitconfig.erb'
+            owner 'vagrant'
+            group 'vagrant'
+            mode '0644'
 
-          variables(
-            :name  => 'vagrant',
-            :email => "vagrant@#{node['fqdn']}"
-          )
+            variables(
+              :name  => 'vagrant',
+              :email => "vagrant@#{node['fqdn']}"
+            )
+          end
         end
       end
     end

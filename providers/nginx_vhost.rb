@@ -3,13 +3,13 @@
 # Provider:: nginx_vhost
 #
 # Copyright (C) 2013 Alexander Merkulov
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,13 +45,13 @@ action :create do
 #     end
 
 #     directory "#{node[:nginx][:dir]}/ssl" do
-#       owner node[:nginx][:user] 
+#       owner node[:nginx][:user]
 #       group node[:nginx][:group]
 #       mode '0755'
 #     end
 
 #     file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt" do
-#       owner node[:nginx][:user] 
+#       owner node[:nginx][:user]
 #       group node[:nginx][:group]
 #       mode '0640'
 #       content  <<-EOH
@@ -61,7 +61,7 @@ action :create do
 #     end
 
 #     file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key" do
-#       owner node[:nginx][:user] 
+#       owner node[:nginx][:user]
 #       group node[:nginx][:group]
 #       mode '0640'
 #       content <<-EOH
@@ -84,7 +84,7 @@ action :create do
   end
 
   template "#{node[:nginx][:dir]}/sites-available/#{name}" do
-    owner "root" 
+    owner "root"
     group "root"
     mode 00644
     source(new_resource.template || 'nginx_vhost.erb')
@@ -102,7 +102,7 @@ action :create do
       :error_log => new_resource.error_log,
       :name => name,
       :admin => new_resource.admin,
-      :path =>  new_resource.path,      
+      :path =>  new_resource.path,
       :server_name => server_name,
       :php =>  new_resource.php,
       :min =>  new_resource.min,
@@ -117,9 +117,16 @@ action :create do
     notifies :run, test_nginx, new_resource.reload
   end
 
-  nginx_site name do
-    enable true
-    only_if { new_resource.auto_enable_site }
+  begin
+    nginx_site name do
+      enable true
+      only_if { new_resource.auto_enable_site }
+    end
+  rescue Exception => e
+    log "message" do
+      message "Upload Nginx Cookbook.\n#{e.message}"
+      level :error
+    end
   end
 
   # link "#{node[:nginx][:dir]}/sites-enabled/#{name}" do
@@ -134,8 +141,15 @@ end
 action :delete do
   name = new_resource.name
 
-  nginx_site name do
-    enable false
+  begin
+    nginx_site name do
+      enable false
+    end
+  rescue Exception => e
+    log "message" do
+      message "Upload Nginx Cookbook.\n#{e.message}"
+      level :error
+    end
   end
 
   file "#{node[:nginx][:dir]}/sites-available/#{name}" do
@@ -167,8 +181,15 @@ end
 action :enable do
   name = new_resource.name
 
-  nginx_site name do
-    enable true
+  begin
+    nginx_site name do
+      enable true
+    end
+  rescue Exception => e
+    log "message" do
+      message "Upload Nginx Cookbook.\n#{e.message}"
+      level :error
+    end
   end
 
   new_resource.updated_by_last_action(true)
@@ -177,8 +198,15 @@ end
 action :disable do
   name = new_resource.name
 
-  nginx_site name do
-    enable false  
+  begin
+    nginx_site name do
+      enable false
+    end
+  rescue Exception => e
+    log "message" do
+      message "Upload Nginx Cookbook.\n#{e.message}"
+      level :error
+    end
   end
 
   new_resource.updated_by_last_action(true)

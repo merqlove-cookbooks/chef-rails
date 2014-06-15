@@ -3,13 +3,13 @@
 # Definition:: app
 #
 # Copyright (C) 2013 Alexander Merkulov
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,13 @@ define :app, application: false, type: "apps" do
   if params[:application]
     a = params[:application]
     type = params[:type]
+
+    directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}" do
+      owner a["user"]
+      group a["user"]
+      mode "0750"
+      recursive true
+    end
 
     if a[:delete]
       if type.include? "sites" and a.include? "nginx"
@@ -37,46 +44,53 @@ define :app, application: false, type: "apps" do
     end
 
     if type.include? "sites" and a.include? "nginx"
-      unless a[:enable]      
+      unless a[:enable]
         rails_nginx_vhost a["name"] do
           action :disable
-        end        
+        end
         next
-      end      
-    end 
-
-    directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}" do
-      owner a["user"]
-      group a["user"]
-      mode "0750"
-      recursive true
+      end
     end
 
     group a["user"] do
       append true
       members [node['nginx']['user']]
-    end 
-
-    if a.include? "smtp"      
-      node.default['msmtp']['accounts'][a['user']][a["name"]]= a[:smtp]
-      node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
-    end 
+    end
 
     if node.default['rails']['ruby']
-      if a.include? "rbenv"
+      if a.include?("rbenv") and
         #set ruby
-        # unless a["rbenv"]["version"].include? node['rails']['rbenv']['version']
+        begin
           rbenv_ruby "#{a["rbenv"]["version"]}" do
             ruby_version "#{a["rbenv"]["version"]}"
-          end      
-        # end
-
-        #add gems
-        a["rbenv"]["gems"].each do |g|
-          rbenv_gem "#{g[:name]}" do
-            ruby_version "#{a["rbenv"]["version"]}"
-            version g[:version] if g[:version]
           end
+
+          #add gems
+          a["rbenv"]["gems"].each do |g|
+            rbenv_gem "#{g[:name]}" do
+              ruby_version "#{a["rbenv"]["version"]}"
+              version g[:version] if g[:version]
+            end
+          end
+        rescue Exception => e
+          log "message" do
+            message "Upload Rbenv Cookbook.\n#{e.message}"
+            level :error
+          end
+        end
+      end
+    end
+
+    if a.include? "smtp"
+      begin
+        node.default['msmtp']['accounts'][a['user']][a["name"]]= a[:smtp]
+        node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
+        node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "off"
+        node.default['msmtp']['accounts'][a['user']][a["name"]][:log] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/msmtp.log"
+      rescue Exception => e
+        log "message" do
+          message "Upload MSMTP Cookbook.\n#{e.message}"
+          level :error
         end
       end
     end
@@ -89,58 +103,68 @@ define :app, application: false, type: "apps" do
           password: d["password"],
           app_type: type,
           app_name: a["name"],
-          app_user: a["user"]                      
-        }          
+          app_user: a["user"]
+        }
       end
     end
 
     if a.include? "php"
-      if !File.exist?("/usr/bin/php")
-        include_recipe "php"          
-        package "php-gd"
-        package "php-pecl-memcached"
-        package "php-pecl-apcu"
-        package "php-mbstring" do
-          action :install
-          notifies :reload, 'service[php-fpm]', :delayed
+      begin
+        if !File.exist?("/usr/bin/php")
+          include_recipe "php"
+          package "php-gd"
+          package "php-pecl-memcached"
+          package "php-pecl-apcu"
+          package "php-mbstring" do
+            action :install
+            notifies :reload, 'service[php-fpm]', :delayed
+          end
+        end
+
+        include_recipe "composer"
+
+        directory "/var/lib/php/session/#{a["name"]}" do
+          owner a["user"]
+          group a["user"]
+          mode "0700"
+          action :create
+          recursive true
+        end
+
+        template "/etc/php.d/php_fix.ini" do
+          owner "root"
+          group "root"
+          mode '755'
+          source 'php_fix.erb'
+          notifies :restart, 'service[php-fpm]', :delayed
+        end
+        node.default['php-fpm']['pools'].push(a["name"])
+        node.default['php-fpm']['pool'][a["name"]] = node['php-fpm']['default']['pool']
+
+        node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-fpm-#{a["name"]}.sock"
+        node.default['php-fpm']['pool'][a["name"]]['user'] = a["user"]
+        node.default['php-fpm']['pool'][a["name"]]['group'] = a["user"]
+        node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"
+        node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-slowlog.log"
+        node.default['php-fpm']['pool'][a["name"]]['error_log'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-error_log.log"
+
+        if a[:php][:pool]
+          a[:php][:pool].each do |key, value|
+            node.default['php-fpm']['pool'][a["name"]][:"#{key}"] = value
+          end
+        end
+
+        if a.include? "smtp"
+          node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "/usr/bin/msmtp -a #{a['name']} -t"
+        end
+      rescue Exception => e
+        log "message" do
+          message "Upload PHP-FPM Cookbook.\n#{e.message}"
+          level :error
         end
       end
-
-      include_recipe "composer"
-
-      directory "/var/lib/php/session/#{a["name"]}" do
-        owner a["user"]
-        group a["user"]
-        mode "0700"
-        action :create
-        recursive true
-      end
-      
-      template "/etc/php.d/php_fix.ini" do
-        owner "root"
-        group "root"
-        mode '755'
-        source 'php_fix.erb'
-        notifies :restart, 'service[php-fpm]', :delayed
-      end
-      node.default['php-fpm']['pools'].push(a["name"])
-      node.default['php-fpm']['pool'][a["name"]] = node['php-fpm']['default']['pool']
-
-      node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-fpm-#{a["name"]}.sock"
-      node.default['php-fpm']['pool'][a["name"]]['user'] = a["user"]
-      node.default['php-fpm']['pool'][a["name"]]['group'] = a["user"]     
-      node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"      
-      node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-slowlog.log"
-      node.default['php-fpm']['pool'][a["name"]]['error_log'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-error_log.log"
-      
-      if a[:php][:pool]
-        a[:php][:pool].each do |key, value|
-          node.default['php-fpm']['pool'][a["name"]][:"#{key}"] = value
-        end
-      end
-    
     end
-    
+
     directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/backup" do
       mode      '0700'
       owner     a['user']
@@ -164,17 +188,13 @@ define :app, application: false, type: "apps" do
         action    :create
         recursive true
       end
-      if a.include? "smtp"
-        node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "off"
-        node.default['msmtp']['accounts'][a['user']][a["name"]][:log] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/msmtp.log"        
-        if a.include? "php"
-          node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "/usr/bin/msmtp -a #{a['name']} -t"
-        end
-      end
+
       server_name = a["nginx"]["server_name"].dup
+
       if node.role? "vagrant"
         server_name.push "#{a["nginx"]["vagrant_server_name"]}.#{node["vagrant"]["fqdn"]}" if a["nginx"]["vagrant_server_name"]
       end
+
       rails_nginx_vhost a["name"] do
         access_log a["nginx"]["access_log"]
         error_log a["nginx"]["error_log"]
@@ -184,13 +204,13 @@ define :app, application: false, type: "apps" do
         disable_www a["nginx"]["disable_www"]
         php a.include? "php"
         block a["nginx"]["block"]
-        listen a["nginx"]["listen"]        
+        listen a["nginx"]["listen"]
         admin a["nginx"]["admin"]
         min a["nginx"]["min"]
         wordpress a["nginx"]["wordpress"]
         server_name server_name
         path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
-        rewrites a["nginx"]["rewrites"]        
+        rewrites a["nginx"]["rewrites"]
         file_rewrites a["nginx"]["file_rewrites"]
         php_rewrites a["nginx"]["php_rewrites"]
         error_pages a["nginx"]["error_pages"]

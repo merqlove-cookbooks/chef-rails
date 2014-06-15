@@ -3,13 +3,13 @@
 # Recipe:: users
 #
 # Copyright (C) 2013 Alexander Merkulov
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ if node['rails']['apps'] or node['rails']['sites']
   end
   users = users.push(node['rails']['user']['deploy']).uniq.compact
   
-  if File.exists? node['rails']['secrets']['default']
+  if File.exists?(node['rails']['secrets']['default']) and Chef.const_defined?("EncryptedDataBagItem")
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
     vcs = data_bag("vcs_keys")
 
@@ -46,20 +46,20 @@ if node['rails']['apps'] or node['rails']['sites']
         if u == node['rails']['user']['deploy']
           group "admin" do
             append true
-            members [node['rails']['user']['deploy']]            
+            members [node['rails']['user']['deploy']]
           end
         end
 
         if node.role? "base_ruby"
           group node[:rbenv][:group] do
             append true
-            members [u]        
+            members [u]
           end
         end
 
         group node[:msmtp][:group] do
           append true
-          members [u]        
+          members [u]
         end
 
         directory "/home/#{u}/.ssh" do
@@ -76,7 +76,7 @@ if node['rails']['apps'] or node['rails']['sites']
           mode  '0600'
           variables :keys => data["ssh-keys"]
         end
-        
+
         if data["vcs"]
           data["vcs"].each do |v|
             if vcs.include? v
@@ -102,7 +102,7 @@ if node['rails']['apps'] or node['rails']['sites']
             mode  '0600'
             variables :vcs => data["vcs"]
           end
-          template "/home/#{u}/.gitconfig" do          
+          template "/home/#{u}/.gitconfig" do
             source 'gitconfig.erb'
             owner u
             group u
@@ -116,7 +116,7 @@ if node['rails']['apps'] or node['rails']['sites']
         end
       end
     end
-    
+
     #Reload OHAI 7
     ohai "reload_passwd" do
       action :nothing
