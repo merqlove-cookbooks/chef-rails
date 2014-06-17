@@ -36,7 +36,7 @@ if node['rails']['apps'] or node['rails']['sites']
       if data
         user u do
           password  data["password"]
-          action:   :modify
+          action    :modify
         end
       end
     end
