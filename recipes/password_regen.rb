@@ -19,11 +19,15 @@
 
 if node['rails']['apps'] or node['rails']['sites']
   users = []
-  node['rails']['apps'].each do |k, a|
-    users.push a["user"]
+  if node['rails']['apps']
+    node['rails']['apps'].each do |k, a|
+      users.push a["user"]
+    end
   end
-  node['rails']['sites'].each do |k, a|
-    users.push a["user"]
+  if node['rails']['sites']
+    node['rails']['sites'].each do |k, a|
+      users.push a["user"]
+    end
   end
   users = users.push(node['rails']['user']['deploy']).uniq.compact
   
