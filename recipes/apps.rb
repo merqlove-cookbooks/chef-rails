@@ -46,13 +46,13 @@ end
 if node.default['php-fpm']['pools'].count > 0
   include_recipe "php-fpm"
   
-  if Dir.exist? "#{node['php-fpm']['conf_dir']}/pools"
+  if Dir.exist? "#{node['php-fpm']['conf_dir']}"
     deleted = false
-    Dir.foreach("#{node['php-fpm']['conf_dir']}/pools") do |pool|
+    Dir.foreach("#{node['php-fpm']['conf_dir']}") do |pool|
       next if pool == '.' or pool == '..'
       if pool.include? ".conf"
         unless node['php-fpm']['pools'].include? Hash[name: pool.gsub(/\.conf/, '')]
-          File.delete("#{node['php-fpm']['conf_dir']}/pools/#{pool}") 
+          File.delete("#{node['php-fpm']['conf_dir']}/#{pool}") 
           deleted = true
         end
       end
@@ -70,11 +70,11 @@ if node.default['php-fpm']['pools'].count > 0
     mode "0777"      
   end
 else
-  if Dir.exist? "#{node['php-fpm']['conf_dir']}/pools"  
-    Dir.foreach("#{node['php-fpm']['conf_dir']}/pools") do |pool|
+  if Dir.exist? "#{node['php-fpm']['conf_dir']}"  
+    Dir.foreach("#{node['php-fpm']['conf_dir']}") do |pool|
       next if pool == '.' or pool == '..'
       if pool.include? ".conf"
-        File.delete("#{node['php-fpm']['conf_dir']}/pools/#{pool}")
+        File.delete("#{node['php-fpm']['conf_dir']}/#{pool}")
       end
     end
     service node['php-fpm']['service'] do
