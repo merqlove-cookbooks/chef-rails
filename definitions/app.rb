@@ -138,7 +138,7 @@ define :app, application: false, type: "apps" do
           source 'php_fix.erb'
           notifies :restart, 'service[php-fpm]', :delayed
         end
-        node.default['php-fpm']['pools'].push(a["name"])
+        node.default['php-fpm']['pools'].push({:name => a["name"]})
         node.default['php-fpm']['pool'][a["name"]] = node['php-fpm']['default']['pool']
 
         node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-fpm-#{a["name"]}.sock"
