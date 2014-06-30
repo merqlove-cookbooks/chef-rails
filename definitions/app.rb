@@ -21,12 +21,11 @@ define :app, application: false, type: "apps" do
   if params[:application]
     a = params[:application]
     type = params[:type]
-    
+
     directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}" do
       owner a["user"]
       group a["user"]
       mode "0750"
-      recursive true
     end
 
     directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}" do
