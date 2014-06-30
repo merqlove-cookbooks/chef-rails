@@ -24,7 +24,7 @@ define :app, application: false, type: "apps" do
 
     directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}" do
       owner a["user"]
-      group a["user"]
+      group ["ftp", a["user"]]
       mode "0750"
     end
 
@@ -65,6 +65,10 @@ define :app, application: false, type: "apps" do
 
     if type.include? "sites"
       node.default['vsftpd']['allowed'].push(a["user"])
+      group "ftp" do
+        append true
+        members [a['user']]
+      end  
     end
 
     if node.default['rails']['ruby']
