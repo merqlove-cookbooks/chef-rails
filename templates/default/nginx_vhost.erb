@@ -1,7 +1,7 @@
   # Maintained by Chef.  Local changes will be overwritten
 
   <% if @php %>
-    upstream php_<%= @user %>-_<%= @name %> {
+    upstream php_<%= @user %>_<%= @name %> {
       server unix:/var/run/php-<%= @user %>-<%= @name %>.sock;
     }
   <% end %>
@@ -126,20 +126,20 @@
         try_files $uri =404;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         include fastcgi_params;
-        fastcgi_pass  php_<%= @user %>-_<%= @name %>;
+        fastcgi_pass  php_<%= @user %>_<%= @name %>;
         fastcgi_index index.php;
         fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
       }
 
       location @website {
         include fastcgi_params;
-        fastcgi_pass  pphp_<%= @user %>-_<%= @name %>;
+        fastcgi_pass  php_<%= @user %>_<%= @name %>;
         fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;
       }
 
       #location @admin_website {
       #  include fastcgi_params;
-      #  fastcgi_pass  php_<%= @user %>-_<%= @name %>;
+      #  fastcgi_pass  php_<%= @user %>_<%= @name %>;
        ## fastcgi_index index.php;
       #  fastcgi_param  SCRIPT_FILENAME  $document_root/admin/index.php;
       #}
