@@ -24,7 +24,7 @@ define :app, application: false, type: "apps" do
 
     directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}" do
       owner a["user"]
-      group ["ftp", a["user"]]
+      group a["user"]
       mode "0750"
     end
 
