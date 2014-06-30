@@ -22,7 +22,7 @@ define :app, application: false, type: "apps" do
     a = params[:application]
     type = params[:type]
 
-    directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}" do
+    directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}" do
       owner a["user"]
       group a["user"]
       mode "0750"
@@ -36,7 +36,7 @@ define :app, application: false, type: "apps" do
         end
       end
 
-      directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}" do
+      directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}" do
         action :delete
       end
 
@@ -86,7 +86,7 @@ define :app, application: false, type: "apps" do
         node.default['msmtp']['accounts'][a['user']][a["name"]]= a[:smtp]
         node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
         node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "off"
-        node.default['msmtp']['accounts'][a['user']][a["name"]][:log] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/msmtp.log"
+        node.default['msmtp']['accounts'][a['user']][a["name"]][:log] = "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/msmtp.log"
       rescue Exception => e
         log "message" do
           message "Upload MSMTP Cookbook.\n#{e.message}"
@@ -123,7 +123,7 @@ define :app, application: false, type: "apps" do
 
         include_recipe "composer"
 
-        directory "/var/lib/php/session/#{a["name"]}" do
+        directory "/var/lib/php/session/#{a["user"]}_#{a["name"]}" do
           owner a["user"]
           group a["user"]
           mode "0700"
@@ -141,12 +141,12 @@ define :app, application: false, type: "apps" do
         node.default['php-fpm']['pools'].push({:name => a["name"]})
         node.default['php-fpm']['pool'][a["name"]] = node['php-fpm']['default']['pool']
 
-        node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-fpm-#{a["name"]}.sock"
+        node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-#{a["user"]}-#{a["name"]}.sock"
         node.default['php-fpm']['pool'][a["name"]]['user'] = a["user"]
         node.default['php-fpm']['pool'][a["name"]]['group'] = a["user"]
-        node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["name"]}"
-        node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-slowlog.log"
-        node.default['php-fpm']['pool'][a["name"]]['error_log'] = "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log/php-fpm-error_log.log"
+        node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["user"]}_#{a["name"]}"
+        node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-slowlog.log"
+        node.default['php-fpm']['pool'][a["name"]]['error_log'] = "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-error_log.log"
 
         if a[:php][:pool]
           a[:php][:pool].each do |key, value|
@@ -155,7 +155,7 @@ define :app, application: false, type: "apps" do
         end
 
         if a.include? "smtp"
-          node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "/usr/bin/msmtp -a #{a['name']} -t"
+          node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "/usr/bin/msmtp -a #{a["user"]}_#{a['name']} -t"
         end
       rescue Exception => e
         log "message" do
@@ -165,7 +165,7 @@ define :app, application: false, type: "apps" do
       end
     end
 
-    directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/backup" do
+    directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/backup" do
       mode      '0700'
       owner     a['user']
       group     a['user']
@@ -174,14 +174,14 @@ define :app, application: false, type: "apps" do
     end
 
     if type.include? "sites" and a.include? "nginx"
-      directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/docs" do
+      directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/docs" do
         mode      '0750'
         owner     a['user']
         group     a['user']
         action    :create
         recursive true
       end
-      directory "#{node['rails']["#{type}_base_path"]}/#{a["name"]}/log" do
+      directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log" do
         mode      '0755'
         owner     a['user']
         group     a['user']
@@ -196,6 +196,7 @@ define :app, application: false, type: "apps" do
       end
 
       rails_nginx_vhost a["name"] do
+        user a["user"]
         access_log a["nginx"]["access_log"]
         error_log a["nginx"]["error_log"]
         default a["nginx"]["default"] unless node.role? "vagrant"
@@ -209,7 +210,7 @@ define :app, application: false, type: "apps" do
         min a["nginx"]["min"]
         wordpress a["nginx"]["wordpress"]
         server_name server_name
-        path "#{node['rails']["#{type}_base_path"]}/#{a["name"]}"
+        path "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}"
         rewrites a["nginx"]["rewrites"]
         file_rewrites a["nginx"]["file_rewrites"]
         php_rewrites a["nginx"]["php_rewrites"]

@@ -53,7 +53,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         type "mongodb"
         port "#{node['mongodb']['config']['port']}"
         host node['mongodb']['config']['bind_ip']
-        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_name"]}"
+        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_user"]}/#{d["app_name"]}"
         owner d["app_user"]
         group d["app_user"]
         action :nothing
@@ -96,7 +96,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         type "postgresql"
         port "#{node['postgresql']['config']['port']}"
         host node['postgresql']['config']['listen_addresses']
-        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_name"]}"
+        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_user"]}/#{d["app_name"]}"
         owner d["app_user"]
         group d["app_user"]
         action :nothing
@@ -147,7 +147,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         type "mysql"
         port "#{node['mysql']['port']}"
         host node['mysql']['bind_address']
-        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_name"]}"
+        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_user"]}/#{d["app_name"]}"
         owner d["app_user"]
         group d["app_user"]
         action :nothing

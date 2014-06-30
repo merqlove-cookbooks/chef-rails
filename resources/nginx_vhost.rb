@@ -23,6 +23,7 @@ default_action :create
 
 attribute :block, :kind_of => [String, Array, NilClass], :default => nil # Include additional code
 attribute :name, :name_attribute => true, :kind_of => String
+attribute :user, :kind_of => String
 attribute :listen, :kind_of => [String, NilClass], :default => "80"  # Listening port, ip, etc.
 attribute :server_name, :kind_of => [String, Array, NilClass], :default => nil # Server name if different then the name attribute.
 attribute :path, :kind_of => [String, NilClass], :default => nil # Server root

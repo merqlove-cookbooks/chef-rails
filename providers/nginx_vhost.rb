@@ -101,6 +101,7 @@ action :create do
       :access_log => new_resource.access_log,
       :error_log => new_resource.error_log,
       :name => name,
+      :user => new_resource.user,
       :admin => new_resource.admin,
       :path =>  new_resource.path,
       :server_name => server_name,

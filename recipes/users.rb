@@ -61,20 +61,22 @@ if node['rails']['apps'] or node['rails']['sites']
           append true
           members [u]
         end
+        
+        if data["ssh-keys"]
+          directory "/home/#{u}/.ssh" do
+            action :create
+            owner  u
+            group  u
+            mode   '0700'
+          end
 
-        directory "/home/#{u}/.ssh" do
-          action :create
-          owner  u
-          group  u
-          mode   '0700'
-        end
-
-        template "/home/#{u}/.ssh/authorized_keys" do
-          source 'authorized_keys.erb'
-          owner  u
-          group  u
-          mode  '0600'
-          variables :keys => data["ssh-keys"]
+          template "/home/#{u}/.ssh/authorized_keys" do
+            source 'authorized_keys.erb'
+            owner  u
+            group  u
+            mode  '0600'
+            variables :keys => data["ssh-keys"]
+          end
         end
 
         if data["vcs"]
