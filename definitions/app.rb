@@ -64,9 +64,9 @@ define :app, application: false, type: "apps" do
     end
 
     if type.include? "sites"
-      node.default['vsftpd']['allowed'].push({:name => a["user"]})
+      node.default['vsftpd']['allowed'].push(a["user"])
     end
-    
+
     if node.default['rails']['ruby']
       if a.include?("rbenv") and
         #set ruby
