@@ -60,7 +60,7 @@ define :app, application: false, type: "apps" do
 
     group a["user"] do
       append true
-      members [node['nginx']['user']]
+      members [node['nginx']['user'], node['rails']['user']['deploy']]
     end
 
     if node.default['rails']['ruby']
