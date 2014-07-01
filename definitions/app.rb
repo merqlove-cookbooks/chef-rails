@@ -63,14 +63,6 @@ define :app, application: false, type: "apps" do
       members [node['nginx']['user'], node['rails']['user']['deploy']]
     end
 
-    if type.include? "sites"
-      node.default['vsftpd']['allowed'].push(a["user"])
-      group "ftp" do
-        append true
-        members [a['user']]
-      end  
-    end
-
     if node.default['rails']['ruby']
       if a.include?("rbenv") and
         #set ruby

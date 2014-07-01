@@ -18,105 +18,31 @@
 #
 
 if node['rails']['apps'] or node['rails']['sites']
-  users = []
+  app_users = []
+  site_users = []
   node['rails']['apps'].each do |k, a|
-    users.push a["user"]
+    app_users.push a["user"]
   end
   node['rails']['sites'].each do |k, a|
-    users.push a["user"]
+    site_users.push a["user"]    
   end
-  users = users.push(node['rails']['user']['deploy']).uniq.compact
+  app_users = app_users.push(node['rails']['user']['deploy']).uniq.compact
   
   if File.exists?(node['rails']['secrets']['default']) and Chef.const_defined?("EncryptedDataBagItem")
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
     vcs = data_bag("vcs_keys")
 
-    users.each do |u|
-      data = Chef::EncryptedDataBagItem.load('users', u, default_secret)
-      if data
+    user_ref u do
+      users site_users
+      secret default_secret
+      vcs vcs
+      type "sites"
+    end
 
-        user u do
-          home      "/home/#{u}"
-          password  data["password"]
-          shell     data["shell"]
-          comment   data["comment"]
-          supports  :manage_home => true
-        end
-
-        if u == node['rails']['user']['deploy']
-          group "admin" do
-            append true
-            members [node['rails']['user']['deploy']]
-          end
-        end
-
-        if node.role? "base_ruby"
-          group node[:rbenv][:group] do
-            append true
-            members [u]
-          end
-        end
-
-        group node[:msmtp][:group] do
-          append true
-          members [u]
-        end
-        
-        if data["ssh-keys"]
-          directory "/home/#{u}/.ssh" do
-            action :create
-            owner  u
-            group  u
-            mode   '0700'
-          end
-
-          template "/home/#{u}/.ssh/authorized_keys" do
-            source 'authorized_keys.erb'
-            owner  u
-            group  u
-            mode  '0600'
-            variables :keys => data["ssh-keys"]
-          end
-        end
-
-        if data["vcs"]
-          data["vcs"].each do |v|
-            if vcs.include? v
-              key = Chef::EncryptedDataBagItem.load("vcs_keys", v, default_secret)
-
-              file "/home/#{u}/.ssh/#{key["file-name"]}" do
-                content key['file-content']
-                owner u
-                group u
-                mode 0600
-              end
-
-              ssh_known_hosts_entry "#{key["host"]}" do
-                file "/home/#{u}/.ssh/known_hosts"
-                owner u
-              end
-            end
-          end
-          template "/home/#{u}/.ssh/config" do
-            source 'ssh_config.erb'
-            owner  u
-            group  u
-            mode  '0600'
-            variables :vcs => data["vcs"]
-          end
-          template "/home/#{u}/.gitconfig" do
-            source 'gitconfig.erb'
-            owner u
-            group u
-            mode '0644'
-
-            variables(
-              :name  => u,
-              :email => "#{u}@#{node['fqdn']}"
-            )
-          end
-        end
-      end
+    user_ref u do
+      users app_users
+      secret default_secret
+      vcs vcs
     end
 
     #Reload OHAI 7

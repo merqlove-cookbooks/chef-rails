@@ -22,6 +22,7 @@ depends "php"
 depends "php-fpm"
 depends "composer"
 depends "msmtp"
+depends "vsftpd"
 
 # attribute "hub/install_path",
 #   display_name: "Install path",
