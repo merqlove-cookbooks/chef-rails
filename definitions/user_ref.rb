@@ -17,33 +17,34 @@
 # limitations under the License.
 #
 
-define :user_ref, users: false, secret: false, vcs: false, type: "apps" do
+define :user_ref, users: false, secret: false, vcs: false do
   if params[:users] and params[:secret] and params[:vcs]
     users = params[:users]
     default_secret =  params[:secret]
     vcs = params[:vcs]
-    type = params[:type]
     name_pass = []
 
     users.each do |u|
       data = Chef::EncryptedDataBagItem.load('users', u, default_secret)
       if data
-        if type.include? "sites"
-          name_pass.push({'name' => u, 'password' => data["password"] })
-          node.default['vsftpd']['users'].push({
-            'name' => u, 
-            'config' => {
-              'local_root' => "#{node['rails']['sites_base_path']}/#{u}",
-              'dirlist_enable' => 'YES',
-              'download_enable' => 'YES',
-              'write_enable' => 'YES',
-              'chown_username' => u,
-              'guest_username' => u,
-              'ftp_username' => u,
-            }
-          })
+        if data["ftp"]
+          data["ftp"].each do |ftp|
+            name_pass.push({'name' => ftp["name"], 'password' => ftp["password"] })
+            node.default['vsftpd']['users'].push({
+              'name' => ftp["name"], 
+              'config' => {
+                'local_root' => "#{node['rails']['sites_base_path']}/#{u}",
+                'dirlist_enable' => 'YES',
+                'download_enable' => 'YES',
+                'write_enable' => 'YES',
+                'chown_username' => u,
+                'guest_username' => u,
+                'ftp_username' => u,
+              }
+            })
 
-          node.default['vsftpd']['allowed'].push(u)
+            node.default['vsftpd']['allowed'].push(ftp["name"])
+          end
 
           group node['nginx']['user'] do
             append true
@@ -136,14 +137,12 @@ define :user_ref, users: false, secret: false, vcs: false, type: "apps" do
       end
     end
 
-    if type.include? "sites"
-      node.default['vsftpd']['config']['ftp_username'] = node['nginx']['user']
-      node.default['vsftpd']['config']['chown_username'] = node['nginx']['user']
-      node.default['vsftpd']['config']['guest_username'] = node['nginx']['user']
+    node.default['vsftpd']['config']['ftp_username'] = node['nginx']['user']
+    node.default['vsftpd']['config']['chown_username'] = node['nginx']['user']
+    node.default['vsftpd']['config']['guest_username'] = node['nginx']['user']
 
-      vsftpd_virtual_users "vsftpd_site_credentials" do
-        users name_pass
-      end
+    vsftpd_virtual_users "vsftpd_credentials" do
+      users name_pass
     end
 
   end
