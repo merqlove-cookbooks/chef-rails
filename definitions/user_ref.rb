@@ -137,9 +137,9 @@ define :user_ref, users: false, secret: false, vcs: false, type: "apps" do
     end
 
     if type.include? "sites"
-      node.default['vsftpd']['ftp_username'] = node['nginx']['user']
-      node.default['vsftpd']['chown_username'] = node['nginx']['user']
-      node.default['vsftpd']['guest_username'] = node['nginx']['user']
+      node.default['vsftpd']['config']['ftp_username'] = node['nginx']['user']
+      node.default['vsftpd']['config']['chown_username'] = node['nginx']['user']
+      node.default['vsftpd']['config']['guest_username'] = node['nginx']['user']
 
       vsftpd_virtual_users "vsftpd_site_credentials" do
         users name_pass
