@@ -32,14 +32,14 @@ if node['rails']['apps'] or node['rails']['sites']
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
     vcs = data_bag("vcs_keys")
 
-    user_ref u do
+    user_ref "references_for_site_users" do
       users site_users
       secret default_secret
       vcs vcs
       type "sites"
     end
 
-    user_ref u do
+    user_ref "references_for_app_users" do
       users app_users
       secret default_secret
       vcs vcs
