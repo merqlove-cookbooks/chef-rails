@@ -23,7 +23,7 @@ file "#{node['nginx']['dir']}/conf.d/default.conf" do
 end  
 
 #PHP fpm fix
-node.default['php-fpm']['pools'] = [node['php-fpm']['default']['pool'].dup]
+node.default['php-fpm']['pools'] = []
 
 #Useful databases
 node.default["rails"]["databases"] = {}
@@ -45,6 +45,7 @@ end
 #PHP pools
 if node.default['php-fpm']['pools'].count > 0
   include_recipe "php-fpm::configure"
+  include_recipe "php-fpm::install"
   
   if Dir.exist? "#{node['php-fpm']['conf_dir']}"
     deleted = false
