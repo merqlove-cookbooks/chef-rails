@@ -145,7 +145,7 @@ define :app, application: false, type: "apps" do
           notifies :restart, 'service[php-fpm]', :delayed
         end
 
-        pool = node['php-fpm']['default']['pool']
+        pool = node.default['php-fpm']['default']['pool'].dup
 
         pool_custom = {
           :name => a["name"],
