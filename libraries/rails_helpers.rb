@@ -1,6 +1,6 @@
 module Rails
   module Helpers
-    def has_hash_in_array?(other_array, value)      
+    def self.has_hash_in_array?(other_array, value)      
       other_array.each { |h| return true if h.is_a?(Hash) and h.has_value? value }
       return false
     end  
