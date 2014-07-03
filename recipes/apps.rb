@@ -36,7 +36,7 @@ node['rails']['sites'].each do |k, a|
 end
 
 log "message" do
-  message node.default['php-fpm']['pools']
+  message node.default['php-fpm']['pools'].to_s
   level :info   
 end
 

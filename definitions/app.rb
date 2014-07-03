@@ -188,7 +188,7 @@ define :app, application: false, type: "apps" do
         node.default['php-fpm']['pools'].push(pool)
 
         log "message" do
-          message pool
+          message pool.to_s
           level :info
         end
       rescue Exception => e
