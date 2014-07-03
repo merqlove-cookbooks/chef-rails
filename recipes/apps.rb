@@ -35,10 +35,6 @@ node['rails']['sites'].each do |k, a|
   end
 end
 
-
-Chef::Log.info node.default['php-fpm']['pools'].to_s
-
-
 node['rails']['apps'].each do |k, a|
   app k do
     application a

@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-# Chef::Recipe.send(:include, Rails::Helpers)
-
 define :app, application: false, type: "apps" do
   if params[:application]
     a = params[:application]
@@ -183,11 +181,7 @@ define :app, application: false, type: "apps" do
           end
         end
 
-        # pool = pool.deep_merge pool_custom
-
-        node.default['php-fpm']['pools'].push(pool)
-
-        Chef::Log.info pool.to_s        
+        node.default['php-fpm']['pools'].push(pool)   
       rescue Exception => e
         log "message" do
           message "Upload PHP-FPM Cookbook.\n#{e.message}"
