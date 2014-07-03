@@ -51,7 +51,7 @@ if node.default['php-fpm']['pools'].count > 0
     Dir.foreach("#{node['php-fpm']['conf_dir']}") do |pool|
       next if pool == '.' or pool == '..'
       if pool.include? ".conf"
-        unless node['php-fpm']['pools'].include? Hash[name: pool.gsub(/\.conf/, '')]
+        unless node['php-fpm']['pools'].has_value?(pool.gsub(/\.conf/, ''))
           File.delete("#{node['php-fpm']['conf_dir']}/#{pool}") 
           deleted = true
         end
