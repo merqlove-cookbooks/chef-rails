@@ -35,7 +35,10 @@ node['rails']['sites'].each do |k, a|
   end
 end
 
-p node.default['php-fpm']['pools']
+log "message" do
+  message node.default['php-fpm']['pools']
+  level :info   
+end
 
 node['rails']['apps'].each do |k, a|
   app k do
