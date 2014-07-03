@@ -44,7 +44,7 @@ end
   
 #PHP pools
 if node.default['php-fpm']['pools'].count > 0
-  include_recipe "php-fpm"
+  include_recipe "php-fpm::configure"
   
   if Dir.exist? "#{node['php-fpm']['conf_dir']}"
     deleted = false
