@@ -156,6 +156,9 @@ define :app, application: false, type: "apps" do
             'php_value[session.save_path]' => "/var/lib/php/session/#{a["user"]}_#{a["name"]}",
             'php_admin_value[error_log]' => "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-error_log.log",
             'slowlog' => "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-slowlog.log",
+            'php_admin_value[post_max_size]' => '16M',
+            'php_admin_value[upload_max_filesize]' => '16M',
+            # 'php_value[session.save_handler]' => 'files' 
           }
         }
 
