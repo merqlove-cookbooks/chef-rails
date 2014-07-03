@@ -186,6 +186,7 @@ define :app, application: false, type: "apps" do
         # pool = pool.deep_merge pool_custom
 
         node.default['php-fpm']['pools'].push(pool)
+        p pool
       rescue Exception => e
         log "message" do
           message "Upload PHP-FPM Cookbook.\n#{e.message}"
