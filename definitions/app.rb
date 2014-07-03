@@ -196,7 +196,7 @@ define :app, application: false, type: "apps" do
     end
 
     directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/backup" do
-      mode      '0700'
+      mode      '0750'
       owner     a['user']
       group     a['user']
       action    :create
