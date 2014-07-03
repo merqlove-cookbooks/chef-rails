@@ -67,7 +67,7 @@ define :user_ref, users: false, secret: false, vcs: false do
             members [node['rails']['user']['deploy']]
           end
         else
-          group a["user"] do
+          group u do
             append true
             members [node['nginx']['user'], node['rails']['user']['deploy']]
           end
