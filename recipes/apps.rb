@@ -23,7 +23,7 @@ file "#{node['nginx']['dir']}/conf.d/default.conf" do
 end  
 
 #PHP fpm fix
-node.default['php-fpm']['pools'] = []
+node.default['php-fpm']['pools'] = [node['php-fpm']['default']['pool'].dup]
 
 #Useful databases
 node.default["rails"]["databases"] = {}
