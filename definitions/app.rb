@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-Chef::Recipe.send(:include, Rails::Helpers)
+# Chef::Recipe.send(:include, Rails::Helpers)
 
 define :app, application: false, type: "apps" do
   if params[:application]
@@ -175,15 +175,15 @@ define :app, application: false, type: "apps" do
           pool_custom[:php_options]['php_admin_value[sendmail_path]'] = "/usr/bin/msmtp -a #{a["user"]}_#{a['name']} -t"
         end
 
-        # pool_custom.each do |key, value|
-        #   if key.include? 'php_options'
-        #     pool[:"#{key}"] = pool[:"#{key}"].merge(value)
-        #   else
-        #     pool[:"#{key}"] = value
-        #   end
-        # end
+        pool_custom.each do |key, value|
+          if key.include? 'php_options'
+            pool[:"#{key}"] = pool[:"#{key}"].merge(value)
+          else
+            pool[:"#{key}"] = value
+          end
+        end
 
-        pool = pool.deep_merge pool_custom
+        # pool = pool.deep_merge pool_custom
 
         node.default['php-fpm']['pools'].push(pool)
       rescue Exception => e
