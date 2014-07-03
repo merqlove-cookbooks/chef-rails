@@ -176,10 +176,10 @@ define :app, application: false, type: "apps" do
         end
 
         pool_custom.each do |key, value|
-          if key.include? 'php_options'
-            pool[:"#{key}"] = pool[:"#{key}"].merge(value)
+          if key == :php_options
+            pool[key] = pool[key].merge(value)
           else
-            pool[:"#{key}"] = value
+            pool[key] = value
           end
         end
 
