@@ -158,7 +158,8 @@ define :app, application: false, type: "apps" do
             'slowlog' => "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-slowlog.log",
             'php_admin_value[post_max_size]' => '16M',
             'php_admin_value[upload_max_filesize]' => '16M',
-            # 'php_value[session.save_handler]' => 'files' 
+            # 'php_value[session.save_handler]' => 'files',
+            # "php_admin_value[memory_limit]" => "128M",
           }
         }
 
