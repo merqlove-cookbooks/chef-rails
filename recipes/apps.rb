@@ -45,24 +45,25 @@ end
 #PHP pools
 if node.default['php-fpm']['pools'].count > 0
   include_recipe "php-fpm::configure"
-  include_recipe "php-fpm::install"
   
-  if Dir.exist? "#{node['php-fpm']['conf_dir']}"
-    deleted = false
-    Dir.foreach("#{node['php-fpm']['conf_dir']}") do |pool|
-      next if pool == '.' or pool == '..'
-      if pool.include? ".conf"
-        unless node['php-fpm']['pools'].has_value?(pool.gsub(/\.conf/, ''))
-          File.delete("#{node['php-fpm']['conf_dir']}/#{pool}") 
-          deleted = true
+  ruby_block "cleanup php-fpm configuration" do
+    block do
+      if Dir.exist? "#{node['php-fpm']['conf_dir']}"
+        deleted = false
+        Dir.foreach("#{node['php-fpm']['conf_dir']}") do |pool|
+          next if pool == '.' or pool == '..'
+          if pool.include? ".conf"
+            unless node['php-fpm']['pools'].has_value?(pool.gsub(/\.conf/, ''))
+              File.delete("#{node['php-fpm']['conf_dir']}/#{pool}") 
+              deleted = true
+            end
+          end
         end
+
+        resources(:service => node['php-fpm']['service']).run_action(:restart) if deleted   
       end
     end
-
-    service node['php-fpm']['service'] do
-      action :restart
-      # only_if { deleted }
-    end      
+    action :create
   end
 
   directory "/var/lib/php/session" do
@@ -70,6 +71,8 @@ if node.default['php-fpm']['pools'].count > 0
     group "root"
     mode "0777"      
   end
+
+  include_recipe "php-fpm::install"
 else
   if Dir.exist? "#{node['php-fpm']['conf_dir']}"  
     Dir.foreach("#{node['php-fpm']['conf_dir']}") do |pool|
