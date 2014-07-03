@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include RailsHelpers
 
 define :app, application: false, type: "apps" do
   if params[:application]
@@ -144,25 +145,46 @@ define :app, application: false, type: "apps" do
           source 'php_fix.erb'
           notifies :restart, 'service[php-fpm]', :delayed
         end
-        node.default['php-fpm']['pools'].push({:name => a["name"]})
-        node.default['php-fpm']['pool'][a["name"]] = node['php-fpm']['default']['pool']
 
-        node.default['php-fpm']['pool'][a["name"]]['listen'] = "/var/run/php-#{a["user"]}-#{a["name"]}.sock"
-        node.default['php-fpm']['pool'][a["name"]]['user'] = a["user"]
-        node.default['php-fpm']['pool'][a["name"]]['group'] = a["user"]
-        node.default['php-fpm']['pool'][a["name"]]['session_save_path'] = "/var/lib/php/session/#{a["user"]}_#{a["name"]}"
-        node.default['php-fpm']['pool'][a["name"]]['slowlog'] = "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-slowlog.log"
-        node.default['php-fpm']['pool'][a["name"]]['error_log'] = "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-error_log.log"
+        pool = node['php-fpm']['default']['pool']
 
-        if a[:php][:pool]
+        pool_custom = {
+          :name => a["name"],
+          :listen => "/var/run/php-#{a["user"]}-#{a["name"]}.sock",
+          :user => a["user"],
+          :group => a["user"],
+          :php_options => {            
+            'php_value[session.save_path]' => "/var/lib/php/session/#{a["user"]}_#{a["name"]}",
+            'php_admin_value[error_log]' => "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-error_log.log",
+            'slowlog' => "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-slowlog.log",
+          }
+        }
+
+        if a[:php][:pool]          
           a[:php][:pool].each do |key, value|
-            node.default['php-fpm']['pool'][a["name"]][:"#{key}"] = value
+            if key.include? 'php_options'
+              pool_custom[:"#{key}"] = pool_custom[:"#{key}"].merge(value)
+            else
+              pool_custom[:"#{key}"] = value
+            end
           end
         end
 
         if a.include? "smtp"
-          node.default['php-fpm']['pool'][a["name"]]['sendmail_path'] = "/usr/bin/msmtp -a #{a["user"]}_#{a['name']} -t"
+          pool_custom[:php_options]['php_admin_value[sendmail_path]'] = "/usr/bin/msmtp -a #{a["user"]}_#{a['name']} -t"
         end
+
+        # pool_custom.each do |key, value|
+        #   if key.include? 'php_options'
+        #     pool[:"#{key}"] = pool[:"#{key}"].merge(value)
+        #   else
+        #     pool[:"#{key}"] = value
+        #   end
+        # end
+
+        pool = pool.deep_merge pool_custom
+
+        node.default['php-fpm']['pools'].push(pool)
       rescue Exception => e
         log "message" do
           message "Upload PHP-FPM Cookbook.\n#{e.message}"
