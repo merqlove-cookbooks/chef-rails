@@ -46,7 +46,8 @@ define :user_ref, users: false, secret: false, vcs: false do
             node.default['vsftpd']['allowed'].push(ftp["name"])
           end
 
-          group node['nginx']['user'] do
+          group "#{node['nginx']['user']} #{u}" do
+            group_name node['nginx']['user']
             append true
             members [u]
           end 
@@ -65,16 +66,23 @@ define :user_ref, users: false, secret: false, vcs: false do
             append true
             members [node['rails']['user']['deploy']]
           end
+        else
+          group a["user"] do
+            append true
+            members [node['nginx']['user'], node['rails']['user']['deploy']]
+          end
         end
 
         if node.role? "base_ruby"
-          group node[:rbenv][:group] do
+          group "#{node[:rbenv][:group]} #{u}" do
+            group_name node[:rbenv][:group]
             append true
             members [u]
           end
         end
 
-        group node[:msmtp][:group] do
+        group "#{node[:msmtp][:group]} #{u}" do
+          group_name node[:msmtp][:group]
           append true
           members [u]
         end
@@ -108,7 +116,8 @@ define :user_ref, users: false, secret: false, vcs: false do
                 mode 0600
               end
 
-              ssh_known_hosts_entry "#{key["host"]}" do
+              ssh_known_hosts_entry "#{key["host"]} #{u}" do
+                host key["host"]
                 file "/home/#{u}/.ssh/known_hosts"
                 owner u
               end

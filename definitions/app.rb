@@ -22,7 +22,8 @@ define :app, application: false, type: "apps" do
     a = params[:application]
     type = params[:type]
 
-    directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}" do
+    directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]} #{a["name"]}" do
+      path a["name"]
       owner a["user"]
       group a["user"]
       mode "0750"
@@ -56,11 +57,6 @@ define :app, application: false, type: "apps" do
         end
         next
       end
-    end
-
-    group a["user"] do
-      append true
-      members [node['nginx']['user'], node['rails']['user']['deploy']]
     end
 
     if node.default['rails']['ruby']
@@ -135,14 +131,6 @@ define :app, application: false, type: "apps" do
           mode "0700"
           action :create
           recursive true
-        end
-
-        template "/etc/php.d/php_fix.ini" do
-          owner "root"
-          group "root"
-          mode '755'
-          source 'php_fix.erb'
-          notifies :restart, 'service[php-fpm]', :delayed
         end
 
         pool = node.default['php-fpm']['default']['pool'].dup

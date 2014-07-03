@@ -45,6 +45,13 @@ end
 #PHP pools
 if node.default['php-fpm']['pools'].count > 0
   include_recipe "php-fpm::configure"
+  template "/etc/php.d/php_fix.ini" do
+    owner "root"
+    group "root"
+    mode '755'
+    source 'php_fix.erb'
+    notifies :restart, 'service[php-fpm]', :delayed
+  end
   
   ruby_block "cleanup php-fpm configuration" do
     block do
