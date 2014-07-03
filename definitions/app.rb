@@ -16,7 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include RailsHelpers
+
+Chef::Recipe.send(:include, Rails::Helpers)
 
 define :app, application: false, type: "apps" do
   if params[:application]
