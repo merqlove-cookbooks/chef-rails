@@ -187,10 +187,7 @@ define :app, application: false, type: "apps" do
 
         node.default['php-fpm']['pools'].push(pool)
 
-        log "message" do
-          message pool.to_s
-          level :info
-        end
+        Chef::Log.info pool.to_s        
       rescue Exception => e
         log "message" do
           message "Upload PHP-FPM Cookbook.\n#{e.message}"
