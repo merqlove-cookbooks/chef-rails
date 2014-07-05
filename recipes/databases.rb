@@ -127,7 +127,6 @@ if Chef.const_defined? "EncryptedDataBagItem"
     end    
 
     include_recipe "mysql::client"
-    include_recipe "mysql::server"
 
     if node['rails'].include? "mysql"
       template '/etc/mysql/conf.d/tune.cnf' do
@@ -140,6 +139,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
         notifies :restart, "mysql_service[#{node['mysql']['service_name']}]"
       end
     end
+    
+    include_recipe "mysql::server"
 
     include_recipe "database::mysql"
 
