@@ -18,6 +18,7 @@
 #
 
 node.default_attrs[:rails].delete(:databases) rescue nil
+node.default_attrs[:rails].delete(:mysql) rescue nil
 node.default_attrs[:msmtp].delete(:accounts) rescue nil
 
 node.default_attrs[:mysql].delete(:server_debian_password) rescue nil
