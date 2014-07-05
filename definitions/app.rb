@@ -112,9 +112,10 @@ define :app, application: false, type: "apps" do
 
     if a.include? "php"
       begin
+        node.default['php']['packages'] = %w{ php php-devel php-cli php-pear }
         if File.exist?("/usr/bin/php")
           include_recipe "composer::self_update"
-        else
+        else          
           include_recipe "php"
           package "php-gd"
           package "php-pecl-memcached"
