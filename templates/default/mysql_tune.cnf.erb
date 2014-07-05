@@ -1,0 +1,12 @@
+# Maintained by Chef.  Local changes will be overwritten
+
+<% @config.each_pair do |k,v| %>
+[<%= k %>]
+  <% v.each_pair do |option,value| %>
+    <% if value.is_a?(TrueClass) or value.is_a?(FalseClass) %>
+<%= option %> 
+    <% else %>
+<%= option %> = <%= value %>
+    <% end -%>
+  <% end -%>
+<% end -%>

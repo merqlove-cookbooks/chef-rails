@@ -129,6 +129,16 @@ if Chef.const_defined? "EncryptedDataBagItem"
     include_recipe "mysql::client"
     include_recipe "mysql::server"
 
+    template '/etc/mysql/conf.d/tune.cnf' do
+      owner 'mysql'
+      owner 'mysql'      
+      source 'mysql_tune.cnf.erb'
+      variables(
+        :config => node['rails']['mysql']
+      )
+      notifies :restart, "mysql_service[#{node['mysql']['service_name']}]"
+    end
+
     include_recipe "database::mysql"
 
     package "php-mysql" if FileTest.exist?("/usr/bin/php")
