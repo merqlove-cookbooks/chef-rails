@@ -112,7 +112,9 @@ define :app, application: false, type: "apps" do
 
     if a.include? "php"
       begin
-        if !File.exist?("/usr/bin/php")
+        if File.exist?("/usr/bin/php")
+          include_recipe "composer::self_update"
+        else
           include_recipe "php"
           package "php-gd"
           package "php-pecl-memcached"
@@ -121,9 +123,8 @@ define :app, application: false, type: "apps" do
             action :install
             notifies :reload, 'service[php-fpm]', :delayed
           end
-        end
-
-        include_recipe "composer"
+          include_recipe "composer"
+        end        
 
         directory "/var/lib/php/session/#{a["user"]}_#{a["name"]}" do
           owner a["user"]
