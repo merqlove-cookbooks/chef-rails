@@ -20,7 +20,7 @@
 if Chef.const_defined? "EncryptedDataBagItem"
   default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
 
-  if node.default["rails"]["databases"].include?("mongodb") and node['recipes'].include?("mongodb::default")
+  if node.default["rails"]["databases"].include?("mongodb")
     admin = Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
     include_recipe "mongodb::default"
 
@@ -68,7 +68,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
     end
   end
 
-  if node.default["rails"]["databases"].include?("postgresql") and node['recipes'].include?("postgresql::server")
+  if node.default["rails"]["databases"].include?("postgresql")
     postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
     node.normal['postgresql']['password']['postgres'] = postgres["password"]
 
@@ -118,7 +118,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
     end
   end
 
-  if node.default["rails"]["databases"].include? "mysql" and node['recipes'].include?("mysql::server")
+  if node.default["rails"]["databases"].include? "mysql"
     root = Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
     if root
       node.normal['mysql']['server_debian_password'] = root["debian_password"]
