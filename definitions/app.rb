@@ -112,7 +112,10 @@ define :app, application: false, type: "apps" do
 
     if a.include? "php"
       begin
-        node.default['php']['packages'] = %w{ php php-devel php-cli php-pear }
+        if node['platform_version'].to_f < 6
+          node.default['php']['packages'] = %w{ php php-devel php-cli php-pear }
+        end
+        
         if File.exist?("/usr/bin/php")
           include_recipe "composer::self_update"
         else          
