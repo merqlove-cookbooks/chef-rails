@@ -124,9 +124,12 @@ if Chef.const_defined? "EncryptedDataBagItem"
       node.normal['mysql']['server_debian_password'] = root["debian_password"]
       node.normal['mysql']['server_root_password']   = root["password"]
       node.normal['mysql']['server_repl_password']   = root["replication_password"]
-    end
-    
+    end    
 
+    include_recipe "mysql::client"
+    include_recipe "mysql::server"
+
+    if node['rails'].include? "mysql"
       template '/etc/mysql/conf.d/tune.cnf' do
         owner 'mysql'
         owner 'mysql'      
@@ -136,10 +139,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         )
         notifies :restart, "mysql_service[#{node['mysql']['service_name']}]"
       end
-    
-
-    include_recipe "mysql::client"
-    include_recipe "mysql::server"
+    end
 
     include_recipe "database::mysql"
 
