@@ -23,7 +23,7 @@ define :app, application: false, type: "apps" do
     type = params[:type]
 
     directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]} #{a["name"]}" do
-      path a["name"]
+      path "#{node['rails']["#{type}_base_path"]}/#{a["user"]}"
       owner a["user"]
       group a["user"]
       mode "0750"
