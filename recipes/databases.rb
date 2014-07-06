@@ -53,7 +53,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         type "mongodb"
         port "#{node['mongodb']['config']['port']}"
         host node['mongodb']['config']['bind_ip']
-        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_user"]}/#{d["app_name"]}"
+        path d["app_path"]
         owner d["app_user"]
         group d["app_user"]
         action :nothing
@@ -96,7 +96,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         type "postgresql"
         port "#{node['postgresql']['config']['port']}"
         host node['postgresql']['config']['listen_addresses']
-        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_user"]}/#{d["app_name"]}"
+        path d["app_path"]
         owner d["app_user"]
         group d["app_user"]
         action :nothing
@@ -124,14 +124,14 @@ if Chef.const_defined? "EncryptedDataBagItem"
       node.normal['mysql']['server_debian_password'] = root["debian_password"]
       node.normal['mysql']['server_root_password']   = root["password"]
       node.normal['mysql']['server_repl_password']   = root["replication_password"]
-    end    
+    end
 
     include_recipe "mysql::client"
 
     if node['rails'].include? "mysql"
       template '/etc/mysql/conf.d/tune.cnf' do
         owner 'mysql'
-        owner 'mysql'      
+        owner 'mysql'
         source 'mysql_tune.cnf.erb'
         variables(
           :config => node['rails']['mysql']
@@ -139,7 +139,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         notifies :restart, "mysql_service[#{node['mysql']['service_name']}]"
       end
     end
-    
+
     include_recipe "mysql::server"
 
     include_recipe "database::mysql"
@@ -160,7 +160,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         type "mysql"
         port "#{node['mysql']['port']}"
         host node['mysql']['bind_address']
-        path "#{node['rails']["#{d["app_type"]}_base_path"]}/#{d["app_user"]}/#{d["app_name"]}"
+        path d["app_path"]
         owner d["app_user"]
         group d["app_user"]
         action :nothing

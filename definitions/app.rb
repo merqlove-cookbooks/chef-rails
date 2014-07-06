@@ -21,15 +21,18 @@ define :app, application: false, type: "apps" do
   if params[:application]
     a = params[:application]
     type = params[:type]
+    base_path = node['rails']["#{type}_base_path"]
+    base_path += "/#{a["user"]}" if type.include? "sites"
+    app_path = "#{base_path}/#{a["name"]}"
 
-    directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]} #{a["name"]}" do
-      path "#{node['rails']["#{type}_base_path"]}/#{a["user"]}"
+    directory "#{base_path} #{a["name"]}" do
+      path "#{base_path}"
       owner a["user"]
       group a["user"]
       mode "0750"
     end
 
-    directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}" do
+    directory app_path do
       owner a["user"]
       group a["user"]
       mode "0750"
@@ -43,7 +46,7 @@ define :app, application: false, type: "apps" do
         end
       end
 
-      directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}" do
+      directory app_path do
         action :delete
       end
 
@@ -88,7 +91,7 @@ define :app, application: false, type: "apps" do
         node.default['msmtp']['accounts'][a['user']][a["name"]]= a[:smtp]
         node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "on"
         node.default['msmtp']['accounts'][a['user']][a["name"]][:syslog] = "off"
-        node.default['msmtp']['accounts'][a['user']][a["name"]][:log] = "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/msmtp.log"
+        node.default['msmtp']['accounts'][a['user']][a["name"]][:log] = "#{app_path}/log/msmtp.log"
       rescue Exception => e
         log "message" do
           message "Upload MSMTP Cookbook.\n#{e.message}"
@@ -105,6 +108,7 @@ define :app, application: false, type: "apps" do
           password: d["password"],
           app_type: type,
           app_name: a["name"],
+          app_path: app_path,
           app_user: a["user"]
         }
       end
@@ -115,10 +119,10 @@ define :app, application: false, type: "apps" do
         if node['platform_version'].to_f < 6
           node.default['php']['packages'] = %w{ php php-devel php-cli php-pear }
         end
-        
+
         if File.exist?("/usr/bin/php")
           include_recipe "composer::self_update"
-        else          
+        else
           include_recipe "php"
           package "php-gd"
           package "php-pecl-memcached"
@@ -128,7 +132,7 @@ define :app, application: false, type: "apps" do
             notifies :reload, 'service[php-fpm]', :delayed
           end
           include_recipe "composer"
-        end        
+        end
 
         directory "/var/lib/php/session/#{a["user"]}_#{a["name"]}" do
           owner a["user"]
@@ -145,10 +149,10 @@ define :app, application: false, type: "apps" do
           :listen => "/var/run/php-#{a["user"]}-#{a["name"]}.sock",
           :user => a["user"],
           :group => a["user"],
-          :php_options => {            
+          :php_options => {
             'php_value[session.save_path]' => "/var/lib/php/session/#{a["user"]}_#{a["name"]}",
-            'php_admin_value[error_log]' => "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-error_log.log",
-            'slowlog' => "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log/php-fpm-slowlog.log",
+            'php_admin_value[error_log]' => "#{app_path}/log/php-fpm-error_log.log",
+            'slowlog' => "#{app_path}/log/php-fpm-slowlog.log",
             'php_admin_value[post_max_size]' => '16M',
             'php_admin_value[upload_max_filesize]' => '16M',
             'request_slowlog_timeout' => "5s",
@@ -157,7 +161,7 @@ define :app, application: false, type: "apps" do
           }
         }
 
-        if a[:php][:pool]          
+        if a[:php][:pool]
           a[:php][:pool].each do |key, value|
             if key.include? 'php_options'
               pool_custom[:"#{key}"] = pool_custom[:"#{key}"].merge(value)
@@ -179,7 +183,7 @@ define :app, application: false, type: "apps" do
           end
         end
 
-        node.default['php-fpm']['pools'].push(pool)   
+        node.default['php-fpm']['pools'].push(pool)
       rescue Exception => e
         log "message" do
           message "Upload PHP-FPM Cookbook.\n#{e.message}"
@@ -188,7 +192,7 @@ define :app, application: false, type: "apps" do
       end
     end
 
-    directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/backup" do
+    directory "#{app_path}/backup" do
       mode      '0750'
       owner     a['user']
       group     a['user']
@@ -197,14 +201,14 @@ define :app, application: false, type: "apps" do
     end
 
     if type.include? "sites" and a.include? "nginx"
-      directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/docs" do
+      directory "#{app_path}/docs" do
         mode      '0750'
         owner     a['user']
         group     a['user']
         action    :create
         recursive true
       end
-      directory "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}/log" do
+      directory "#{app_path}/log" do
         mode      '0755'
         owner     a['user']
         group     a['user']
@@ -233,7 +237,7 @@ define :app, application: false, type: "apps" do
         min a["nginx"]["min"]
         wordpress a["nginx"]["wordpress"]
         server_name server_name
-        path "#{node['rails']["#{type}_base_path"]}/#{a["user"]}/#{a["name"]}"
+        path app_path
         rewrites a["nginx"]["rewrites"]
         file_rewrites a["nginx"]["file_rewrites"]
         php_rewrites a["nginx"]["php_rewrites"]

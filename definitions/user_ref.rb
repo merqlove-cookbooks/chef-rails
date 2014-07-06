@@ -30,10 +30,11 @@ define :user_ref, users: false, secret: false, vcs: false do
         if data["ftp"]
           data["ftp"].each do |ftp|
             name_pass.push({'name' => ftp["name"], 'password' => ftp["password"] })
+            local_root = ftp["local_root"] || "#{node['rails']['sites_base_path']}/#{u}"
             node.default['vsftpd']['users'].push({
-              'name' => ftp["name"], 
+              'name' => ftp["name"],
               'config' => {
-                'local_root' => "#{node['rails']['sites_base_path']}/#{u}",
+                'local_root' => local_root,
                 'dirlist_enable' => 'YES',
                 'download_enable' => 'YES',
                 'write_enable' => 'YES',
@@ -50,7 +51,7 @@ define :user_ref, users: false, secret: false, vcs: false do
             group_name node['nginx']['user']
             append true
             members [u]
-          end 
+          end
         end
 
         user u do
