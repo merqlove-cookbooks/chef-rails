@@ -56,14 +56,13 @@ if Chef.const_defined? "EncryptedDataBagItem"
         path d["app_path"]
         owner d["app_user"]
         group d["app_user"]
-        action :nothing
+        action :create
       end
 
       execute d["name"] do
         command "mongo admin -u #{admin["id"]} -p #{admin["password"]} --eval '#{d["name"]}=db.getSiblingDB(\"#{d["name"]}\"); #{d["name"]}.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"
         action :run
         not_if "mongo #{d["name"]} --eval 'db.auth(\"#{d["user"]}\",\"#{d["password"]}\")' | grep -q ^1$"
-        notifies :create, "rails_db_yml[#{d["name"]}_mongodb]", :immediately
       end
     end
   else
@@ -106,7 +105,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         path d["app_path"]
         owner d["app_user"]
         group d["app_user"]
-        action :nothing
+        action :create
       end
 
       postgresql_database_user d["user"] do
@@ -120,7 +119,6 @@ if Chef.const_defined? "EncryptedDataBagItem"
         owner d["user"]
         connection_limit '-1'
         action     :create
-        notifies :create, "rails_db_yml[#{d["name"]}_postgresql]", :immediately
       end
     end
   else
@@ -177,7 +175,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         path d["app_path"]
         owner d["app_user"]
         group d["app_user"]
-        action :nothing
+        action :create
       end
 
       mysql_database_user d["user"] do
@@ -190,7 +188,6 @@ if Chef.const_defined? "EncryptedDataBagItem"
         connection mysql_connection_info
         owner d["user"]
         action :create
-        notifies :create, "rails_db_yml[#{d["name"]}_mysql]", :immediately
         notifies :grant, "mysql_database_user[grant_#{d["user"]}_#{d["name"]}]", :immediately
       end
       mysql_database_user "grant_#{d["user"]}_#{d["name"]}" do
