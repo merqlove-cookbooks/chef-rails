@@ -54,7 +54,7 @@ define :app, application: false, type: "apps" do
       end
     end
 
-    if a[:delete]
+    if a[:delete] and a[:name]
       if type.include? "sites" and a.include? "nginx"
         rails_nginx_vhost a["name"] do
           action :delete
