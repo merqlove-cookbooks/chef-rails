@@ -38,7 +38,7 @@ define :app, application: false, type: "apps" do
       mode "0750"
       recursive true
     end
-    
+
     if a.include? "db"
       a["db"].each do |d|
         node.default["rails"]["databases"][d["type"]][d["name"]] = {
@@ -48,7 +48,7 @@ define :app, application: false, type: "apps" do
           app_type: type,
           app_name: a["name"],
           app_path: app_path,
-          app_user: a["user"]
+          app_user: a["user"],
           app_delete: a[:delete]
         }
       end
