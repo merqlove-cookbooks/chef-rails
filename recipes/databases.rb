@@ -67,8 +67,11 @@ if Chef.const_defined? "EncryptedDataBagItem"
       end
     end
   else
-    if FileTest.file? File.join(node[:mongodb][:init_dir], node['mongodb']['instance_name'])
-      resources(:service => node[:mongodb][:instance_name]).run_action([:stop, :disable])
+    mongo_init = File.join(node[:mongodb][:init_dir], node['mongodb']['instance_name'])
+    if FileTest.file? mongo_init
+      service node['mongodb']['instance_name'] do
+        action [:stop, :disable]
+      end
     end
   end
 
@@ -121,8 +124,11 @@ if Chef.const_defined? "EncryptedDataBagItem"
       end
     end
   else
-    if FileTest.file? File.join("/etc/init.d", node['postgresql']['server']['service_name'])
-      resources(:service => "postgresql").run_action([:stop, :disable])
+    postgresql_init = File.join("/etc/init.d", node['postgresql']['server']['service_name'])
+    if FileTest.file? postgresql_init
+      service node['postgresql']['server']['service_name'] do
+        action [:stop, :disable]
+      end
     end
   end
 
@@ -197,8 +203,11 @@ if Chef.const_defined? "EncryptedDataBagItem"
       end
     end
   else
-    if FileTest.file? File.join("/etc/init.d", "mysqld")
-      resources(:service => "mysqld").run_action([:stop, :disable])
+    mysql_init = File.join("/etc/init.d", "mysqld")
+    if FileTest.file? mysql_init
+      service "mysqld" do
+        action [:stop, :disable]
+      end
     end
   end
 end
