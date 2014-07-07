@@ -38,6 +38,21 @@ define :app, application: false, type: "apps" do
       mode "0750"
       recursive true
     end
+    
+    if a.include? "db"
+      a["db"].each do |d|
+        node.default["rails"]["databases"][d["type"]][d["name"]] = {
+          name: d["name"],
+          user: d["user"],
+          password: d["password"],
+          app_type: type,
+          app_name: a["name"],
+          app_path: app_path,
+          app_user: a["user"]
+          app_delete: a[:delete]
+        }
+      end
+    end
 
     if a[:delete]
       if type.include? "sites" and a.include? "nginx"
@@ -97,20 +112,6 @@ define :app, application: false, type: "apps" do
           message "Upload MSMTP Cookbook.\n#{e.message}"
           level :error
         end
-      end
-    end
-
-    if a.include? "db"
-      a["db"].each do |d|
-        node.default["rails"]["databases"][d["type"]][d["name"]] = {
-          name: d["name"],
-          user: d["user"],
-          password: d["password"],
-          app_type: type,
-          app_name: a["name"],
-          app_path: app_path,
-          app_user: a["user"]
-        }
       end
     end
 

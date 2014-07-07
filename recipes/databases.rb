@@ -66,6 +66,10 @@ if Chef.const_defined? "EncryptedDataBagItem"
         notifies :create, "rails_db_yml[#{d["name"]}_mongodb]", :immediately
       end
     end
+  else
+    if FileTest.file? File.join(node[:mongodb][:init_dir], node['mongodb']['instance_name'])
+      resources(:service => node[:mongodb][:instance_name]).run_action([:stop, :disable])
+    end
   end
 
   if node.default["rails"]["databases"].include?("postgresql")
@@ -115,6 +119,10 @@ if Chef.const_defined? "EncryptedDataBagItem"
         action     :create
         notifies :create, "rails_db_yml[#{d["name"]}_postgresql]", :immediately
       end
+    end
+  else
+    if FileTest.file? File.join("/etc/init.d", node['postgresql']['server']['service_name'])
+      resources(:service => "postgresql").run_action([:stop, :disable])
     end
   end
 
@@ -187,6 +195,10 @@ if Chef.const_defined? "EncryptedDataBagItem"
         privileges    [:all]
         action        :nothing
       end
+    end
+  else
+    if FileTest.file? File.join("/etc/init.d", "mysqld")
+      resources(:service => "mysqld").run_action([:stop, :disable])
     end
   end
 end
