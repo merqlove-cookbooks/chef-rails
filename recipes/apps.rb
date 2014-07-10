@@ -119,12 +119,14 @@ unless node.role? "vagrant"
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
     aws = data_bag("aws")
     duplicity = data_bag("duplicity")
-    if duplicity.include?("main")
+    if duplicity.include?("main") and aws.include?("main")
       duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", "main", default_secret)
-      passphrase = duplicity_main["passphrase"]
-      aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret) if aws.include?("main")
+      aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
+      p aws_main
+      p duplicity_main
       if duplicity_main["passphrase"] and aws_main["aws_access_key_id"] and aws_main["aws_secret_access_key"]
-        aws_host = aws_main["aws_host"] ? aws_main["aws_host"] : "s3.amazonaws.com"
+        aws_host = aws_main["aws_host"] || "s3.amazonaws.com"
+        p aws_main
         duplicity_ng_cronjob 'dbackup' do
           name 'dbackup' # Cronjob filename (name_attribute)
 
@@ -136,7 +138,7 @@ unless node.role? "vagrant"
 
           # duplicity parameters
           backend    "s3://#{aws_host}/#{prefix}/#{node['fqdn']}" # Backend to use (default: nil, required!)
-          passphrase passphrase                 # duplicity passphrase (default: nil, required!)
+          passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
 
           include        %w(/etc/ /root/ /var/log/) # Default directories to backup
           exclude        %w()                       # Default directories to exclude from backup
@@ -164,7 +166,7 @@ unless node.role? "vagrant"
           # In case you use S3 as your backend, your credentials go here
           aws_access_key_id     aws_main["aws_access_key_id"]
           aws_secret_access_key aws_main["aws_secret_access_key"]
-          aws_eu (aws_main["aws_eu"] ? aws_main["aws_eu"] : true)
+          aws_eu (aws_main["aws_eu"] || true)
         end
       end
     end
