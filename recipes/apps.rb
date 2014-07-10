@@ -122,11 +122,8 @@ unless node.role? "vagrant"
     if duplicity.include?("main") and aws.include?("main")
       duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", "main", default_secret)
       aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
-      p aws_main
-      p duplicity_main
       if duplicity_main["passphrase"] and aws_main["aws_access_key_id"] and aws_main["aws_secret_access_key"]
         aws_host = aws_main["aws_host"] || "s3.amazonaws.com"
-        p aws_main
         duplicity_ng_cronjob 'dbackup' do
           name 'dbackup' # Cronjob filename (name_attribute)
 
