@@ -124,7 +124,7 @@ unless node.role? "vagrant"
       aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
       if duplicity_main["passphrase"] and aws_main["aws_access_key_id"] and aws_main["aws_secret_access_key"]
         aws_host = aws_main["aws_host"] || "s3.amazonaws.com"
-        backup_apps = node['rails']['apps'].keys.map{|key| "#{node['rails']['apps_base_path']}/#{node['rails']['sites'][key]["name"]}/" }.join(" ")
+        backup_apps = node['rails']['apps'].keys.map{|key| "#{node['rails']['apps_base_path']}/#{node['rails']['apps'][key]["name"]}/" }.join(" ")
         backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }.join(" ")
         backup_paths = %w(/etc/ /root/ /var/log/)
         # backup_paths.push backup_apps
