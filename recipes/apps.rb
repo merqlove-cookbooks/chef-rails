@@ -119,13 +119,12 @@ unless node.role? "vagrant"
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
     aws = data_bag("aws")
     duplicity = data_bag("duplicity")
-    if duplicity.include?("passphrase")
-      passphrase = Chef::EncryptedDataBagItem.load("duplicity", "passphrase", default_secret)
-      if aws.include?("aws_access_key_id") and aws.include?("aws_secret_access_key")
-        aws_access_key_id = Chef::EncryptedDataBagItem.load("aws", "aws_access_key_id", default_secret)
-        aws_secret_access_key = Chef::EncryptedDataBagItem.load("aws", "aws_secret_access_key", default_secret)
-        aws_host = aws.include?("aws_host") ? Chef::EncryptedDataBagItem.load("aws", "aws_host", default_secret) : "s3.amazonaws.com"
-        aws_eu = Chef::EncryptedDataBagItem.load("aws", "aws_eu", default_secret) if aws.include?("aws_eu")
+    if duplicity.include?("main")
+      duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", "main", default_secret)
+      passphrase = duplicity_main["passphrase"]
+      aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret) if aws.include?("main")
+      if duplicity_main["passphrase"] and aws_main["aws_access_key_id"] and aws_main["aws_secret_access_key"]
+        aws_host = aws_main["aws_host"] ? aws_main["aws_host"] : "s3.amazonaws.com"
         duplicity_ng_cronjob 'dbackup' do
           name 'dbackup' # Cronjob filename (name_attribute)
 
@@ -163,9 +162,9 @@ unless node.role? "vagrant"
           # swift_authurl  'SwiftAuthURL'
 
           # In case you use S3 as your backend, your credentials go here
-          aws_access_key_id     aws_access_key_id
-          aws_secret_access_key aws_secret_access_key
-          aws_eu (aws_eu ? aws_eu : true)
+          aws_access_key_id     aws_main["aws_access_key_id"]
+          aws_secret_access_key aws_main["aws_secret_access_key"]
+          aws_eu (aws_main["aws_eu"] ? aws_main["aws_eu"] : true)
         end
       end
     end
