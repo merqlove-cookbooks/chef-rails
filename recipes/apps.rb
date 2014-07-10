@@ -124,6 +124,11 @@ unless node.role? "vagrant"
       aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
       if duplicity_main["passphrase"] and aws_main["aws_access_key_id"] and aws_main["aws_secret_access_key"]
         aws_host = aws_main["aws_host"] || "s3.amazonaws.com"
+        backup_apps = node['rails']['apps'].keys.map{|key| "#{node['rails']['apps_base_path']}/#{node['rails']['sites'][key]["name"]}/" }.join(" ")
+        backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }.join(" ")
+        backup_paths = %w(/etc/ /root/ /var/log/)
+        backup_paths.push backup_apps
+        backup_paths.push backup_sites
         duplicity_ng_cronjob 'dbackup' do
           name 'dbackup' # Cronjob filename (name_attribute)
 
@@ -131,13 +136,13 @@ unless node.role? "vagrant"
           interval         'daily'              # Cron interval (hourly, daily, monthly)
           duplicity_path   '/usr/bin/duplicity' # Path to duplicity
           configure_zabbix false                # Automatically configure zabbix user paremeters
-          logfile          '/dev/null'          # Log cronjob output to this file
-
+          # logfile          '/dev/null'          # Log cronjob output to this file
+          logfile          '/var/log/duplicity.log'
           # duplicity parameters
           backend    "s3://#{aws_host}/#{prefix}/#{node['fqdn']}" # Backend to use (default: nil, required!)
           passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
 
-          include        %w(/etc/ /root/ /var/log/) # Default directories to backup
+          include        backup_paths # Default directories to backup
           exclude        %w()                       # Default directories to exclude from backup
           archive_dir    '/tmp/duplicity-archive'   # duplicity archive directory
           temp_dir       '/tmp/duplicity-tmp'       # duplicity temp directory
