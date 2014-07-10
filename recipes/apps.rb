@@ -124,7 +124,7 @@ unless node.role? "vagrant"
       if aws.include?("aws_access_key_id") and aws.include?("aws_secret_access_key")
         aws_access_key_id = Chef::EncryptedDataBagItem.load("aws", "aws_access_key_id", default_secret)
         aws_secret_access_key = Chef::EncryptedDataBagItem.load("aws", "aws_secret_access_key", default_secret)
-        aws_host = if aws.include?("aws_host") ? Chef::EncryptedDataBagItem.load("aws", "aws_host", default_secret) : "s3.amazonaws.com"
+        aws_host = aws.include?("aws_host") ? Chef::EncryptedDataBagItem.load("aws", "aws_host", default_secret) : "s3.amazonaws.com"
         aws_eu = Chef::EncryptedDataBagItem.load("aws", "aws_eu", default_secret) if aws.include?("aws_eu")
         duplicity_ng_cronjob 'dbackup' do
           name 'dbackup' # Cronjob filename (name_attribute)
