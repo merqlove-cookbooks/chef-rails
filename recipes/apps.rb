@@ -113,7 +113,7 @@ include_recipe "rails::database_admin"
 unless node.role? "vagrant"
   prefix = "backups_"
   node['tags'].each do |tag|
-    prefix += tag[/server\_/,''] if tag.include? "server_"
+    prefix += tag.gsub('server_','') if tag.include? "server_"
   end
   if Chef.const_defined?("EncryptedDataBagItem")
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
