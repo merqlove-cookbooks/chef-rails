@@ -168,7 +168,7 @@ unless node.role? "vagrant"
           # In case you use S3 as your backend, your credentials go here
           aws_access_key_id     aws_main["aws_access_key_id"]
           aws_secret_access_key aws_main["aws_secret_access_key"]
-          aws_eu (aws_main["aws_eu"] || true)
+          aws_eu aws_main["aws_eu"] || false
         end
       end
     end
