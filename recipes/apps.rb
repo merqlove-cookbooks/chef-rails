@@ -137,6 +137,8 @@ unless node.role? "vagrant"
           interval         'daily'              # Cron interval (hourly, daily, monthly)
           # logfile          '/dev/null'          # Log cronjob output to this file
           logfile          '/var/log/duplicity.log'
+          duplicity_path   '/usr/local/bin/duplicity'
+          
           # duplicity parameters
           backend    "#{aws_eu}s3://#{aws_host}/#{prefix}/#{node['fqdn']}" # Backend to use (default: nil, required!)
           passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
