@@ -127,6 +127,7 @@ unless node.role? "vagrant"
         backup_apps = node['rails']['apps'].keys.map{|key| "#{node['rails']['apps_base_path']}/#{node['rails']['apps'][key]["name"]}/" }.join(" ")
         backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }.join(" ")
         backup_paths = %w(/etc/ /root/ /var/log/)
+        aws_eu = aws_main["aws_eu"] ? "--s3-use-new-style --s3-european-buckets " : ""
         # backup_paths.push backup_apps
         # backup_paths.push backup_sites
         duplicity_ng_cronjob 'dbackup' do
@@ -134,12 +135,10 @@ unless node.role? "vagrant"
 
           # Attributes for the default cronjob template
           interval         'daily'              # Cron interval (hourly, daily, monthly)
-          duplicity_path   '/usr/bin/duplicity' # Path to duplicity
-          configure_zabbix false                # Automatically configure zabbix user paremeters
           # logfile          '/dev/null'          # Log cronjob output to this file
           logfile          '/var/log/duplicity.log'
           # duplicity parameters
-          backend    "s3://#{aws_host}/#{prefix}/#{node['fqdn']}" # Backend to use (default: nil, required!)
+          backend    "#{aws_eu}s3://#{aws_host}/#{prefix}/#{node['fqdn']}" # Backend to use (default: nil, required!)
           passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
 
           include        backup_paths # Default directories to backup
@@ -168,7 +167,6 @@ unless node.role? "vagrant"
           # In case you use S3 as your backend, your credentials go here
           aws_access_key_id     aws_main["aws_access_key_id"]
           aws_secret_access_key aws_main["aws_secret_access_key"]
-          aws_eu aws_main["aws_eu"] || false
         end
       end
     end
