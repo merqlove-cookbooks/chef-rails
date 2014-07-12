@@ -32,6 +32,12 @@ define :app, application: false, type: "apps" do
       mode "0750"
     end
 
+    if a["backup"]
+      rails_backup a["name"] do
+        path "#{type}/#{a["name"]}"
+      end
+    end
+
     directory app_path do
       owner a["user"]
       group a["user"]
@@ -54,7 +60,7 @@ define :app, application: false, type: "apps" do
       end
     end
 
-    if a[:delete] and a[:name]
+    if a[:delete] and a[:name] and !a["name"].empty?
       if type.include? "sites" and a.include? "nginx"
         rails_nginx_vhost a["name"] do
           action :delete

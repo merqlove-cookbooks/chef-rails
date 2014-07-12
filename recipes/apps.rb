@@ -110,67 +110,78 @@ end
 include_recipe "rails::databases"
 include_recipe "rails::database_admin"
 
-unless node.role? "vagrant"
-  if Chef.const_defined?("EncryptedDataBagItem")
-    default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
-    aws = data_bag("aws")
-    duplicity = data_bag("duplicity")
-    if duplicity.include?("main") and aws.include?("main")
-      duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", "main", default_secret)
-      aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
-      if duplicity_main["passphrase"] and aws_main["aws_access_key_id"] and aws_main["aws_secret_access_key"]
-        aws_host = node['rails']['duplicity']['s3']['host']
-        backup_apps = node['rails']['apps'].keys.map{|key| "#{node['rails']['apps_base_path']}/#{node['rails']['apps'][key]["name"]}/" }
-        backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }
-        backup_paths = node['rails']['duplicity']['include']
-        aws_eu = node['rails']['duplicity']['s3']['eu'] ? "--s3-use-new-style --s3-european-buckets " : ""
-        backup_paths.concat backup_apps
-        backup_paths.concat backup_sites
-        logfile = node['rails']['duplicity']['log'] ? node['rails']['duplicity']['log_file'] : '/dev/null'
-        duplicity_ng_cronjob 'backup' do
-          name 'backup' # Cronjob filename (name_attribute)
+rails_backup "system"
 
-          # Attributes for the default cronjob template
-          interval         node['rails']['duplicity']['interval']              # Cron interval (hourly, daily, monthly)
-          logfile          logfile          # Log cronjob output to this file
-
-          duplicity_path   node['rails']['duplicity']['path']
-
-          # duplicity parameters
-          backend    "#{aws_eu}s3+http://#{node['rails']['duplicity']['bucket']}/#{node['fqdn']}" # Backend to use (default: nil, required!)
-          passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
-
-          include        backup_paths # Default directories to backup
-          exclude        node['rails']['duplicity']['exclude']                       # Default directories to exclude from backup
-          archive_dir    node['rails']['duplicity']['archive_dir']   # duplicity archive directory
-          temp_dir       node['rails']['duplicity']['temp_dir']       # duplicity temp directory
-          keep_full      node['rails']['duplicity']['keep_full']                          # Keep 5 full backups
-          nice           node['rails']['duplicity']['nice']                         # Be nice (cpu)
-          ionice         node['rails']['duplicity']['ionice']                          # Ionice class (3 => idle)
-          full_backup_if_older_than node['rails']['duplicity']['full_per']            # Take a full backup after this interval
-
-          # # Command(s) to run at the very beginning of the cronjob (default: empty)
-          # exec_pre %(if [ -f "/nobackup" ]; then exit 0; fi)
-          #
-          # # Command(s) to run after cleanup, but before the backup (default: empty)
-          # exec_before ['pg_dumpall -U postgres |bzip2 > /tmp/dump.sql.bz2']
-          #
-          # # Command(s) to run after the backup has finished (default: empty)
-          # exec_after  ['touch /backup-sucessfull', 'echo yeeeh']
-          #
-          # # In case you use Swift as you backend, specify the credentials here
-          # swift_username 'mySwiftUsername'
-          # swift_password 'mySwiftPassword'
-          # swift_authurl  'SwiftAuthURL'
-
-          # In case you use S3 as your backend, your credentials go here
-          aws_access_key_id     aws_main["aws_access_key_id"]
-          aws_secret_access_key aws_main["aws_secret_access_key"]
-        end
-      end
-    end
-  end
-end
+# unless node.role? "vagrant"
+#   if Chef.const_defined?("EncryptedDataBagItem")
+#     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
+#     case node['rails']['duplicity']['method']
+#     when "aws"
+#       store_keys = data_bag("aws")
+#     when "gs"
+#       store_keys = data_bag("gs")
+#     end
+#     duplicity = data_bag("duplicity")
+#     if duplicity.include?("main") and store_keys.include?("main")
+#       duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", "main", default_secret)
+#       case node['rails']['duplicity']['method']
+#       when "aws"
+#         store_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
+#       when "gs"
+#         store_main = Chef::EncryptedDataBagItem.load("gs", "main", default_secret)
+#       end
+#       if duplicity_main["passphrase"] and store_main["access_key_id"] and store_main["secret_access_key"]
+#         backup_paths = node['rails']['duplicity']['include']
+#         aws_eu = node['rails']['duplicity']['s3']['eu'] ? "--s3-use-new-style --s3-european-buckets " : ""
+#         logfile = node['rails']['duplicity']['log'] ? node['rails']['duplicity']['log_file'] : '/dev/null'
+#         duplicity_ng_cronjob 'backup' do
+#           name 'backup' # Cronjob filename (name_attribute)
+#
+#           # Attributes for the default cronjob template
+#           interval         node['rails']['duplicity']['interval']              # Cron interval (hourly, daily, monthly)
+#           logfile          logfile          # Log cronjob output to this file
+#
+#           duplicity_path   node['rails']['duplicity']['path']
+#
+#           # duplicity parameters
+#           backend    "#{aws_eu}#{node['rails']['duplicity']['method']}://#{node['rails']['duplicity']['target']}/#{node['fqdn']}" # Backend to use (default: nil, required!)
+#           passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
+#
+#           include        backup_paths # Default directories to backup
+#           exclude        node['rails']['duplicity']['exclude']                       # Default directories to exclude from backup
+#           archive_dir    node['rails']['duplicity']['archive_dir']   # duplicity archive directory
+#           temp_dir       node['rails']['duplicity']['temp_dir']       # duplicity temp directory
+#           keep_full      node['rails']['duplicity']['keep_full']                          # Keep 5 full backups
+#           nice           node['rails']['duplicity']['nice']                         # Be nice (cpu)
+#           ionice         node['rails']['duplicity']['ionice']                          # Ionice class (3 => idle)
+#           full_backup_if_older_than node['rails']['duplicity']['full_per']            # Take a full backup after this interval
+#
+#           # # Command(s) to run at the very beginning of the cronjob (default: empty)
+#           # exec_pre %(if [ -f "/nobackup" ]; then exit 0; fi)
+#           #
+#           # # Command(s) to run after cleanup, but before the backup (default: empty)
+#           # exec_before ['pg_dumpall -U postgres |bzip2 > /tmp/dump.sql.bz2']
+#           #
+#           # # Command(s) to run after the backup has finished (default: empty)
+#           # exec_after  ['touch /backup-sucessfull', 'echo yeeeh']
+#           #
+#           # # In case you use Swift as you backend, specify the credentials here
+#           # swift_username 'mySwiftUsername'
+#           # swift_password 'mySwiftPassword'
+#           # swift_authurl  'SwiftAuthURL'
+#
+#           # In case you use S3 as your backend, your credentials go here
+#           gs_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("gs")
+#           gs_secret_access_key store_main["secret_access_key"] if node['rails']['duplicity']['method'].include?("gs")
+#
+#           # In case you use S3 as your backend, your credentials go here
+#           aws_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("aws")
+#           aws_secret_access_key store__main["secret_access_key"] if node['rails']['duplicity']['method'].include?("aws")
+#         end
+#       end
+#     end
+#   end
+# end
 
 include_recipe "msmtp"
 include_recipe "rails::cleanup"

@@ -38,6 +38,11 @@ default['rails']['duplicity']['nice'] = 10
 default['rails']['duplicity']['ionice'] = 3
 
 # Amazon S3, Google Cloud Storage defaults
-default['rails']['duplicity']['bucket'] = nil # must set if we use buckets
+default['rails']['duplicity']['method'] = "s3+http" # possible "s3", "s3+http", "gs", "ftp", "ssh", ...
+default['rails']['duplicity']['target'] = nil # must be not nil!
 default['rails']['duplicity']['s3']['eu'] = false # eu buckets?
 default['rails']['duplicity']['s3']['host'] = 's3.amazonaws.com' # optional
+
+default['rails']['duplicity']['exec_pre'] = [] # ['if [ -f "/nobackup" ]; then exit 0; fi']
+default['rails']['duplicity']['exec_before'] = [] # ['pg_dumpall -U postgres |bzip2 > /tmp/dump.sql.bz2']
+default['rails']['duplicity']['exec_after'] = [] # ['touch /backup-sucessfull', 'echo yeeeh']
