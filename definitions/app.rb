@@ -35,6 +35,9 @@ define :app, application: false, type: "apps" do
     if a["backup"]
       rails_backup a["name"] do
         path "#{type}/#{a["name"]}"
+        include app_path
+        archive_dir "/tmp/da-#{a["name"]}"
+        temp_dir "/tmp/dt-#{a["name"]}"
       end
     end
 

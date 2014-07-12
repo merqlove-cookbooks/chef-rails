@@ -40,8 +40,10 @@ attribute :interval, :kind_of => [String, NilClass], :default => nil
 attribute :full_per, :kind_of => [String, NilClass], :default => nil
 
 # Directory select
-attribute :include, :kind_of => [Array, NilClass], :default => nil
-attribute :exclude, :kind_of => [Array, NilClass], :default => nil
+attribute :include,      :kind_of => [Array, NilClass], :default => nil
+attribute :exclude,      :kind_of => [Array, NilClass], :default => nil
+attribute :archive_dir,  :kind_of => [String, NilClass], :default => nil
+attribute :temp_dir,     :kind_of => [String, NilClass], :default => nil
 
 # Shell scripts that will be appended at the beginning/end of the cronjob
 attribute :exec_pre, :kind_of => [Array, NilClass], :default => nil

@@ -54,8 +54,8 @@ action :create do
 
             include                   new_resource.include || node['rails']['duplicity']['include']  # Default directories to backup
             exclude                   new_resource.exclude || node['rails']['duplicity']['exclude']                      # Default directories to exclude from backup
-            archive_dir               node['rails']['duplicity']['archive_dir']   # duplicity archive directory
-            temp_dir                  node['rails']['duplicity']['temp_dir']       # duplicity temp directory
+            archive_dir               new_resource.archive_dir || node['rails']['duplicity']['archive_dir']   # duplicity archive directory
+            temp_dir                  new_resource.temp_dir || node['rails']['duplicity']['temp_dir']       # duplicity temp directory
             keep_full                 new_resource.keep_full || node['rails']['duplicity']['keep_full']                         # Keep 5 full backups
             nice                      node['rails']['duplicity']['nice']                         # Be nice (cpu)
             ionice                    node['rails']['duplicity']['ionice']                          # Ionice class (3 => idle)
