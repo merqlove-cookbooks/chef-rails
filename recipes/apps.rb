@@ -119,35 +119,35 @@ unless node.role? "vagrant"
       duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", "main", default_secret)
       aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
       if duplicity_main["passphrase"] and aws_main["aws_access_key_id"] and aws_main["aws_secret_access_key"]
-        aws_host = aws_main["aws_host"] || "s3.amazonaws.com"
+        aws_host = node['rails']['duplicity']['s3']['host']
         backup_apps = node['rails']['apps'].keys.map{|key| "#{node['rails']['apps_base_path']}/#{node['rails']['apps'][key]["name"]}/" }
         backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }
-        backup_paths = %w(/etc/ /root/ /var/log/)
-        aws_eu = aws_main["aws_eu"] ? "--s3-use-new-style --s3-european-buckets " : ""
+        backup_paths = node['rails']['duplicity']['include']
+        aws_eu = node['rails']['duplicity']['s3']['eu'] ? "--s3-use-new-style --s3-european-buckets " : ""
         backup_paths.concat backup_apps
         backup_paths.concat backup_sites
-        duplicity_ng_cronjob 'dbackup' do
-          name 'dbackup' # Cronjob filename (name_attribute)
+        logfile = node['rails']['duplicity']['log'] ? node['rails']['duplicity']['log_file'] : '/dev/null'
+        duplicity_ng_cronjob 'backup' do
+          name 'backup' # Cronjob filename (name_attribute)
 
           # Attributes for the default cronjob template
-          interval         'daily'              # Cron interval (hourly, daily, monthly)
-          node['rails']['duplicity']['bucket']
-          # logfile          '/dev/null'          # Log cronjob output to this file
-          logfile          '/var/log/duplicity.log'
-          duplicity_path   '/usr/local/bin/duplicity'
+          interval         node['rails']['duplicity']['interval']              # Cron interval (hourly, daily, monthly)
+          logfile          logfile          # Log cronjob output to this file
+
+          duplicity_path   node['rails']['duplicity']['path']
 
           # duplicity parameters
           backend    "#{aws_eu}s3+http://#{node['rails']['duplicity']['bucket']}/#{node['fqdn']}" # Backend to use (default: nil, required!)
           passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
 
           include        backup_paths # Default directories to backup
-          exclude        %w()                       # Default directories to exclude from backup
-          archive_dir    '/tmp/duplicity-archive'   # duplicity archive directory
-          temp_dir       '/tmp/duplicity-tmp'       # duplicity temp directory
-          keep_full      1                          # Keep 5 full backups
-          nice           10                         # Be nice (cpu)
-          ionice         3                          # Ionice class (3 => idle)
-          full_backup_if_older_than '7D'            # Take a full backup after this interval
+          exclude        node['rails']['duplicity']['exclude']                       # Default directories to exclude from backup
+          archive_dir    node['rails']['duplicity']['archive_dir']   # duplicity archive directory
+          temp_dir       node['rails']['duplicity']['temp_dir']       # duplicity temp directory
+          keep_full      node['rails']['duplicity']['keep_full']                          # Keep 5 full backups
+          nice           node['rails']['duplicity']['nice']                         # Be nice (cpu)
+          ionice         node['rails']['duplicity']['ionice']                          # Ionice class (3 => idle)
+          full_backup_if_older_than node['rails']['duplicity']['full_per']            # Take a full backup after this interval
 
           # # Command(s) to run at the very beginning of the cronjob (default: empty)
           # exec_pre %(if [ -f "/nobackup" ]; then exit 0; fi)
