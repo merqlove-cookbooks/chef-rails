@@ -120,8 +120,8 @@ unless node.role? "vagrant"
       aws_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
       if duplicity_main["passphrase"] and aws_main["aws_access_key_id"] and aws_main["aws_secret_access_key"]
         aws_host = aws_main["aws_host"] || "s3.amazonaws.com"
-        backup_apps = node['rails']['apps'].keys.map{|key| "#{node['rails']['apps_base_path']}/#{node['rails']['apps'][key]["name"]}/" }.join(" ")
-        backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }.join(" ")
+        backup_apps = node['rails']['apps'].keys.map{|key| "#{node['rails']['apps_base_path']}/#{node['rails']['apps'][key]["name"]}/" }
+        backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }
         backup_paths = %w(/etc/ /root/ /var/log/)
         aws_eu = aws_main["aws_eu"] ? "--s3-use-new-style --s3-european-buckets " : ""
         backup_paths.concat backup_apps
@@ -131,6 +131,7 @@ unless node.role? "vagrant"
 
           # Attributes for the default cronjob template
           interval         'daily'              # Cron interval (hourly, daily, monthly)
+          node['rails']['duplicity']['bucket']
           # logfile          '/dev/null'          # Log cronjob output to this file
           logfile          '/var/log/duplicity.log'
           duplicity_path   '/usr/local/bin/duplicity'
