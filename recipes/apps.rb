@@ -110,7 +110,9 @@ end
 include_recipe "rails::databases"
 include_recipe "rails::database_admin"
 
-rails_backup "system"
+rails_backup "system" do
+  path "system"
+end
 
 # unless node.role? "vagrant"
 #   if Chef.const_defined?("EncryptedDataBagItem")
