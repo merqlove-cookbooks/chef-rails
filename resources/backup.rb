@@ -25,7 +25,7 @@ attribute :name, :kind_of => String, :name_attribute => true
 attribute :cookbook, :kind_of => [String, NilClass], :default => "rails" #Cookbook to find template
 
 # Path
-attribute :path,  :kind_of => [String, NilClass], :default => ''
+attribute :path,  :kind_of => [String, NilClass], :default => nil
 attribute :target,  :kind_of => [String, NilClass], :default => nil
 
 # S3 EU region
