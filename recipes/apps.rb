@@ -111,7 +111,7 @@ include_recipe "rails::databases"
 include_recipe "rails::database_admin"
 
 rails_backup "system" do
-  path "system"
+  path "_system"
 end
 
 # unless node.role? "vagrant"
