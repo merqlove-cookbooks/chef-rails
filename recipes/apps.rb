@@ -124,8 +124,8 @@ unless node.role? "vagrant"
         backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }.join(" ")
         backup_paths = %w(/etc/ /root/ /var/log/)
         aws_eu = aws_main["aws_eu"] ? "--s3-use-new-style --s3-european-buckets " : ""
-        backup_paths.push backup_apps
-        backup_paths.push backup_sites
+        backup_paths.concat backup_apps
+        backup_paths.concat backup_sites
         duplicity_ng_cronjob 'dbackup' do
           name 'dbackup' # Cronjob filename (name_attribute)
 
