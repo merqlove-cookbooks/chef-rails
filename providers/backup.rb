@@ -28,15 +28,28 @@ action :create do
         store_keys = data_bag("gs")
       end
       duplicity = data_bag("duplicity")
-      if duplicity.include?("main") and store_keys.include?("main")
-        duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", "main", default_secret)
+      key_id = new_resource.key_id || node['rails']['duplicity']['key_id']
+      if duplicity.include?(key_id) and store_keys.include?(key_id)
+        duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", key_id, default_secret)
         case node['rails']['duplicity']['method']
         when "aws"
-          store_main = Chef::EncryptedDataBagItem.load("aws", "main", default_secret)
+          store_main = Chef::EncryptedDataBagItem.load("aws", key_id, default_secret)
         when "gs"
-          store_main = Chef::EncryptedDataBagItem.load("gs", "main", default_secret)
+          store_main = Chef::EncryptedDataBagItem.load("gs", key_id, default_secret)
         end
         if duplicity_main["passphrase"] and store_main["access_key_id"] and store_main["secret_access_key"]
+          boto_cfg = !!(new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg'])
+          if boto_cfg
+            duplicity_ng_boto "base boto config" do
+              # In case you use S3 as your backend, your credentials go here
+              gs_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("gs")
+              gs_secret_access_key store_main["secret_access_key"] if node['rails']['duplicity']['method'].include?("gs")
+
+              # In case you use S3 as your backend, your credentials go here
+              aws_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("aws")
+              aws_secret_access_key store__main["secret_access_key"] if node['rails']['duplicity']['method'].include?("aws")
+            end
+          end
           aws_eu = (new_resource.s3_eu || node['rails']['duplicity']['s3']['eu']) ? "--s3-use-new-style --s3-european-buckets " : ""
           logfile = (new_resource.log || node['rails']['duplicity']['log']) ? (new_resource.logfile || node['rails']['duplicity']['log_file']) : '/dev/null'
           duplicity_ng_cronjob "backup #{new_resource.name}" do
@@ -72,12 +85,12 @@ action :create do
             # swift_authurl  'SwiftAuthURL'
 
             # In case you use S3 as your backend, your credentials go here
-            gs_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("gs")
-            gs_secret_access_key store_main["secret_access_key"] if node['rails']['duplicity']['method'].include?("gs")
+            gs_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("gs") and !boto_cfg
+            gs_secret_access_key store_main["secret_access_key"] if node['rails']['duplicity']['method'].include?("gs") and !boto_cfg
 
             # In case you use S3 as your backend, your credentials go here
-            aws_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("aws")
-            aws_secret_access_key store__main["secret_access_key"] if node['rails']['duplicity']['method'].include?("aws")
+            aws_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("aws") and !boto_cfg
+            aws_secret_access_key store__main["secret_access_key"] if node['rails']['duplicity']['method'].include?("aws") and !boto_cfg
           end
         end
       end

@@ -24,12 +24,18 @@ default_action :create
 attribute :name, :kind_of => String, :name_attribute => true
 attribute :cookbook, :kind_of => [String, NilClass], :default => "rails" #Cookbook to find template
 
+# Data Bag Id
+attribute :key_id,  :kind_of => [String, NilClass], :default => nil
+
 # Path
 attribute :path,  :kind_of => [String, NilClass], :default => nil
 attribute :target,  :kind_of => [String, NilClass], :default => nil
 
 # S3 EU region
 attribute :s3_eu,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
+
+# Create boto config?
+attribute :boto_cfg,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
 
 # Logging
 attribute :log,      :kind_of => [TrueClass, FalseClass, NilClass], :default => nil

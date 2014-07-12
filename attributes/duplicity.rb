@@ -17,6 +17,10 @@
 # limitations under the License.
 #
 
+# passwords data bag id
+default['rails']['duplicity']['key_id'] = "main"
+default['rails']['duplicity']['boto_cfg'] = false
+
 # path & log
 default['rails']['duplicity']['path'] = '/usr/local/bin/duplicity'
 default['rails']['duplicity']['log'] = false # Log or not
