@@ -111,10 +111,6 @@ include_recipe "rails::databases"
 include_recipe "rails::database_admin"
 
 unless node.role? "vagrant"
-  prefix = "backups_"
-  node['tags'].each do |tag|
-    prefix += tag.gsub('server_','') if tag.include? "server_"
-  end
   if Chef.const_defined?("EncryptedDataBagItem")
     default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
     aws = data_bag("aws")
@@ -128,8 +124,8 @@ unless node.role? "vagrant"
         backup_sites = node['rails']['sites'].map{|key, value| "#{node['rails']['sites_base_path']}/#{node['rails']['sites'][key]["user"]}/#{node['rails']['sites'][key]["name"]}/" }.join(" ")
         backup_paths = %w(/etc/ /root/ /var/log/)
         aws_eu = aws_main["aws_eu"] ? "--s3-use-new-style --s3-european-buckets " : ""
-        # backup_paths.push backup_apps
-        # backup_paths.push backup_sites
+        backup_paths.push backup_apps
+        backup_paths.push backup_sites
         duplicity_ng_cronjob 'dbackup' do
           name 'dbackup' # Cronjob filename (name_attribute)
 
@@ -138,9 +134,9 @@ unless node.role? "vagrant"
           # logfile          '/dev/null'          # Log cronjob output to this file
           logfile          '/var/log/duplicity.log'
           duplicity_path   '/usr/local/bin/duplicity'
-          
+
           # duplicity parameters
-          backend    "#{aws_eu}s3://#{aws_host}/#{prefix}/#{node['fqdn']}" # Backend to use (default: nil, required!)
+          backend    "#{aws_eu}s3+http://#{node['rails']['duplicity']['bucket']}/#{node['fqdn']}" # Backend to use (default: nil, required!)
           passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
 
           include        backup_paths # Default directories to backup
