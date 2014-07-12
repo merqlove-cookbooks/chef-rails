@@ -40,6 +40,7 @@ default['rails']['duplicity']['ionice'] = 3
 # Amazon S3, Google Cloud Storage defaults
 default['rails']['duplicity']['method'] = "s3+http" # possible "s3", "s3+http", "gs", "ftp", "ssh", ...
 default['rails']['duplicity']['target'] = nil # must be not nil!
+default['rails']['duplicity']['path'] = "_system" # must be not empty!
 default['rails']['duplicity']['s3']['eu'] = false # eu buckets?
 default['rails']['duplicity']['s3']['host'] = 's3.amazonaws.com' # optional
 
