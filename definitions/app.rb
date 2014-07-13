@@ -22,15 +22,16 @@ define :app, application: false, type: "apps" do
     a = params[:application]
     type = params[:type]
     base_path = node['rails']["#{type}_base_path"]
+    user_path = a["user"] if type.include? "sites"
     project_path = if type.include? "sites"
-      "#{a["user"]}/#{a["name"]}"
+      "#{user_path}/#{a["name"]}"
     else
       a["name"]
     end
     app_path = "#{base_path}/#{project_path}"
 
-    directory "#{project_path} #{a["name"]}" do
-      path "#{project_path}"
+    directory "#{base_path} #{a["name"]} #{a["user"]}" do
+      path "#{base_path}/#{a["user"]}"
       owner a["user"]
       group a["user"]
       mode "0750"
