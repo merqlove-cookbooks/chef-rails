@@ -24,7 +24,7 @@ define :app, application: false, type: "apps" do
     base_path = node['rails']["#{type}_base_path"]
     user_path = a["user"] if type.include? "sites"
     project_path = if type.include? "sites"
-      "#{user_path}/#{a["name"]}"
+      "#{a["user"]}/#{a["name"]}"
     else
       a["name"]
     end
