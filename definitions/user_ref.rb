@@ -65,12 +65,12 @@ define :user_ref, users: false, secret: false, vcs: false do
         if u == node['rails']['user']['deploy']
           group "admin" do
             append true
-            members [node['rails']['user']['deploy'], "postgres"]
+            members [node['rails']['user']['deploy']]
           end
         else
           group u do
             append true
-            members [node['nginx']['user'], node['rails']['user']['deploy'], "postgres"]
+            members [node['nginx']['user'], node['rails']['user']['deploy']]
           end
         end
 
