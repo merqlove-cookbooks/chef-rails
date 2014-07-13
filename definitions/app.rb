@@ -29,8 +29,8 @@ define :app, application: false, type: "apps" do
     end
     app_path = "#{base_path}/#{project_path}"
 
-    directory "#{base_path} #{a["name"]}" do
-      path "#{base_path}"
+    directory "#{project_path} #{a["name"]}" do
+      path "#{project_path}"
       owner a["user"]
       group a["user"]
       mode "0750"
