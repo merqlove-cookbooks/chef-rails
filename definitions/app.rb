@@ -23,10 +23,15 @@ define :app, application: false, type: "apps" do
     type = params[:type]
     base_path = node['rails']["#{type}_base_path"]
     user_path = a["user"] if type.include? "sites"
-    project_path = if type.include? "sites"
+    backup_project_path = if type.include? "sites"
       "#{a["user"]}/#{a["name"]}"
     else
       a["name"]
+    end
+    backup_db_path = if type.include? "sites"
+      "#{a["user"]}/#{a["name"]}_db"
+    else
+      "#{a["name"]}_db"
     end
     app_path = "#{base_path}/#{project_path}"
 
@@ -39,18 +44,11 @@ define :app, application: false, type: "apps" do
 
     if a["backup"]
       rails_backup a["name"] do
-        path "#{type}/#{project_path}"
+        path "#{type}/#{backup_project_path}"
         include [app_path]
+        exclude ["#{app_path}/backup"]
         archive_dir "/tmp/da-#{a["user"]}-#{a["name"]}"
         temp_dir "/tmp/dt-#{a["user"]}-#{a["name"]}"
-      end
-      if a.include? "db"
-        rails_backup "db_#{a["name"]}" do
-          path "#{type}/#{project_path}/db"
-          include ["#{app_path}/backup"]
-          archive_dir "/tmp/da-#{a["user"]}-db-#{a["name"]}"
-          temp_dir "/tmp/dt-#{a["user"]}-db-#{a["name"]}"
-        end
       end
     else
       rails_backup a["name"] do
@@ -61,17 +59,6 @@ define :app, application: false, type: "apps" do
       end
       directory "/tmp/dt-#{a["user"]}-#{a["name"]}" do
         action :delete
-      end
-      if a.include? "db"
-        rails_backup "db_#{a["name"]}" do
-          action :delete
-        end
-        directory "/tmp/da-#{a["user"]}-db-#{a["name"]}" do
-          action :delete
-        end
-        directory "/tmp/dt-#{a["user"]}-db-#{a["name"]}" do
-          action :delete
-        end
       end
     end
 
@@ -92,7 +79,12 @@ define :app, application: false, type: "apps" do
           app_name: a["name"],
           app_path: app_path,
           app_user: a["user"],
-          app_delete: a[:delete]
+          app_delete: a[:delete],
+          app_backup: a["backup"],
+          app_backup_path: "#{type}/#{backup_db_path}/#{d["type"]}",
+          app_backup_dir: "#{app_path}/backup/#{d["type"]}",
+          app_backup_archive: "/tmp/da-#{a["user"]}-#{d["type"]}-#{d["name"]}",
+          app_backup_temp: "/tmp/dt-#{a["user"]}-#{d["type"]}-#{d["name"]}"
         }
       end
     end

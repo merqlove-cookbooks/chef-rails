@@ -59,6 +59,32 @@ if Chef.const_defined? "EncryptedDataBagItem"
         action :create
       end
 
+      if d["app_backup"]
+        rails_backup "mongo_db_#{d["app_name"]}" do
+          path        d["app_backup_path"]
+          exec_pre    [
+            "mkdir -p #{d["app_backup_archive"]}",
+            "mkdir -p #{d["app_backup_temp"]}",
+            "mkdir -p #{d["app_backup_dir"]}",
+            "rm -rf #{d["app_backup_dir"]}/*",
+            "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d"
+          ]
+          include     ["#{d["app_backup_dir"]}"]
+          archive_dir d["app_backup_archive"]
+          temp_dir    d["app_backup_temp"]
+        end
+      else
+        rails_backup "mongo_db_#{d["app_name"]}" do
+          action :delete
+        end
+        directory d["app_backup_archive"] do
+          action :delete
+        end
+        directory d["app_backup_temp"] do
+          action :delete
+        end
+      end
+
       execute d["name"] do
         command "mongo admin -u #{admin["id"]} -p #{admin["password"]} --eval '#{d["name"]}=db.getSiblingDB(\"#{d["name"]}\"); #{d["name"]}.addUser(\"#{d["user"]}\",\"#{d["password"]}\")'"
         action :run
@@ -87,6 +113,16 @@ if Chef.const_defined? "EncryptedDataBagItem"
 
     include_recipe "postgresql::ruby"
 
+    template "/root/.pgpass" do
+      source "pgpass.erb"
+      variables(
+        :password => postgres["password"]
+      )
+      group  "root"
+      user   "root"
+      mode   00600
+    end
+
     postgresql_connection_info = {
       :host     => '127.0.0.1',
       :port     => node['postgresql']['config']['port'],
@@ -106,6 +142,32 @@ if Chef.const_defined? "EncryptedDataBagItem"
         owner d["app_user"]
         group d["app_user"]
         action :create
+      end
+
+      if d["app_backup"]
+        rails_backup "pg_db_#{d["app_name"]}" do
+          path        "#{d["app_backup_path"]}/pg"
+          exec_pre    [
+            "mkdir -p #{d["app_backup_archive"]}",
+            "mkdir -p #{d["app_backup_temp"]}",
+            "mkdir -p #{d["app_backup_dir"]}",
+            "rm -rf #{d["app_backup_dir"]}/*",
+            "pg_dump -U postgres #{d["name"]} | bzip2 > #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2"
+          ]
+          include     ["#{d["app_backup_dir"]}"]
+          archive_dir d["app_backup_archive"]
+          temp_dir    d["app_backup_temp"]
+        end
+      else
+        rails_backup "pg_db_#{d["app_name"]}" do
+          action :delete
+        end
+        directory d["app_backup_archive"] do
+          action :delete
+        end
+        directory d["app_backup_temp"] do
+          action :delete
+        end
       end
 
       postgresql_database_user d["user"] do
@@ -176,6 +238,32 @@ if Chef.const_defined? "EncryptedDataBagItem"
         owner d["app_user"]
         group d["app_user"]
         action :create
+      end
+
+      if d["app_backup"]
+        rails_backup "mysql_db_#{d["app_name"]}" do
+          path        d["app_backup_path"]
+          exec_pre    [
+            "mkdir -p #{d["app_backup_archive"]}",
+            "mkdir -p #{d["app_backup_temp"]}",
+            "mkdir -p #{d["app_backup_dir"]}",
+            "rm -rf #{d["app_backup_dir"]}/*",
+            "mysqldump -u #{d["user"]} -p#{d["password"]} #{d["name"]} | bz2 > #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2"
+          ]
+          include     ["#{d["app_backup_dir"]}"]
+          archive_dir d["app_backup_archive"]
+          temp_dir    d["app_backup_temp"]
+        end
+      else
+        rails_backup "mysql_db_#{d["app_name"]}" do
+          action :delete
+        end
+        directory d["app_backup_archive"] do
+          action :delete
+        end
+        directory d["app_backup_temp"] do
+          action :delete
+        end
       end
 
       mysql_database_user d["user"] do
