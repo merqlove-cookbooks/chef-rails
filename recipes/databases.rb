@@ -119,6 +119,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
       group  "root"
       user   "root"
       mode   00600
+      action :delete
     end
 
     postgresql_connection_info = {
@@ -148,7 +149,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "pg_dump -U postgres #{d["name"]} | bzip2 > #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2"
+            "su postgres -c 'pg_dump -U postgres #{d["name"]} | bzip2 > #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2'"
           ]
           include     ["#{d["app_backup_dir"]}"]
           archive_dir d["app_backup_archive"]
