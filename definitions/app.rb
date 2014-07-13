@@ -44,6 +44,35 @@ define :app, application: false, type: "apps" do
         archive_dir "/tmp/da-#{a["user"]}-#{a["name"]}"
         temp_dir "/tmp/dt-#{a["user"]}-#{a["name"]}"
       end
+      if a.include? "db"
+        rails_backup "db_a["name"]" do
+          path "#{type}/#{project_path}/db"
+          include ["#{app_path}/backup"]
+          archive_dir "/tmp/da-#{a["user"]}-db-#{a["name"]}"
+          temp_dir "/tmp/dt-#{a["user"]}-db-#{a["name"]}"
+        end
+      end
+    else
+      rails_backup a["name"] do
+        action :delete
+      end
+      directory "/tmp/da-#{a["user"]}-#{a["name"]}" do
+        action :delete
+      end
+      directory "/tmp/dt-#{a["user"]}-#{a["name"]}" do
+        action :delete
+      end
+      if a.include? "db"
+        rails_backup "db_a["name"]" do
+          action :delete
+        end
+        directory "/tmp/da-#{a["user"]}-db-#{a["name"]}" do
+          action :delete
+        end
+        directory "/tmp/dt-#{a["user"]}-db-#{a["name"]}" do
+          action :delete
+        end
+      end
     end
 
     directory app_path do
