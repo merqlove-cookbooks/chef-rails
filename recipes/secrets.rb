@@ -36,13 +36,12 @@ ruby_block "secrets" do
       Chef::DataBag.load("secrets").each do |item|
         unless item[0].include? "_keys"
           key = ChefVault::Item.load("secrets", item[0])
-          Chef::Provider::File.new "/etc/chef/#{key["file-name"]}" do
-            content "#{key['file-content']}"
-            owner   "root"
-            group   "root"
-            mode    "0600"
-            action  :create
-          end
+          s = Chef::Resource::File.new("/etc/chef/#{key["file-name"]}", run_context)
+          s.content "#{key['file-content']}"
+          s.owner "root"
+          s.group "root"
+          s.mode  "0600"
+          s.run_action(:create)
           # File.open("/etc/chef/#{key["file-name"]}","w") do |f|
           #   f.write("#{key['file-content']}")
           #   f.chmod(0600)
