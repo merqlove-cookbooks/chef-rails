@@ -36,7 +36,7 @@ ruby_block "secrets" do
       Chef::DataBag.load("secrets").each do |item|
         unless item[0].include? "_keys"
           key = ChefVault::Item.load("secrets", item[0])
-          Chef::Provider::File "/etc/chef/#{key["file-name"]}" do
+          Chef::Provider::File.new "/etc/chef/#{key["file-name"]}" do
             content "#{key['file-content']}"
             owner   "root"
             group   "root"
