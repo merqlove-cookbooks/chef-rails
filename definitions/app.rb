@@ -23,7 +23,7 @@ define :app, application: false, type: "apps" do
     type = params[:type]
     base_path = node['rails']["#{type}_base_path"]
     user_path = a["user"] if type.include? "sites"
-    backup_project_path = if type.include? "sites"
+    project_path = if type.include? "sites"
       "#{a["user"]}/#{a["name"]}"
     else
       a["name"]
@@ -44,7 +44,7 @@ define :app, application: false, type: "apps" do
 
     if a["backup"]
       rails_backup a["name"] do
-        path "#{type}/#{backup_project_path}"
+        path "#{type}/#{project_path}"
         include [app_path]
         exclude ["#{app_path}/backup"]
         archive_dir "/tmp/da-#{a["user"]}-#{a["name"]}"
