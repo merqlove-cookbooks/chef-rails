@@ -145,7 +145,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
 
       if d["app_backup"]
         rails_backup "pg_db_#{d["app_name"]}" do
-          path        "#{d["app_backup_path"]}/pg"
+          path        d["app_backup_path"]
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
