@@ -34,7 +34,7 @@ ruby_block "secrets" do
     require 'chef-vault'
     if Class.const_defined? "ChefVault"
       Chef::DataBag.load("secrets").each do |item|
-        if item[0].include?(node['rails']['secrets']['key']) and !item[0].include?("_keys")
+        if item[0] == node['rails']['secrets']['key']
           key = ChefVault::Item.load("secrets", item[0])
           s = Chef::Resource::File.new(node['rails']['secrets']['default'], run_context)
           s.content key['file-content']
