@@ -63,7 +63,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "mongo_db_#{d["app_name"]}" do
           path        d["app_backup_path"]
           exec_pre    [
-            "mkdir -p #{d["app_backup_dir"]}",
+            "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
             "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d"
           ]
@@ -146,7 +146,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "pg_db_#{d["app_name"]}" do
           path        "#{d["app_backup_path"]}/pg"
           exec_pre    [
-            "mkdir -p #{d["app_backup_dir"]}",
+            "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
             "pg_dump -U postgres #{d["name"]} | bzip2 > #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2"
           ]
@@ -240,7 +240,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "mysql_db_#{d["app_name"]}" do
           path        d["app_backup_path"]
           exec_pre    [
-            "mkdir -p #{d["app_backup_dir"]}",
+            "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
             "mysqldump -u #{d["user"]} -p#{d["password"]} #{d["name"]} | bz2 > #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2"
           ]
