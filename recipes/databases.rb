@@ -304,12 +304,14 @@ if Chef.const_defined? "EncryptedDataBagItem"
 
   # Backup All Databases
 
+  db_backup_root = "/var/tmp/db_backup"
+
   node['rails']['duplicity']['db'].each do |db|
     pre = [
-      "mkdir -p /var/tmp/db_backup/#{db} >> /dev/null 2>&1",
-      "rm -rf /var/tmp/db_backup/#{db}/*",
+      "mkdir -p #{db_backup_root}/#{db} >> /dev/null 2>&1",
+      "rm -rf #{db_backup_root}/#{db}/*",
     ]
-    db_backup_dir = "/var/tmp/db_backup/#{db}"
+    db_backup_dir = "#{db_backup_root}/#{db}"
     case db
       when "postgresql"
         postgres = postgres || Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
@@ -334,9 +336,10 @@ if Chef.const_defined? "EncryptedDataBagItem"
       temp_dir    "/tmp/dt-#{db}"
     end
   end
-  
-  if Dir.exist? "#{node['rails']['duplicity']['db']}"
-    Dir.foreach("/var/tmp/db_backup") do |db|
+
+  if Dir.exist? db_backup_root
+    Dir.foreach(db_backup_root) do |db|
+      next if db == '.' or db == '..'
       unless node['rails']['duplicity']['db'].include? db
         rails_backup "#{db}_db_delete" do
           action :delete
