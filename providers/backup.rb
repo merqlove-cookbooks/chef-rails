@@ -41,7 +41,7 @@ action :create do
           boto_cfg = !!(new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg']) and new_resource.main
           if boto_cfg
             duplicity_ng_boto "base boto config" do
-              # In case you use S3 as your backend, your credentials go here
+              # In case you use Google Cloud Storage as your backend, your credentials go here
               gs_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("gs")
               gs_secret_access_key store_main["secret_access_key"] if node['rails']['duplicity']['method'].include?("gs")
 
@@ -82,7 +82,7 @@ action :create do
             # swift_password 'mySwiftPassword'
             # swift_authurl  'SwiftAuthURL'
 
-            # In case you use S3 as your backend, your credentials go here
+            # In case you use Google Cloud Storage as your backend, your credentials go here
             gs_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("gs") and !boto_cfg
             gs_secret_access_key store_main["secret_access_key"] if node['rails']['duplicity']['method'].include?("gs") and !boto_cfg
 

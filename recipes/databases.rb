@@ -21,6 +21,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
   default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
   date = '$(date +"%Y%m%d")'
 
+  # Backup Mongo User DB
+
   if node.default["rails"]["databases"].include?("mongodb")
     admin = Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
     include_recipe "mongodb::default"
@@ -73,7 +75,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
           temp_dir    d["app_backup_temp"]
         end
       else
-        rails_backup "mongo_db_#{d["app_name"]}" do
+        rails_backup "mongo_db_#{d["app_name"]} delete" do
           action :delete
         end
         directory d["app_backup_archive"] do
@@ -98,6 +100,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
       end
     end
   end
+
+  # Backup Postgresql User DB
 
   if node.default["rails"]["databases"].include?("postgresql")
     postgres = Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
@@ -151,15 +155,15 @@ if Chef.const_defined? "EncryptedDataBagItem"
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
             "su postgres -c 'pg_dump -U postgres #{d["name"]} | bzip2 > /tmp/#{d["name"]}.#{date}.sql.bz2'",
-            "mv /tmp/#{d["name"]}.%Y%m%d.sql.bz2 #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2",
+            "mv /tmp/#{d["name"]}.#{date}.sql.bz2 #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2",
             "chown #{d["app_user"]}:#{d["app_user"]} #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2"
           ]
-          include     ["#{d["app_backup_dir"]}"]
+          include     [d["app_backup_dir"]]
           archive_dir d["app_backup_archive"]
           temp_dir    d["app_backup_temp"]
         end
       else
-        rails_backup "pg_db_#{d["app_name"]}" do
+        rails_backup "pg_db_#{d["app_name"]} delete" do
           action :delete
         end
         directory d["app_backup_archive"] do
@@ -191,6 +195,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
       end
     end
   end
+
+  # Backup MySQL User DB
 
   if node.default["rails"]["databases"].include? "mysql"
     root = Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
@@ -248,12 +254,12 @@ if Chef.const_defined? "EncryptedDataBagItem"
             "rm -rf #{d["app_backup_dir"]}/*",
             "mysqldump -u root -p#{root["password"]} #{d["name"]} | bzip2 > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2"
           ]
-          include     ["#{d["app_backup_dir"]}"]
+          include     [d["app_backup_dir"]]
           archive_dir d["app_backup_archive"]
           temp_dir    d["app_backup_temp"]
         end
       else
-        rails_backup "mysql_db_#{d["app_name"]}" do
+        rails_backup "mysql_db_#{d["app_name"]} delete" do
           action :delete
         end
         directory d["app_backup_archive"] do
@@ -290,6 +296,56 @@ if Chef.const_defined? "EncryptedDataBagItem"
     if FileTest.file? mysql_init
       service "mysqld" do
         action [:stop, :disable]
+      end
+    end
+  end
+
+  # Backup All Databases
+
+  node['rails']['duplicity']['db'].each do |db|
+    pre = [
+      "mkdir -p /var/tmp/db_backup/#{db} >> /dev/null 2>&1",
+      "rm -rf /var/tmp/db_backup/#{db}/*",
+    ]
+    db_backup_dir = "/var/tmp/db_backup/#{db}"
+    case db
+      when "postgresql"
+        postgres = postgres || Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
+        pre = [
+          "su postgres -c 'pg_dump_all -U postgres | bzip2 > /tmp/#{db}.#{date}.sql.bz2'",
+          "mv /tmp/#{db}.#{date}.sql.bz2 #{db_backup_dir}/#{db}.#{date}.sql.bz2",
+          "chown root:root #{db_backup_dir}/#{db}.#{date}.sql.bz2"
+        ]
+      when "mysql"
+        root = root || Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
+        pre.push "mysqldump --all-databases -u root -p#{root["password"]} | bzip2 > #{db_backup_dir}/#{db}.#{date}.sql.bz2"
+      when "mongodb"
+        admin = admin || Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
+        pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date}"
+    end
+
+    rails_backup "#{db}_db_backup" do
+      path        "db/#{db}"
+      exec_pre    pre
+      include     [db_backup_dir]
+      archive_dir "/tmp/da-#{db}"
+      temp_dir    "/tmp/dt-#{db}"
+    end
+  end
+
+  Dir.foreach("/var/tmp/db_backup") do |db|
+    unless node['rails']['duplicity']['db'].include? db
+      rails_backup "#{db}_db_delete" do
+        action :delete
+      end
+      directory "/tmp/da-#{db}" do
+        action :delete
+      end
+      directory "/tmp/dt-#{db}" do
+        action :delete
+      end
+      directory "/var/tmp/db_backup/#{db}" do
+        action :delete
       end
     end
   end
