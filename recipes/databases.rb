@@ -162,7 +162,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_before [
             "#{date}",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "su postgres -c 'pg_dump -U postgres #{d["name"]} | gzip > /tmp/#{d["name"]}.$NOW.sql.gz'",
+            "su postgres -c 'pg_dump -U postgres #{d["name"]} | gzip > /tmp/#{d["name"]}.\"$0\".sql.gz' -- \"$NOW\"",
             "mv /tmp/#{d["name"]}.$NOW.sql.gz #{d["app_backup_dir"]}/",
             "chown -R #{d["app_user"]}:#{d["app_user"]} #{d["app_backup_dir"]}/*"
           ]
@@ -327,11 +327,11 @@ if Chef.const_defined? "EncryptedDataBagItem"
       "#{date}",
       "rm -rf #{db_backup_dir}/*",
     ]
-    
+
     case db
       when "postgresql"
         postgres = postgres || Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
-        exec_before.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.$NOW.sql.gz'"
+        exec_before.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.\"$0\".sql.gz' -- \"$NOW\""
         exec_before.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
         exec_before.push "chown -R root:root #{db_backup_dir}/*"
       when "mysql"
