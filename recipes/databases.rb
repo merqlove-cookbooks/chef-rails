@@ -350,7 +350,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         directory "/tmp/dt-#{db}" do
           action :delete
         end
-        directory "/var/tmp/db_backup/#{db}" do
+        directory "#{db_backup_root}/#{db}" do
           action :delete
         end
       end
