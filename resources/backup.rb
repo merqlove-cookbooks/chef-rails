@@ -32,11 +32,11 @@ attribute :path,  :kind_of => [String, NilClass], :default => nil
 attribute :target,  :kind_of => [String, NilClass], :default => nil
 
 # S3 EU region
-attribute :s3_eu,  :kind_of => [TrueClass, FalseClass], :default => false
+attribute :s3_eu,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
 
 # Create boto config?
-attribute :boto_cfg,  :kind_of => [TrueClass, FalseClass], :default => true
-attribute :main,  :kind_of => [TrueClass, FalseClass], :default => false
+attribute :boto_cfg,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
+attribute :main,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
 
 # Logging
 attribute :log,      :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
