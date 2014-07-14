@@ -66,8 +66,10 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "mongo_db_#{d["app_name"]}" do
           path        d["app_backup_path"]
           exec_pre    [
-            "#{date}",
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
+          ]
+          exec_before [
+            "#{date}",
             "rm -rf #{d["app_backup_dir"]}/*",
             "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.$NOW >> /dev/null 2>&1",
             "gzip #{d["app_backup_dir"]}/#{d["name"]}.$NOW",
@@ -155,8 +157,10 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "pg_db_#{d["app_name"]}" do
           path        d["app_backup_path"]
           exec_pre    [
-            "#{date}",
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
+          ]
+          exec_before [
+            "#{date}",
             "rm -rf #{d["app_backup_dir"]}/*",
             "su postgres -c 'pg_dump -U postgres #{d["name"]} | gzip > /tmp/#{d["name"]}.$NOW.sql.gz'",
             "mv /tmp/#{d["name"]}.$NOW.sql.gz #{d["app_backup_dir"]}/",
@@ -254,8 +258,10 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "mysql_db_#{d["app_name"]}" do
           path        d["app_backup_path"]
           exec_pre    [
-            "#{date}",
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
+          ]
+          exec_before [
+            "#{date}",
             "rm -rf #{d["app_backup_dir"]}/*",
             "mysqldump -u root -p#{root["password"]} #{d["name"]} | gzip > #{d["app_backup_dir"]}/#{d["name"]}.$NOW.sql.gz"
           ]
@@ -310,31 +316,38 @@ if Chef.const_defined? "EncryptedDataBagItem"
   db_backup_root = "/var/tmp/db_backup"
 
   node['rails']['duplicity']['db'].each do |db|
-    pre = [
-      "#{date}",
-      "mkdir -p #{db_backup_root}/#{db} >> /dev/null 2>&1",
-      "rm -rf #{db_backup_root}/#{db}/*",
-    ]
+
     db_backup_dir = "#{db_backup_root}/#{db}"
+
+    exec_pre = [
+      "mkdir -p #{db_backup_dir} >> /dev/null 2>&1",
+    ]
+
+    exec_before = [
+      "#{date}",
+      "rm -rf #{db_backup_dir}/*",
+    ]
+    
     case db
       when "postgresql"
         postgres = postgres || Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
-        pre.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.$NOW.sql.gz'"
-        pre.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
-        pre.push "chown -R root:root #{db_backup_dir}/*"
+        exec_before.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.$NOW.sql.gz'"
+        exec_before.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
+        exec_before.push "chown -R root:root #{db_backup_dir}/*"
       when "mysql"
         root = root || Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
-        pre.push "mysqldump --all-databases -u root -p#{root["password"]} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
+        exec_before.push "mysqldump --all-databases -u root -p#{root["password"]} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
       when "mongodb"
         admin = admin || Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
-        pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
-        pre.push "tar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
-        pre.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
+        exec_before.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
+        exec_before.push "tar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
+        exec_before.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
     end
 
     rails_backup "#{db}_db_backup" do
       path        "db/#{db}"
-      exec_pre    pre
+      exec_pre    exec_pre
+      exec_before exec_before
       include     [db_backup_dir]
       archive_dir "/tmp/da-#{db}"
       temp_dir    "/tmp/dt-#{db}"
