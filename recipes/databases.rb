@@ -315,7 +315,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
     case db
       when "postgresql"
         postgres = postgres || Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
-        pre.push "su postgres -c 'pg_dump_all -U postgres | bzip2 > /tmp/#{db}.#{date}.sql.bz2'"
+        pre.push "su postgres -c 'pg_dumpall -U postgres | bzip2 > /tmp/#{db}.#{date}.sql.bz2'"
         pre.push "mv /tmp/#{db}.#{date}.sql.bz2 #{db_backup_dir}/#{db}.#{date}.sql.bz2"
         pre.push "chown root:root #{db_backup_dir}/#{db}.#{date}.sql.bz2"
       when "mysql"
