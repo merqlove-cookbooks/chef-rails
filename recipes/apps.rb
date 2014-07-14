@@ -112,6 +112,7 @@ include_recipe "rails::database_admin"
 
 rails_backup "system" do
   boto_cfg true
+  main     true
 end
 
 include_recipe "msmtp"
