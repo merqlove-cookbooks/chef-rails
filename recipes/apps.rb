@@ -111,7 +111,6 @@ include_recipe "rails::databases"
 include_recipe "rails::database_admin"
 
 rails_backup "system" do
-  boto_cfg true
   main     true
 end
 

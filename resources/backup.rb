@@ -35,8 +35,8 @@ attribute :target,  :kind_of => [String, NilClass], :default => nil
 attribute :s3_eu,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
 
 # Create boto config?
-attribute :boto_cfg,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
-attribute :main,      :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
+attribute :boto_cfg,  :kind_of => [TrueClass, FalseClass], :default => true
+attribute :main,      :kind_of => [TrueClass, FalseClass], :default => false
 
 # Logging
 attribute :log,      :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
