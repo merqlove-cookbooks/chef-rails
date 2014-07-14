@@ -334,7 +334,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
       temp_dir    "/tmp/dt-#{db}"
     end
   end
-  if Dir.exist? "#{node['php-fpm']['pool_conf_dir']}"
+  
+  if Dir.exist? "#{node['rails']['duplicity']['db']}"
     Dir.foreach("/var/tmp/db_backup") do |db|
       unless node['rails']['duplicity']['db'].include? db
         rails_backup "#{db}_db_delete" do
