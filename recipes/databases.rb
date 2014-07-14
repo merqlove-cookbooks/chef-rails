@@ -69,7 +69,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
             "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.#{date}",
-            "bzip2 -c #{d["app_backup_dir"]}/#{d["name"]}.#{date} > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.bz2",
+            "gzip #{d["app_backup_dir"]}/#{d["name"]}.#{date}",
             "rm -f #{d["app_backup_dir"]}/#{d["name"]}.#{date}"
           ]
           include     ["#{d["app_backup_dir"]}"]
@@ -156,9 +156,9 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "su postgres -c 'pg_dump -U postgres #{d["name"]} | bzip2 > /tmp/#{d["name"]}.#{date}.sql.bz2'",
-            "mv /tmp/#{d["name"]}.#{date}.sql.bz2 #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2",
-            "chown #{d["app_user"]}:#{d["app_user"]} #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2"
+            "su postgres -c 'pg_dump -U postgres #{d["name"]} | gzip > /tmp/#{d["name"]}.#{date}.sql.gz'",
+            "mv /tmp/#{d["name"]}.#{date}.sql.gz #{d["app_backup_dir"]}/",
+            "chown -R #{d["app_user"]}:#{d["app_user"]} #{d["app_backup_dir"]}/*"
           ]
           include     [d["app_backup_dir"]]
           archive_dir d["app_backup_archive"]
@@ -254,7 +254,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "mysqldump -u root -p#{root["password"]} #{d["name"]} | bzip2 > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2"
+            "mysqldump -u root -p#{root["password"]} #{d["name"]} | gzip > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.gz"
           ]
           include     [d["app_backup_dir"]]
           archive_dir d["app_backup_archive"]
@@ -315,17 +315,17 @@ if Chef.const_defined? "EncryptedDataBagItem"
     case db
       when "postgresql"
         postgres = postgres || Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
-        pre.push "su postgres -c 'pg_dumpall -U postgres | bzip2 > /tmp/#{db}.#{date}.sql.bz2'"
-        pre.push "mv /tmp/#{db}.#{date}.sql.bz2 #{db_backup_dir}/#{db}.#{date}.sql.bz2"
-        pre.push "chown root:root #{db_backup_dir}/#{db}.#{date}.sql.bz2"
+        pre.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.#{date}.sql.gz'"
+        pre.push "mv /tmp/#{db}.#{date}.sql.gz #{db_backup_dir}/"
+        pre.push "chown -R root:root #{db_backup_dir}/*"
       when "mysql"
         root = root || Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
-        pre.push "mysqldump --all-databases -u root -p#{root["password"]} | bzip2 > #{db_backup_dir}/#{db}.#{date}.sql.bz2"
+        pre.push "mysqldump --all-databases -u root -p#{root["password"]} | gzip > #{db_backup_dir}/#{db}.#{date}.sql.gz"
       when "mongodb"
         admin = admin || Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
         pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date}"
-        pre.push "bzip2 -c #{db_backup_dir}/#{db}.#{date} > #{db_backup_dir}/#{db}.#{date}.bz2"
-        pre.push "rm -f #{db_backup_dir}/#{db}.#{date}"
+        pre.push "tar -zcvf #{db_backup_dir}/#{db}.#{date}.tar.gz #{db_backup_dir}/#{db}.#{date}"
+        pre.push "rm -rf #{db_backup_dir}/#{db}.#{date}"
     end
 
     rails_backup "#{db}_db_backup" do
