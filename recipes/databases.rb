@@ -69,6 +69,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
             "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.#{date}"
+            "bzip2 -c #{d["app_backup_dir"]}/#{d["name"]}.#{date} > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.bz2"
+            "rm -f #{d["app_backup_dir"]}/#{d["name"]}.#{date}"
           ]
           include     ["#{d["app_backup_dir"]}"]
           archive_dir d["app_backup_archive"]
@@ -321,7 +323,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         admin = admin || Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
         pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date}"
         pre.push "bzip2 -c #{db_backup_dir}/#{db}.#{date} > #{db_backup_dir}/#{db}.#{date}.bz2"
-        pre.push "rm -f #{db_backup_dir}/#{db}.#{date}" 
+        pre.push "rm -f #{db_backup_dir}/#{db}.#{date}"
     end
 
     rails_backup "#{db}_db_backup" do
