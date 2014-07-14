@@ -101,7 +101,7 @@ action :delete do
   duplicity_ng_cronjob "backup #{new_resource.name}" do
     action :delete
   end
-  if !!(new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg']) and new_resource.main
+  if (new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg']) and new_resource.main
     duplicity_ng_boto "delete boto config" do
       action :delete
     end
