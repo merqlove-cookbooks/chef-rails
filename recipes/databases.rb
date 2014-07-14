@@ -19,6 +19,7 @@
 
 if Chef.const_defined? "EncryptedDataBagItem"
   default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
+  date = "$(date +"%Y%m%d")"
 
   if node.default["rails"]["databases"].include?("mongodb")
     admin = Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
@@ -65,7 +66,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d"
+            "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.#{date}"
           ]
           include     ["#{d["app_backup_dir"]}"]
           archive_dir d["app_backup_archive"]
@@ -149,9 +150,9 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "su postgres -c 'pg_dump -U postgres #{d["name"]} | bzip2 > /tmp/#{d["name"]}.%Y%m%d.sql.bz2'",
-            "mv /tmp/#{d["name"]}.%Y%m%d.sql.bz2 #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2",
-            "chown #{d["app_user"]}:#{d["app_user"]} #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2"
+            "su postgres -c 'pg_dump -U postgres #{d["name"]} | bzip2 > /tmp/#{d["name"]}.#{date}.sql.bz2'",
+            "mv /tmp/#{d["name"]}.%Y%m%d.sql.bz2 #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2",
+            "chown #{d["app_user"]}:#{d["app_user"]} #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2"
           ]
           include     ["#{d["app_backup_dir"]}"]
           archive_dir d["app_backup_archive"]
@@ -245,7 +246,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "mysqldump -u #{d["user"]} -p#{d["password"]} #{d["name"]} | bz2 > #{d["app_backup_dir"]}/#{d["name"]}.%Y%m%d.sql.bz2"
+            "mysqldump -u #{d["user"]} -p#{d["password"]} #{d["name"]} | bz2 > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2"
           ]
           include     ["#{d["app_backup_dir"]}"]
           archive_dir d["app_backup_archive"]
