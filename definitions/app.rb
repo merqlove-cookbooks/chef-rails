@@ -44,6 +44,7 @@ define :app, application: false, type: "apps" do
 
     if a["backup"]
       rails_backup a["name"] do
+        main false
         path "#{type}/#{project_path}"
         include [app_path]
         exclude ["#{app_path}/backup"]
@@ -52,6 +53,7 @@ define :app, application: false, type: "apps" do
       end
     else
       rails_backup a["name"] do
+        main   false
         action :delete
       end
       directory "/tmp/da-#{a["user"]}-#{a["name"]}" do
