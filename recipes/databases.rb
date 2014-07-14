@@ -68,7 +68,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.#{date}",
+            "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.#{date} >> /dev/null 2>&1",
             "gzip #{d["app_backup_dir"]}/#{d["name"]}.#{date}",
             "rm -f #{d["app_backup_dir"]}/#{d["name"]}.#{date}"
           ]
@@ -323,7 +323,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         pre.push "mysqldump --all-databases -u root -p#{root["password"]} | gzip > #{db_backup_dir}/#{db}.#{date}.sql.gz"
       when "mongodb"
         admin = admin || Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
-        pre.push "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date}"
+        pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date} >> /dev/null 2>&1"
         pre.push "tar -zcf #{db_backup_dir}/#{db}.#{date}.tar.gz #{db_backup_dir}/#{db}.#{date}"
         pre.push "rm -rf #{db_backup_dir}/#{db}.#{date}"
     end
