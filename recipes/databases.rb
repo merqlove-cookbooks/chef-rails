@@ -323,8 +323,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
         pre.push "mysqldump --all-databases -u root -p#{root["password"]} | gzip > #{db_backup_dir}/#{db}.#{date}.sql.gz"
       when "mongodb"
         admin = admin || Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
-        pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date}"
-        pre.push "tar -zcvf #{db_backup_dir}/#{db}.#{date}.tar.gz #{db_backup_dir}/#{db}.#{date}"
+        pre.push "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date}"
+        pre.push "tar -zcf #{db_backup_dir}/#{db}.#{date}.tar.gz #{db_backup_dir}/#{db}.#{date}"
         pre.push "rm -rf #{db_backup_dir}/#{db}.#{date}"
     end
 
