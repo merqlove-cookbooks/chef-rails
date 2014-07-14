@@ -21,14 +21,14 @@ actions :create, :delete
 
 default_action :create
 
-attribute :name, :kind_of => String, :name_attribute => true
+attribute :name,     :kind_of => String, :name_attribute => true
 attribute :cookbook, :kind_of => [String, NilClass], :default => "rails" #Cookbook to find template
 
 # Data Bag Id
 attribute :key_id,  :kind_of => [String, NilClass], :default => nil
 
 # Path
-attribute :path,  :kind_of => [String, NilClass], :default => nil
+attribute :path,    :kind_of => [String, NilClass], :default => nil
 attribute :target,  :kind_of => [String, NilClass], :default => nil
 
 # S3 EU region
@@ -36,7 +36,7 @@ attribute :s3_eu,  :kind_of => [TrueClass, FalseClass, NilClass], :default => ni
 
 # Create boto config?
 attribute :boto_cfg,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
-attribute :main,  :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
+attribute :main,      :kind_of => [TrueClass, FalseClass], :default => false
 
 # Logging
 attribute :log,      :kind_of => [TrueClass, FalseClass, NilClass], :default => nil
@@ -53,14 +53,14 @@ attribute :archive_dir,  :kind_of => [String, NilClass], :default => nil
 attribute :temp_dir,     :kind_of => [String, NilClass], :default => nil
 
 # Shell scripts that will be appended at the beginning/end of the cronjob
-attribute :exec_pre, :kind_of => [Array, NilClass], :default => nil
+attribute :exec_pre,    :kind_of => [Array, NilClass], :default => nil
 attribute :exec_before, :kind_of => [Array, NilClass], :default => nil
-attribute :exec_after, :kind_of => [Array, NilClass], :default => nil
+attribute :exec_after,  :kind_of => [Array, NilClass], :default => nil
 
 # Size and speed
 attribute :keep_full, :kind_of => [Integer, NilClass], :default => nil
-attribute :nice, :kind_of => [Integer, NilClass], :default => nil
-attribute :ionice, :kind_of => [Integer, NilClass], :default => nil
+attribute :nice,      :kind_of => [Integer, NilClass], :default => nil
+attribute :ionice,    :kind_of => [Integer, NilClass], :default => nil
 
 def initialize(*args)
   super
