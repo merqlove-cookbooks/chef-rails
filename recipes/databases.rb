@@ -62,7 +62,6 @@ if Chef.const_defined? "EncryptedDataBagItem"
 
       if d["app_backup"]
         rails_backup "mongo_db_#{d["app_name"]}" do
-          main        false
           path        d["app_backup_path"]
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
@@ -75,7 +74,6 @@ if Chef.const_defined? "EncryptedDataBagItem"
         end
       else
         rails_backup "mongo_db_#{d["app_name"]}" do
-          main   false
           action :delete
         end
         directory d["app_backup_archive"] do
@@ -148,7 +146,6 @@ if Chef.const_defined? "EncryptedDataBagItem"
 
       if d["app_backup"]
         rails_backup "pg_db_#{d["app_name"]}" do
-          main        false
           path        d["app_backup_path"]
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
@@ -245,7 +242,6 @@ if Chef.const_defined? "EncryptedDataBagItem"
 
       if d["app_backup"]
         rails_backup "mysql_db_#{d["app_name"]}" do
-          main        false
           path        d["app_backup_path"]
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
@@ -258,7 +254,6 @@ if Chef.const_defined? "EncryptedDataBagItem"
         end
       else
         rails_backup "mysql_db_#{d["app_name"]}" do
-          main   false
           action :delete
         end
         directory d["app_backup_archive"] do
