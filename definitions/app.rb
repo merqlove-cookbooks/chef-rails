@@ -51,15 +51,13 @@ define :app, application: false, type: "apps" do
         temp_dir "/tmp/dt-#{a["user"]}-#{a["name"]}"
       end
     else
+      archive_dir = "/tmp/da-#{a["user"]}-#{a["name"]}"
+      temp_dir = "/tmp/dt-#{a["user"]}-#{a["name"]}"
       rails_backup a["name"] do
         action :delete
       end
-      directory "/tmp/da-#{a["user"]}-#{a["name"]}" do
-        action :delete
-      end
-      directory "/tmp/dt-#{a["user"]}-#{a["name"]}" do
-        action :delete
-      end
+      Dir.delete(archive_dir) if Dir.exists? archive_dir
+      Dir.delete(temp_dir) if Dir.exists? temp_dir
     end
 
     directory app_path do
@@ -75,6 +73,7 @@ define :app, application: false, type: "apps" do
           name: d["name"],
           user: d["user"],
           password: d["password"],
+          pool: d["pool"],
           app_type: type,
           app_name: a["name"],
           app_path: app_path,

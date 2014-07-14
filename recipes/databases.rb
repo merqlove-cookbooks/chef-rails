@@ -83,12 +83,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "mongo_db_#{d["app_name"]} delete" do
           action :delete
         end
-        directory d["app_backup_archive"] do
-          action :delete
-        end
-        directory d["app_backup_temp"] do
-          action :delete
-        end
+        Dir.delete(d["app_backup_archive"]) if Dir.exists? d["app_backup_archive"]
+        Dir.delete(d["app_backup_temp"]) if Dir.exists? d["app_backup_temp"]
       end
 
       execute d["name"] do
@@ -145,6 +141,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
         database_user d["user"]
         database_password d["password"]
         type "postgresql"
+        pool d["pool"]
         port "#{node['postgresql']['config']['port']}"
         host node['postgresql']['config']['listen_addresses']
         path d["app_path"]
@@ -174,12 +171,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "pg_db_#{d["app_name"]} delete" do
           action :delete
         end
-        directory d["app_backup_archive"] do
-          action :delete
-        end
-        directory d["app_backup_temp"] do
-          action :delete
-        end
+        Dir.delete(d["app_backup_archive"]) if Dir.exists? d["app_backup_archive"]
+        Dir.delete(d["app_backup_temp"]) if Dir.exists? d["app_backup_temp"]
       end
 
       postgresql_database_user d["user"] do
@@ -273,12 +266,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "mysql_db_#{d["app_name"]} delete" do
           action :delete
         end
-        directory d["app_backup_archive"] do
-          action :delete
-        end
-        directory d["app_backup_temp"] do
-          action :delete
-        end
+        Dir.delete(d["app_backup_archive"]) if Dir.exists? d["app_backup_archive"]
+        Dir.delete(d["app_backup_temp"]) if Dir.exists? d["app_backup_temp"]
       end
 
       mysql_database_user d["user"] do
@@ -361,15 +350,9 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "#{db}_db_delete" do
           action :delete
         end
-        directory "/tmp/da-#{db}" do
-          action :delete
-        end
-        directory "/tmp/dt-#{db}" do
-          action :delete
-        end
-        directory "#{db_backup_root}/#{db}" do
-          action :delete
-        end
+        Dir.delete("/tmp/da-#{db}")
+        Dir.delete("/tmp/dt-#{db}")
+        Dir.delete("#{db_backup_root}/#{db}")
       end
     end
   end
