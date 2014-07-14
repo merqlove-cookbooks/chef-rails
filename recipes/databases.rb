@@ -68,8 +68,8 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.#{date}"
-            "bzip2 -c #{d["app_backup_dir"]}/#{d["name"]}.#{date} > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.bz2"
+            "mongodump --quiet --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.#{date}",
+            "bzip2 -c #{d["app_backup_dir"]}/#{d["name"]}.#{date} > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.bz2",
             "rm -f #{d["app_backup_dir"]}/#{d["name"]}.#{date}"
           ]
           include     ["#{d["app_backup_dir"]}"]
