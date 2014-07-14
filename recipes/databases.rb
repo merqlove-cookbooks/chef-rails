@@ -246,7 +246,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
           exec_pre    [
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "mysqldump -u #{d["user"]} -p#{d["password"]} #{d["name"]} | bz2 > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2"
+            "mysqldump -u #{d["user"]} -p#{d["password"]} #{d["name"]} | bzip2 > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.bz2"
           ]
           include     ["#{d["app_backup_dir"]}"]
           archive_dir d["app_backup_archive"]
