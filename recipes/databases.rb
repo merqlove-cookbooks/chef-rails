@@ -19,7 +19,7 @@
 
 if Chef.const_defined? "EncryptedDataBagItem"
   default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
-  date = '$(date +"%Y%m%d")'
+  date = 'NOW=$(date +"%Y%m%d")'
 
   # Backup Mongo User DB
 
@@ -66,11 +66,12 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "mongo_db_#{d["app_name"]}" do
           path        d["app_backup_path"]
           exec_pre    [
+            "#{date}",
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.#{date} >> /dev/null 2>&1",
-            "gzip #{d["app_backup_dir"]}/#{d["name"]}.#{date}",
-            "rm -f #{d["app_backup_dir"]}/#{d["name"]}.#{date}"
+            "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d["name"]} --out #{d["app_backup_dir"]}/#{d["name"]}.$NOW >> /dev/null 2>&1",
+            "gzip #{d["app_backup_dir"]}/#{d["name"]}.$NOW",
+            "rm -f #{d["app_backup_dir"]}/#{d["name"]}.$NOW"
           ]
           include     ["#{d["app_backup_dir"]}"]
           archive_dir d["app_backup_archive"]
@@ -154,10 +155,11 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "pg_db_#{d["app_name"]}" do
           path        d["app_backup_path"]
           exec_pre    [
+            "#{date}",
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "su postgres -c 'pg_dump -U postgres #{d["name"]} | gzip > /tmp/#{d["name"]}.#{date}.sql.gz'",
-            "mv /tmp/#{d["name"]}.#{date}.sql.gz #{d["app_backup_dir"]}/",
+            "su postgres -c 'pg_dump -U postgres #{d["name"]} | gzip > /tmp/#{d["name"]}.$NOW.sql.gz'",
+            "mv /tmp/#{d["name"]}.$NOW.sql.gz #{d["app_backup_dir"]}/",
             "chown -R #{d["app_user"]}:#{d["app_user"]} #{d["app_backup_dir"]}/*"
           ]
           include     [d["app_backup_dir"]]
@@ -252,9 +254,10 @@ if Chef.const_defined? "EncryptedDataBagItem"
         rails_backup "mysql_db_#{d["app_name"]}" do
           path        d["app_backup_path"]
           exec_pre    [
+            "#{date}",
             "mkdir -p #{d["app_backup_dir"]} >> /dev/null 2>&1",
             "rm -rf #{d["app_backup_dir"]}/*",
-            "mysqldump -u root -p#{root["password"]} #{d["name"]} | gzip > #{d["app_backup_dir"]}/#{d["name"]}.#{date}.sql.gz"
+            "mysqldump -u root -p#{root["password"]} #{d["name"]} | gzip > #{d["app_backup_dir"]}/#{d["name"]}.$NOW.sql.gz"
           ]
           include     [d["app_backup_dir"]]
           archive_dir d["app_backup_archive"]
@@ -308,6 +311,7 @@ if Chef.const_defined? "EncryptedDataBagItem"
 
   node['rails']['duplicity']['db'].each do |db|
     pre = [
+      "#{date}",
       "mkdir -p #{db_backup_root}/#{db} >> /dev/null 2>&1",
       "rm -rf #{db_backup_root}/#{db}/*",
     ]
@@ -315,17 +319,17 @@ if Chef.const_defined? "EncryptedDataBagItem"
     case db
       when "postgresql"
         postgres = postgres || Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
-        pre.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.#{date}.sql.gz'"
-        pre.push "mv /tmp/#{db}.#{date}.sql.gz #{db_backup_dir}/"
+        pre.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.$NOW.sql.gz'"
+        pre.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
         pre.push "chown -R root:root #{db_backup_dir}/*"
       when "mysql"
         root = root || Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
-        pre.push "mysqldump --all-databases -u root -p#{root["password"]} | gzip > #{db_backup_dir}/#{db}.#{date}.sql.gz"
+        pre.push "mysqldump --all-databases -u root -p#{root["password"]} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
       when "mongodb"
         admin = admin || Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
-        pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date} >> /dev/null 2>&1"
-        pre.push "tar -zcf #{db_backup_dir}/#{db}.#{date}.tar.gz #{db_backup_dir}/#{db}.#{date}"
-        pre.push "rm -rf #{db_backup_dir}/#{db}.#{date}"
+        pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
+        pre.push "tar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
+        pre.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
     end
 
     rails_backup "#{db}_db_backup" do
