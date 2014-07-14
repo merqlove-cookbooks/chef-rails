@@ -311,17 +311,17 @@ if Chef.const_defined? "EncryptedDataBagItem"
     case db
       when "postgresql"
         postgres = postgres || Chef::EncryptedDataBagItem.load("postgresql", 'postgres', default_secret)
-        pre.push [
-          "su postgres -c 'pg_dump_all -U postgres | bzip2 > /tmp/#{db}.#{date}.sql.bz2'",
-          "mv /tmp/#{db}.#{date}.sql.bz2 #{db_backup_dir}/#{db}.#{date}.sql.bz2",
-          "chown root:root #{db_backup_dir}/#{db}.#{date}.sql.bz2"
-        ]
+        pre.push "su postgres -c 'pg_dump_all -U postgres | bzip2 > /tmp/#{db}.#{date}.sql.bz2'"
+        pre.push "mv /tmp/#{db}.#{date}.sql.bz2 #{db_backup_dir}/#{db}.#{date}.sql.bz2"
+        pre.push "chown root:root #{db_backup_dir}/#{db}.#{date}.sql.bz2"
       when "mysql"
         root = root || Chef::EncryptedDataBagItem.load("mysql", 'root', default_secret)
         pre.push "mysqldump --all-databases -u root -p#{root["password"]} | bzip2 > #{db_backup_dir}/#{db}.#{date}.sql.bz2"
       when "mongodb"
         admin = admin || Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
         pre.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.#{date}"
+        pre.push "bzip2 -c #{db_backup_dir}/#{db}.#{date} > #{db_backup_dir}/#{db}.#{date}.bz2"
+        pre.push "rm -f #{db_backup_dir}/#{db}.#{date}" 
     end
 
     rails_backup "#{db}_db_backup" do
