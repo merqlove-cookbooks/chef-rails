@@ -38,8 +38,8 @@ action :create do
           store_main = Chef::EncryptedDataBagItem.load("gs", key_id, default_secret)
         end
         if duplicity_main["passphrase"] and store_main["access_key_id"] and store_main["secret_access_key"]
-          boto_cfg = !!(new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg']) and new_resource.main
-          if boto_cfg
+          boto_cfg = !!(new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg'])
+          if boto_cfg and new_resource.main
             duplicity_ng_boto "base boto config" do
               # In case you use S3 as your backend, your credentials go here
               gs_access_key_id     store_main["access_key_id"] if node['rails']['duplicity']['method'].include?("gs")
