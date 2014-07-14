@@ -19,7 +19,7 @@
 
 if Chef.const_defined? "EncryptedDataBagItem"
   default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
-  date = "$(date +"%Y%m%d")"
+  date = '$(date +"%Y%m%d")'
 
   if node.default["rails"]["databases"].include?("mongodb")
     admin = Chef::EncryptedDataBagItem.load("mongodb", "admin", default_secret)
