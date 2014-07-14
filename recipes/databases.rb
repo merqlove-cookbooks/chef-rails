@@ -332,20 +332,21 @@ if Chef.const_defined? "EncryptedDataBagItem"
       temp_dir    "/tmp/dt-#{db}"
     end
   end
-
-  Dir.foreach("/var/tmp/db_backup") do |db|
-    unless node['rails']['duplicity']['db'].include? db
-      rails_backup "#{db}_db_delete" do
-        action :delete
-      end
-      directory "/tmp/da-#{db}" do
-        action :delete
-      end
-      directory "/tmp/dt-#{db}" do
-        action :delete
-      end
-      directory "/var/tmp/db_backup/#{db}" do
-        action :delete
+  if Dir.exist? "#{node['php-fpm']['pool_conf_dir']}"
+    Dir.foreach("/var/tmp/db_backup") do |db|
+      unless node['rails']['duplicity']['db'].include? db
+        rails_backup "#{db}_db_delete" do
+          action :delete
+        end
+        directory "/tmp/da-#{db}" do
+          action :delete
+        end
+        directory "/tmp/dt-#{db}" do
+          action :delete
+        end
+        directory "/var/tmp/db_backup/#{db}" do
+          action :delete
+        end
       end
     end
   end
