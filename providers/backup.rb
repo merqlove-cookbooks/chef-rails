@@ -28,17 +28,18 @@ action :create do
         store_keys = data_bag("gs")
       end
       duplicity = data_bag("duplicity")
-      key_id = new_resource.key_id || node['rails']['duplicity']['key_id']
-      if duplicity.include?(key_id) and store_keys.include?(key_id)
-        duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", key_id, default_secret)
+      pass_key_id = new_resource.pass_key_id || node['rails']['duplicity']['pass_key_id']
+      storage_key_id = new_resource.storage_key_id || node['rails']['duplicity']['storage_key_id']
+      if duplicity.include?(pass_key_id) and store_keys.include?(storage_key_id)
+        duplicity_main = Chef::EncryptedDataBagItem.load("duplicity", pass_key_id, default_secret)
         case node['rails']['duplicity']['method']
         when "aws"
-          store_main = Chef::EncryptedDataBagItem.load("aws", key_id, default_secret)
+          store_main = Chef::EncryptedDataBagItem.load("aws", storage_key_id, default_secret)
         when "gs"
-          store_main = Chef::EncryptedDataBagItem.load("gs", key_id, default_secret)
+          store_main = Chef::EncryptedDataBagItem.load("gs", storage_key_id, default_secret)
         end
         if duplicity_main["passphrase"] and store_main["access_key_id"] and store_main["secret_access_key"]
-          boto_cfg = !!(new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg']) and new_resource.main
+          boto_cfg = (new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg']) and new_resource.main
           if boto_cfg
             duplicity_ng_boto "base boto config" do
               # In case you use Google Cloud Storage as your backend, your credentials go here

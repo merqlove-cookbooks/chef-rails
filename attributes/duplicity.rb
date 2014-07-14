@@ -18,8 +18,9 @@
 #
 
 # passwords data bag id
-default['rails']['duplicity']['key_id'] = "main"
-default['rails']['duplicity']['boto_cfg'] = false
+default['rails']['duplicity']['pass_key_id'] = "main"
+default['rails']['duplicity']['storage_key_id'] = node.default['rails']['duplicity']['pass_key_id']
+default['rails']['duplicity']['boto_cfg'] = true
 
 # path & log
 default['rails']['duplicity']['path'] = '/usr/local/bin/duplicity'
