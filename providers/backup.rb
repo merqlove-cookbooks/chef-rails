@@ -59,8 +59,6 @@ action :create do
             interval         new_resource.interval || node['rails']['duplicity']['interval'] # Cron interval (hourly, daily, monthly)
             logfile          logfile          # Log cronjob output to this file
 
-            duplicity_path   new_resource.path
-
             # duplicity parameters
             backend    "#{aws_eu}#{node['rails']['duplicity']['method']}://#{new_resource.target || node['rails']['duplicity']['target']}/#{node['fqdn']}/#{new_resource.path || node['rails']['duplicity']['path']}" # Backend to use (default: nil, required!)
             passphrase duplicity_main["passphrase"]                 # duplicity passphrase (default: nil, required!)
