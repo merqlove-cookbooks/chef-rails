@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Definition:: user_ref
+# Provider:: users
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2014 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 # limitations under the License.
 #
 
-define :user_ref, users: false, secret: false, vcs: false do
-  if params[:users] && params[:secret] && params[:vcs]
-    users = params[:users]
-    default_secret =  params[:secret]
-    vcs = params[:vcs]
+action :create do
+  users  = new_resource.users
+  secret = new_resource.secret
+  vcs    = new_resource.vcs
+
+  if users && secret && vcs
     name_pass = []
 
     users.each do |u|
