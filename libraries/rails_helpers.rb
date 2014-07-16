@@ -3,7 +3,7 @@ module Rails
   module Helpers
     def self.hash_in_array?(other_array, value)
       other_array.each { |h| return true if h.is_a?(Hash) && h.value?(value) }
-      return false
+      false
     end
   end
 end

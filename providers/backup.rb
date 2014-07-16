@@ -59,10 +59,10 @@ def config(storage_key_id, pass_key_id)
     store = Chef::EncryptedDataBagItem.load('gs', storage_key_id, default_secret)
   end
 
-  run_config(new_resource, pass_key_id, store) if store['access_key_id'] && store['secret_access_key']
+  use_config(new_resource, pass_key_id, store) if store['access_key_id'] && store['secret_access_key']
 end
 
-def run_config(new_resource, pass_key_id, store)
+def use_config(new_resource, pass_key_id, store)
   return unless store
 
   boto = new_resource.boto_cfg || node['rails']['duplicity']['boto_cfg']
