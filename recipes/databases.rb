@@ -207,7 +207,7 @@ if Chef.const_defined? 'EncryptedDataBagItem'
       node.normal['mysql']['server_repl_password']   = root['replication_password']
     end
 
-    include_recipe "mysql::client"
+    include_recipe 'mysql::client'
 
     if node['rails'].include? 'mysql'
       template '/etc/mysql/conf.d/tune.cnf' do

@@ -123,7 +123,7 @@ action :create do
       enable true
       only_if { new_resource.auto_enable_site }
     end
-  rescue Exception => e
+  rescue => e
     log 'message' do
       message "Upload Nginx Cookbook.\n#{e.message}"
       level :error
@@ -146,7 +146,7 @@ action :delete do
     nginx_site name do
       enable false
     end
-  rescue Exception => e
+  rescue => e
     log 'message' do
       message "Upload Nginx Cookbook.\n#{e.message}"
       level   :error
@@ -186,7 +186,7 @@ action :enable do
     nginx_site name do
       enable true
     end
-  rescue Exception => e
+  rescue => e
     log 'message' do
       message "Upload Nginx Cookbook.\n#{e.message}"
       level   :error
@@ -203,7 +203,7 @@ action :disable do
     nginx_site name do
       enable false
     end
-  rescue Exception => e
+  rescue => e
     log 'message' do
       message "Upload Nginx Cookbook.\n#{e.message}"
       level   :error

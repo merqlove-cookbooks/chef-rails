@@ -110,29 +110,7 @@ action :create do
       end
     end
 
-    if node.default['rails']['ruby']
-      if a.include?('rbenv')
-        # set ruby
-        begin
-          rbenv_ruby "#{a['rbenv']['version']}" do
-            ruby_version "#{a['rbenv']['version']}"
-          end
-
-          # add gems
-          a['rbenv']['gems'].each do |g|
-            rbenv_gem "#{g[:name]}" do
-              ruby_version "#{a['rbenv']['version']}"
-              version      g[:version] if g[:version]
-            end
-          end
-        rescue Exception => e
-          log 'message' do
-            message "Upload Rbenv Cookbook.\n#{e.message}"
-            level   :error
-          end
-        end
-      end
-    end
+    install_rbenv(a) if node.default['rails']['ruby'] && a.include?('rbenv')
 
     if a.include? 'smtp'
       begin
@@ -140,7 +118,7 @@ action :create do
         node.default['msmtp']['accounts'][a['user']][a['name']][:syslog] = 'on'
         node.default['msmtp']['accounts'][a['user']][a['name']][:syslog] = 'off'
         node.default['msmtp']['accounts'][a['user']][a['name']][:log]    = "#{app_path}/log/msmtp.log"
-      rescue Exception => e
+      rescue => e
         log 'message' do
           message "Upload MSMTP Cookbook.\n#{e.message}"
           level :error
@@ -218,7 +196,7 @@ action :create do
         end
 
         node.default['php-fpm']['pools'].push(pool)
-      rescue Exception => e
+      rescue => e
         log 'message' do
           message "Upload PHP-FPM Cookbook.\n#{e.message}"
           level :error
@@ -283,4 +261,27 @@ action :create do
 end
 
 action :delete do
+end
+
+def install_rbenv(a)
+  return unless a
+
+  # set ruby
+  rbenv_ruby "#{a['rbenv']['version']}" do
+    ruby_version "#{a['rbenv']['version']}"
+  end
+
+  # add gems
+  a['rbenv']['gems'].each do |g|
+    rbenv_gem "#{g[:name]}" do
+      ruby_version "#{a['rbenv']['version']}"
+      version      g[:version] if g[:version]
+    end
+  end
+
+rescue => e
+  log 'message' do
+    message "Upload Rbenv Cookbook.\n#{e.message}"
+    level   :error
+  end
 end

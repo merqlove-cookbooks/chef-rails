@@ -22,48 +22,43 @@ actions :create, :delete
 default_action :create
 
 attribute :name,     kind_of: String, name_attribute: true
-attribute :cookbook, kind_of: [String, NilClass], default: 'rails' # Cookbook to find template
+attribute :cookbook, kind_of: String, default: 'rails' # Cookbook to find template
 
 # Data Bag Ids
-attribute :pass_key_id,     kind_of: [String, NilClass], default: nil
-attribute :storage_key_id,  kind_of: [String, NilClass], default: nil
+attribute :pass_key_id,     kind_of: String, default: nil
+attribute :storage_key_id,  kind_of: String, default: nil
 
 # Path
-attribute :path,    kind_of: [String, NilClass], default: nil
-attribute :target,  kind_of: [String, NilClass], default: nil
+attribute :path,    kind_of: String, default: nil
+attribute :target,  kind_of: String, default: nil
 
 # S3 EU region
-attribute :s3_eu,  kind_of: [TrueClass, FalseClass, NilClass], default: nil
+attribute :s3_eu,  kind_of: [TrueClass, FalseClass], default: nil
 
 # Create boto config?
-attribute :boto_cfg,  kind_of: [TrueClass, FalseClass, NilClass], default: nil
+attribute :boto_cfg,  kind_of: [TrueClass, FalseClass], default: nil
 attribute :main,      kind_of: [TrueClass, FalseClass], default: false
 
 # Logging
-attribute :log,      kind_of: [TrueClass, FalseClass, NilClass], default: nil
-attribute :logfile,  kind_of: [String, NilClass], default: nil
+attribute :log,      kind_of: [TrueClass, FalseClass], default: nil
+attribute :logfile,  kind_of: String, default: nil
 
 # Timing parameters
-attribute :interval, kind_of: [String, NilClass], default: nil
-attribute :full_per, kind_of: [String, NilClass], default: nil
+attribute :interval, kind_of: String, default: nil
+attribute :full_per, kind_of: String, default: nil
 
 # Directory select
-attribute :include,      kind_of: [Array, NilClass], default: nil
-attribute :exclude,      kind_of: [Array, NilClass], default: nil
-attribute :archive_dir,  kind_of: [String, NilClass], default: nil
-attribute :temp_dir,     kind_of: [String, NilClass], default: nil
+attribute :include,      kind_of: Array, default: nil
+attribute :exclude,      kind_of: Array, default: nil
+attribute :archive_dir,  kind_of: String, default: nil
+attribute :temp_dir,     kind_of: String, default: nil
 
 # Shell scripts that will be appended at the beginning/end of the cronjob
-attribute :exec_pre,    kind_of: [Array, NilClass], default: nil
-attribute :exec_before, kind_of: [Array, NilClass], default: nil
-attribute :exec_after,  kind_of: [Array, NilClass], default: nil
+attribute :exec_pre,    kind_of: Array, default: nil
+attribute :exec_before, kind_of: Array, default: nil
+attribute :exec_after,  kind_of: Array, default: nil
 
 # Size and speed
-attribute :keep_full, kind_of: [Integer, NilClass], default: nil
-attribute :nice,      kind_of: [Integer, NilClass], default: nil
-attribute :ionice,    kind_of: [Integer, NilClass], default: nil
-
-def initialize(*args)
-  super
-  @action = :create
-end
+attribute :keep_full, kind_of: Integer, default: nil
+attribute :nice,      kind_of: Integer, default: nil
+attribute :ionice,    kind_of: Integer, default: nil
