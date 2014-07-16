@@ -319,15 +319,15 @@ if Chef.const_defined? 'EncryptedDataBagItem'
 
     case db
     when 'postgresql'
-      postgres ||= Chef::EncryptedDataBagItem.load('postgresql', 'postgres', default_secret)
+      postgres ||= Chef::EncryptedDataBagItem.load(db, 'postgres', default_secret)
       exec_before.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.\"$0\".sql.gz' -- \"$NOW\""
       exec_before.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
       exec_before.push "chown -R root:root #{db_backup_dir}/*"
     when 'mysql'
-      root ||= Chef::EncryptedDataBagItem.load('mysql', 'root', default_secret)
+      root ||= Chef::EncryptedDataBagItem.load(db, 'root', default_secret)
       exec_before.push "mysqldump --all-databases -u root -p#{root['password']} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
     when 'mongodb'
-      admin ||= Chef::EncryptedDataBagItem.load('mongodb', 'admin', default_secret)
+      admin ||= Chef::EncryptedDataBagItem.load(db, 'admin', default_secret)
       exec_before.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
       exec_before.push "ar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
       exec_before.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
