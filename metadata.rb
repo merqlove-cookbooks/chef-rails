@@ -6,33 +6,33 @@ description      'Installs/Configures ruby/rails, php, databases and so on'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version           '0.3.3'
 
-supports "centos"
-supports "ubuntu"
+supports 'centos'
+supports 'ubuntu'
 
-depends "duplicity_ng"
-depends "swap"
-depends "iptables"
-depends "ssh_known_hosts"
-depends "nginx"
-depends "rbenv"
-depends "mongodb"
-depends "postgresql"
-depends "mysql"
-depends "database"
-depends "php"
-depends "php-fpm"
-depends "composer"
-depends "msmtp"
-depends "vsftpd"
+depends 'duplicity_ng'
+depends 'swap'
+depends 'iptables'
+depends 'ssh_known_hosts'
+depends 'nginx'
+depends 'rbenv'
+depends 'mongodb'
+depends 'postgresql'
+depends 'mysql'
+depends 'database'
+depends 'php'
+depends 'php-fpm'
+depends 'composer'
+depends 'msmtp'
+depends 'vsftpd'
 
-# attribute "hub/install_path",
-#   display_name: "Install path",
-#   description: "Base path where bin/hub will be installed",
-#   type: "string",
-#   required: "optional"
+# attribute 'hub/install_path',
+#   display_name: 'Install path',
+#   description: 'Base path where bin/hub will be installed',
+#   type: 'string',
+#   required: 'optional'
 
-# attribute "git/src_path",
-#   display_name: "Source path",
-#   description: "Path where hub git repo will be cloned",
-#   type: "string",
-#   required: "optional"
+# attribute 'git/src_path',
+#   display_name: 'Source path',
+#   description: 'Path where hub git repo will be cloned',
+#   type: 'string',
+#   required: 'optional'

@@ -44,8 +44,8 @@ Just include `rails` in your node's `run_list`:
 
 ```json
 {
-  "name":"my_node",
-  "run_list": [
+  'name':'my_node',
+  'run_list': [
     "recipe[rails]"
   ]
 }

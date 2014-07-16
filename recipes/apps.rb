@@ -4,62 +4,62 @@
 #
 # Copyright (C) 2013 Alexander Merkulov
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# distributed under the License is distributed on an 'AS IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
 
-#Fix nginx
+# Fix nginx
 file "#{node['nginx']['dir']}/conf.d/default.conf" do
   action :delete
 end
 
-#PHP fpm fix
-node.default['php-fpm']['pools'] = []
+# PHP fpm fix
+node.default['php-fpm']['pools']   = []
 
-#Useful databases
-node.default["rails"]["databases"] = {}
+# Useful databases
+node.default['rails']['databases'] = {}
 
 node['rails']['sites'].each do |k, a|
-  app k do
+  rails_app k do
     application a
-    type "sites"
+    type 'sites'
   end
 end
 
 node['rails']['apps'].each do |k, a|
-  app k do
+  rails_app k do
     application a
-    type "apps"
+    type 'apps'
   end
 end
 
-#PHP pools
+# PHP pools
 if node.default['php-fpm']['pools'].count > 0
-  include_recipe "php-fpm::configure"
-  template "/etc/php.d/php_fix.ini" do
-    owner "root"
-    group "root"
-    mode '755'
+  include_recipe 'php-fpm::configure'
+  template '/etc/php.d/php_fix.ini' do
+    owner 'root'
+    group 'root'
+    mode 00755
     source 'php_fix.erb'
     notifies :restart, 'service[php-fpm]', :delayed
   end
 
-  ruby_block "cleanup php-fpm configuration" do
+  ruby_block 'cleanup php-fpm configuration' do
     block do
       if Dir.exist? "#{node['php-fpm']['pool_conf_dir']}"
         deleted = false
         Dir.foreach("#{node['php-fpm']['pool_conf_dir']}") do |pool|
-          next if pool == '.' or pool == '..'
-          if pool.include? ".conf"
+          next if pool == '.' || pool == '..'
+          if pool.include? '.conf'
             unless Rails::Helpers.has_hash_in_array?(node['php-fpm']['pools'], pool.gsub(/\.conf/, ''))
               File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")
               deleted = true
@@ -67,24 +67,24 @@ if node.default['php-fpm']['pools'].count > 0
           end
         end
 
-        resources(:service => node['php-fpm']['service']).run_action(:restart) if deleted
+        resources(service: node['php-fpm']['service']).run_action(:restart) if deleted
       end
     end
     action :create
   end
 
-  directory "/var/lib/php/session" do
-    owner "root"
-    group "root"
-    mode "0777"
+  directory '/var/lib/php/session' do
+    owner 'root'
+    group 'root'
+    mode 00777
   end
 
-  include_recipe "php-fpm::install"
+  include_recipe 'php-fpm::install'
 else
   if Dir.exist? "#{node['php-fpm']['pool_conf_dir']}"
     Dir.foreach("#{node['php-fpm']['pool_conf_dir']}") do |pool|
-      next if pool == '.' or pool == '..'
-      if pool.include? ".conf"
+      next if pool == '.' || pool == '..'
+      if pool.include? '.conf'
         File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")
       end
     end
@@ -94,25 +94,25 @@ else
   end
 end
 
-#Sites cleanup
+# Sites cleanup
 if node['rails']['sites'].count > 0
-  execute "deny site groups from write" do
+  execute 'deny site groups from write' do
     command "chmod -R g-w #{node['rails']['sites_base_path']}/*/*/docs"
     action :run
   end
 
-  execute "deny site others from read" do
+  execute 'deny site others from read' do
     command "chmod -R o-rwx #{node['rails']['sites_base_path']}/*/*/docs"
     action :run
   end
 end
 
-include_recipe "rails::databases"
-include_recipe "rails::database_admin"
+include_recipe 'rails::databases'
+include_recipe 'rails::database_admin'
 
-rails_backup "system" do
-  main     true
+rails_backup 'system' do
+  main true
 end
 
-include_recipe "msmtp"
-include_recipe "rails::cleanup"
+include_recipe 'msmtp'
+include_recipe 'rails::cleanup'

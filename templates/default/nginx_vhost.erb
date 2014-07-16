@@ -5,7 +5,7 @@
       server unix:/var/run/php-<%= @user %>-<%= @name %>.sock;
     }
   <% end %>
-  <% unless node.role? "vagrant" and not @disable_www %>
+  <% unless node.role? 'vagrant' && !@disable_www %>
   server {
     listen <%= @listen %>;
     server_name www.<%= Array(@server_name)[0] %>;
@@ -14,7 +14,7 @@
   <% end %>
 
   server {
-    listen <%= @listen %> <%= "default" if @default %> <%= "deferred" if @deferred %>;
+    listen <%= @listen %> <%= 'default' if @default %> <%= 'deferred' if @deferred %>;
     server_name <%= Array(@server_name).join(' ') %>;
 
     <% if @ssl %>ssl on;
@@ -31,7 +31,7 @@
 
     <% if @rewrites %>
       <% @rewrites.each do |rewrite| %>
-        rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+        rewrite <%= rewrite['query'] %> <%= rewrite['uri'] %> <%= rewrite['options'] %>;
       <% end %>
     <% end %>
 
@@ -46,7 +46,7 @@
     <% end %>
 
     <% if @hidden %>
-      <% hidden_paths = "|" %>
+      <% hidden_paths = '|' %>
       <% hidden_paths << Array(@hidden).join('|') %>
     <% end %>
 
@@ -162,7 +162,7 @@
     location @file_rewrite {
       <% if @file_rewrites %>
       <% @file_rewrites.each do |rewrite| %>
-      rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+      rewrite <%= rewrite['query'] %> <%= rewrite['uri'] %> <%= rewrite['options'] %>;
       <% end %>
       <% end %>
     }

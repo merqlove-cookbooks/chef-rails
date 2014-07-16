@@ -4,14 +4,14 @@
 #
 # Copyright (C) 2013 Alexander Merkulov
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# distributed under the License is distributed on an 'AS IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -21,44 +21,44 @@ ruby_exists = search(:node, "roles:base_ruby AND name:#{node.name}")
 
 if ruby_exists.count > 0
   case node[:platform]
-  when "redhat", "centos", "amazon", "oracle"
-    package "patch"
-    package "automake"
-    package "libyaml-devel"
-    package "libffi-devel"
-    package "libtool"
-  when "debian", "ubuntu"
+  when 'redhat', 'centos', 'amazon', 'oracle'
+    package 'patch'
+    package 'automake'
+    package 'libyaml-devel'
+    package 'libffi-devel'
+    package 'libtool'
+  when 'debian', 'ubuntu'
     # TODO: Add same packages
   end
   node.default['rails']['ruby'] = true
 else
   case node[:platform]
-  when "redhat", "centos", "amazon", "oracle"
-    package "openssl-devel"
-    package "zlib-devel"
-    package "readline-devel"
-    package "libxml2-devel"
-    package "libxslt-devel"
-    package "patch"
-    package "automake"
-    package "libyaml-devel"
-    package "libffi-devel"
-    package "libtool"
-  when "debian", "ubuntu"
+  when 'redhat', 'centos', 'amazon', 'oracle'
+    package 'openssl-devel'
+    package 'zlib-devel'
+    package 'readline-devel'
+    package 'libxml2-devel'
+    package 'libxslt-devel'
+    package 'patch'
+    package 'automake'
+    package 'libyaml-devel'
+    package 'libffi-devel'
+    package 'libtool'
+  when 'debian', 'ubuntu'
     # TODO: Add same packages
   end
   node.default['rails']['ruby'] = false
 end
 
-if node['recipes'].include?("memcached::default")
-  service "memcached" do
+if node['recipes'].include?('memcached::default')
+  service 'memcached' do
     action [:enable, :start]
   end
 end
 
-if node['recipes'].include?("postgresql::server")
+if node['recipes'].include?('postgresql::server')
   case node['platform_family']
-  when "debian"
+  when 'debian'
     node.default['postgresql']['enable_pgdg_apt'] = true
   when 'rhel', 'fedora', 'suse'
     node.default['postgresql']['enable_pgdg_yum'] = true

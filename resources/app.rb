@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: centos_ssh
+# Resource:: app
 #
 # Copyright (C) 2013 Alexander Merkulov
 #
@@ -17,13 +17,13 @@
 # limitations under the License.
 #
 
-if platform_family?('rhel')
-  if node['platform_version'].to_i > 5
-    package 'authconfig'
-    execute 'ssh_fix' do
-      command 'authconfig --disablefingerprint --update'
-      user    'root'
-      group   'root'
-    end
-  end
-end
+actions        :create, :delete
+default_action :create
+
+attribute :name, kind_of: String, name_attribute: true
+
+attribute :type,        kind_of: String, default: 'apps'
+attribute :application, kind_of: Hash,   default: nil
+
+# Cookbook to find template
+attribute :cookbook, kind_of: String, default: 'rails'

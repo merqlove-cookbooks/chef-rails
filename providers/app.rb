@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Definition:: app
+# Provider:: app
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2014 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 # limitations under the License.
 #
 
-define :app, application: false, type: 'apps' do
-  if params[:application]
-    a            = params[:application]
-    type         = params[:type]
+action :create do
+  if new_resource.application
+    a            = new_resource.application
+    type         = new_resource.type
     base_path    = node['rails']["#{type}_base_path"]
-    user_path    = a['user'] if type.include? 'sites'
     project_path = if type.include? 'sites'
       "#{a['user']}/#{a['name']}"
     else
@@ -56,8 +55,8 @@ define :app, application: false, type: 'apps' do
       rails_backup a['name'] do
         action :delete
       end
-      Dir.delete(archive_dir) if Dir.exists? archive_dir
-      Dir.delete(temp_dir) if Dir.exists? temp_dir
+      Dir.delete(archive_dir) if Dir.exist? archive_dir
+      Dir.delete(temp_dir) if Dir.exist? temp_dir
     end
 
     directory app_path do
@@ -113,13 +112,13 @@ define :app, application: false, type: 'apps' do
 
     if node.default['rails']['ruby']
       if a.include?('rbenv')
-        #set ruby
+        # set ruby
         begin
           rbenv_ruby "#{a['rbenv']['version']}" do
             ruby_version "#{a['rbenv']['version']}"
           end
 
-          #add gems
+          # add gems
           a['rbenv']['gems'].each do |g|
             rbenv_gem "#{g[:name]}" do
               ruby_version "#{a['rbenv']['version']}"
@@ -281,4 +280,7 @@ define :app, application: false, type: 'apps' do
       end
     end
   end
+end
+
+action :delete do
 end

@@ -15,7 +15,7 @@
     
     <% if @rewrites %> 
       <% @rewrites.each do |rewrite| %>
-        rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+        rewrite <%= rewrite['query'] %> <%= rewrite['uri'] %> <%= rewrite['options'] %>;
       <% end %>
     <% end %>
     
@@ -87,7 +87,7 @@
       <% if @file_rewrites %>      
       if (!-f $request_filename) {  
       <% @file_rewrites.each do |rewrite| %>
-        rewrite <%= rewrite["query"] %> <%= rewrite["uri"] %> <%= rewrite["options"] %>;
+        rewrite <%= rewrite['query'] %> <%= rewrite['uri'] %> <%= rewrite['options'] %>;
       <% end %>
       }
       <% end %>
