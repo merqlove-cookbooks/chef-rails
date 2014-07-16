@@ -18,10 +18,7 @@
 #
 
 imagemagick_package = 'imagemagick'
-
-if platform_family?('rhel')
-  imagemagick_package = 'ImageMagick-last'
-end
+imagemagick_package = 'ImageMagick-last' if platform_family?('rhel')
 
 package 'imagemagick' do
   package_name imagemagick_package

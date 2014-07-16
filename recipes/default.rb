@@ -66,7 +66,7 @@ if node['recipes'].include?('postgresql::server')
 end
 
 directory node['rails']['apps_base_path'] do
-  mode      '0755'
+  mode      00755
   owner     node['rails']['user']['deploy']
   group     node['rails']['user']['deploy']
   action    :create
@@ -74,11 +74,11 @@ directory node['rails']['apps_base_path'] do
 end
 
 directory node['rails']['sites_base_path'] do
-  mode      '0755'
+  mode      00755
   owner     node['rails']['user']['deploy']
   group     node['rails']['user']['deploy']
   action    :create
   recursive true
 end
 
-include_recipe "rails::apps"
+include_recipe 'rails::apps'

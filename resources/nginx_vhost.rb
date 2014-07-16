@@ -29,23 +29,23 @@ attribute :server_name,      kind_of: [String, Array, NilClass], default: nil # 
 attribute :path,             kind_of: [String, NilClass], default: nil # Server root
 attribute :default,          kind_of: [TrueClass, FalseClass], default: false  # Default host
 attribute :deferred,         kind_of: [TrueClass, FalseClass], default: false  # Deffered host
-attribute :disable_www,      kind_of: [TrueClass, FalseClass], default: true #Redirect www to domain
+attribute :disable_www,      kind_of: [TrueClass, FalseClass], default: true # Redirect www to domain
 attribute :access_log,       kind_of: [TrueClass, FalseClass], default: false  # Access log
 attribute :error_log,        kind_of: [TrueClass, FalseClass], default: true  # Error log
-attribute :php,              kind_of: [TrueClass, FalseClass], default: false #PHP code
+attribute :php,              kind_of: [TrueClass, FalseClass], default: false # PHP code
 attribute :admin,            kind_of: [TrueClass, FalseClass], default: false  # Access log
-attribute :min,              kind_of: [TrueClass, FalseClass], default: false #PHP code
-attribute :wordpress,        kind_of: [TrueClass, FalseClass], default: false #Wordpress
+attribute :min,              kind_of: [TrueClass, FalseClass], default: false # Minimizer PHP code
+attribute :wordpress,        kind_of: [TrueClass, FalseClass], default: false # Wordpress
 attribute :locations,        kind_of: [Hash, NilClass], default: {} # Locations to include.
 attribute :rewrites,         kind_of: [Array, NilClass], default: nil # Server rewrites
 attribute :file_rewrites,    kind_of: [Array, NilClass], default: nil # Server files rewrites
 attribute :php_rewrites,     kind_of: [Array, NilClass], default: nil # Server php rewrites
 attribute :hidden,           kind_of: [Array, NilClass], default: nil # Hidden paths
-attribute :cookbook,         kind_of: [String, NilClass], default: nil #Cookbook to find template
+attribute :cookbook,         kind_of: [String, NilClass], default: nil # Cookbook to find template
 attribute :template,         kind_of: [String, NilClass], default: nil # Template to use.
 attribute :error_pages,      kind_of: [Array, NilClass], default: nil # Template to use.
 attribute :auto_enable_site, kind_of: [TrueClass, FalseClass], default: true # Define if you want to link your newly created site conf from sites-availables to sites-enabled
-attribute :ssl,              kind_of: [Hash, NilClass], default: nil #Allow the creation of ssl cert files.
+attribute :ssl,              kind_of: [Hash, NilClass], default: nil # Allow the creation of ssl cert files.
 attribute :reload,           kind_of: [Symbol], equal_to: [:delayed, :immediately], default: :delayed # How soon should we restart nginx.
 
 def initialize(*args)

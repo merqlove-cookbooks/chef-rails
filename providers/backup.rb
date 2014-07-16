@@ -61,7 +61,8 @@ action :create do
             logfile          logfile          # Log cronjob output to this file
 
             # duplicity parameters
-            backend    "#{aws_eu}#{node['rails']['duplicity']['method']}://#{new_resource.target || node['rails']['duplicity']['target']}/#{node['fqdn']}/#{new_resource.path || node['rails']['duplicity']['path']}" # Backend to use (default: nil, required!)
+            # Backend to use (default: nil, required!)
+            backend    "#{aws_eu}#{node['rails']['duplicity']['method']}://#{new_resource.target || node['rails']['duplicity']['target']}/#{node['fqdn']}/#{new_resource.path || node['rails']['duplicity']['path']}"
             passphrase duplicity_main['passphrase']                 # duplicity passphrase (default: nil, required!)
 
             include                   new_resource.include || node['rails']['duplicity']['include']  # Default directories to backup

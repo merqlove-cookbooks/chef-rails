@@ -32,7 +32,7 @@ attribute :database_password, kind_of: [String, NilClass], default: nil, require
 attribute :owner, kind_of: [String, NilClass], default: 'root' # Owner
 attribute :group, kind_of: [String, NilClass], default: 'root' # Group
 attribute :path, kind_of: [String, NilClass], default: '/root' # Path
-attribute :cookbook, kind_of: [String, NilClass], default: nil #Cookbook to find template
+attribute :cookbook, kind_of: [String, NilClass], default: nil # Cookbook to find template
 attribute :template, kind_of: [String, NilClass], default: nil # Template to use.
 
 def initialize(*args)

@@ -26,125 +26,126 @@ define :user_ref, users: false, secret: false, vcs: false do
 
     users.each do |u|
       data = Chef::EncryptedDataBagItem.load('users', u, default_secret)
-      if data
-        if data['ftp']
-          data['ftp'].each do |ftp|
-            name_pass.push({'name' => ftp['name'], 'password' => ftp['password'] })
-            local_root = ftp['local_root'] || "#{node['rails']['sites_base_path']}/#{u}"
-            node.default['vsftpd']['users'].push({
-              'name' => ftp['name'],
-              'config' => {
-                'local_root' => local_root,
-                'dirlist_enable' => 'YES',
-                'download_enable' => 'YES',
-                'write_enable' => 'YES',
-                'chown_username' => u,
-                'guest_username' => u,
-                'ftp_username' => u,
-              }
-            })
+      next unless data
 
-            node.default['vsftpd']['allowed'].push(ftp['name'])
-          end
+      if data['ftp']
+        data['ftp'].each do |ftp|
+          name_pass.push('name' => ftp['name'], 'password' => ftp['password'])
+          local_root = ftp['local_root'] || "#{node['rails']['sites_base_path']}/#{u}"
+          node.default['vsftpd']['users'].push(
+            'name' => ftp['name'],
+            'config' => {
+              'local_root' => local_root,
+              'dirlist_enable' => 'YES',
+              'download_enable' => 'YES',
+              'write_enable' => 'YES',
+              'chown_username' => u,
+              'guest_username' => u,
+              'ftp_username' => u,
+            }
+          )
 
-          group "#{node['nginx']['user']} #{u}" do
-            group_name node['nginx']['user']
-            append     true
-            members    [u]
-          end
+          node.default['vsftpd']['allowed'].push(ftp['name'])
         end
 
-        user u do
-          home      "/home/#{u}"
-          password  data['password']
-          shell     data['shell']
-          comment   data['comment']
-          supports  manage_home: true
-        end
-
-        if u == node['rails']['user']['deploy']
-          group 'admin' do
-            append  true
-            members [node['rails']['user']['deploy']]
-          end
-        else
-          group u do
-            append  true
-            members [node['nginx']['user'], node['rails']['user']['deploy']]
-          end
-        end
-
-        if node.role? 'base_ruby'
-          group "#{node[:rbenv][:group]} #{u}" do
-            group_name node[:rbenv][:group]
-            append     true
-            members    [u]
-          end
-        end
-
-        group "#{node[:msmtp][:group]} #{u}" do
-          group_name node[:msmtp][:group]
+        group "#{node['nginx']['user']} #{u}" do
+          group_name node['nginx']['user']
           append     true
           members    [u]
         end
+      end
 
-        if data['ssh-keys']
-          directory "/home/#{u}/.ssh" do
-            action :create
-            owner  u
-            group  u
-            mode   00700
-          end
+      user u do
+        home      "/home/#{u}"
+        password  data['password']
+        shell     data['shell']
+        comment   data['comment']
+        supports  manage_home: true
+      end
 
-          template "/home/#{u}/.ssh/authorized_keys" do
-            source 'authorized_keys.erb'
-            owner     u
-            group     u
-            mode      00600
-            variables keys: data['ssh-keys']
-          end
+      if u == node['rails']['user']['deploy']
+        group 'admin' do
+          append  true
+          members [node['rails']['user']['deploy']]
         end
-
-        if data['vcs']
-          data['vcs'].each do |v|
-            if vcs.include? v
-              key = Chef::EncryptedDataBagItem.load('vcs_keys', v, default_secret)
-
-              file "/home/#{u}/.ssh/#{key['file-name']}" do
-                content key['file-content']
-                owner   u
-                group   u
-                mode    00600
-              end
-
-              ssh_known_hosts_entry "#{key['host']} #{u}" do
-                host key['host']
-                file "/home/#{u}/.ssh/known_hosts"
-                owner u
-              end
-            end
-          end
-
-          template "/home/#{u}/.ssh/config" do
-            source 'ssh_config.erb'
-            owner  u
-            group  u
-            mode  '0600'
-            variables vcs: data['vcs']
-          end
-          template "/home/#{u}/.gitconfig" do
-            source 'gitconfig.erb'
-            owner u
-            group u
-            mode 00644
-
-            variables(
-              :name  => u,
-              email: "#{u}@#{node['fqdn']}"
-            )
-          end
+      else
+        group u do
+          append  true
+          members [node['nginx']['user'], node['rails']['user']['deploy']]
         end
       end
+
+      if node.role? 'base_ruby'
+        group "#{node[:rbenv][:group]} #{u}" do
+          group_name node[:rbenv][:group]
+          append     true
+          members    [u]
+        end
+      end
+
+      group "#{node[:msmtp][:group]} #{u}" do
+        group_name node[:msmtp][:group]
+        append     true
+        members    [u]
+      end
+
+      if data['ssh-keys']
+        directory "/home/#{u}/.ssh" do
+          action :create
+          owner  u
+          group  u
+          mode   00700
+        end
+
+        template "/home/#{u}/.ssh/authorized_keys" do
+          source 'authorized_keys.erb'
+          owner     u
+          group     u
+          mode      00600
+          variables keys: data['ssh-keys']
+        end
+      end
+
+      if data['vcs']
+        data['vcs'].each do |v|
+          next unless vcs.include?(v)
+
+          key = Chef::EncryptedDataBagItem.load('vcs_keys', v, default_secret)
+
+          file "/home/#{u}/.ssh/#{key['file-name']}" do
+            content key['file-content']
+            owner   u
+            group   u
+            mode    00600
+          end
+
+          ssh_known_hosts_entry "#{key['host']} #{u}" do
+            host key['host']
+            file "/home/#{u}/.ssh/known_hosts"
+            owner u
+          end
+        end
+
+        template "/home/#{u}/.ssh/config" do
+          source 'ssh_config.erb'
+          owner  u
+          group  u
+          mode  '0600'
+          variables vcs: data['vcs']
+        end
+        template "/home/#{u}/.gitconfig" do
+          source 'gitconfig.erb'
+          owner u
+          group u
+          mode 00644
+
+          variables(
+            name:  u,
+            email: "#{u}@#{node['fqdn']}"
+          )
+        end
+      end
+
     end
 
     node.default['vsftpd']['config']['ftp_username'] = node['nginx']['user']

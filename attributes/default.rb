@@ -3,13 +3,13 @@
 # Attributes:: default
 #
 # Copyright (C) 2013 Alexander Merkulov
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an 'AS IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -102,7 +102,7 @@ default['rails']['sites'] = {
   #     'server_name': [
   #       'mrcr.ru'
   #     ],
-  #     'min': false,  
+  #     'min': false,
   #     'error_pages': [
   #       {
   #         'code': '404',
@@ -137,7 +137,7 @@ default['rails']['sites'] = {
   #       'password': 'pass'
   #     }
   #   ]
-  # }  
+  # }
 }
 default['rails']['user']['deploy']      = 'deploy'
 default['vagrant']['fqdn'] = 'merq.dev'

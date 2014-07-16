@@ -22,7 +22,7 @@ actions :create, :delete
 default_action :create
 
 attribute :name,     kind_of: String, name_attribute: true
-attribute :cookbook, kind_of: [String, NilClass], default: 'rails' #Cookbook to find template
+attribute :cookbook, kind_of: [String, NilClass], default: 'rails' # Cookbook to find template
 
 # Data Bag Ids
 attribute :pass_key_id,     kind_of: [String, NilClass], default: nil

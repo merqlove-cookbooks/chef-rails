@@ -151,7 +151,7 @@ action :create do
     if a.include? 'php'
       begin
         if node['platform_version'].to_f < 6
-          node.default['php']['packages'] = %w{ php php-devel php-cli php-pear }
+          node.default['php']['packages'] = %w( php php-devel php-cli php-pear )
         end
 
         if File.exist?('/usr/bin/php')
@@ -252,8 +252,8 @@ action :create do
 
       server_name = a['nginx']['server_name'].dup
 
-      if node.role? 'vagrant'
-        server_name.push "#{a['nginx']['vagrant_server_name']}.#{node['vagrant']['fqdn']}" if a['nginx']['vagrant_server_name']
+      if node.role?('vagrant') && a['nginx']['vagrant_server_name']
+        server_name.push "#{a['nginx']['vagrant_server_name']}.#{node['vagrant']['fqdn']}"
       end
 
       rails_nginx_vhost a['name'] do
