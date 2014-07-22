@@ -17,10 +17,14 @@
 # limitations under the License.
 #
 
-ruby_exists = search(:node, "roles:base_ruby AND name:#{node.name}")
+if Chef::Config[:solo]
+  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
+else
+  ruby_exists = search(:node, "roles:base_ruby AND name:#{node.name}")
+end
 
 if ruby_exists.count > 0
-  case node[:platform]
+  case node['platform']
   when 'redhat', 'centos', 'amazon', 'oracle'
     package 'patch'
     package 'automake'
@@ -32,7 +36,7 @@ if ruby_exists.count > 0
   end
   node.default['rails']['ruby'] = true
 else
-  case node[:platform]
+  case node['platform']
   when 'redhat', 'centos', 'amazon', 'oracle'
     package 'openssl-devel'
     package 'zlib-devel'
@@ -50,10 +54,9 @@ else
   node.default['rails']['ruby'] = false
 end
 
-if node['recipes'].include?('memcached::default')
-  service 'memcached' do
-    action [:enable, :start]
-  end
+service 'memcached' do
+  action [:enable, :start]
+  only_if { node['recipes'].include?('memcached::default') }
 end
 
 if node['recipes'].include?('postgresql::server')

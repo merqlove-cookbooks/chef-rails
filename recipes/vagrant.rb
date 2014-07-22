@@ -18,14 +18,13 @@
 #
 
 if node.role? 'vagrant'
-  if node.role? 'base_ruby'
-    group node[:rbenv][:group] do
-      append  true
-      members ['vagrant']
-    end
+  group node['rbenv']['group'] do
+    append  true
+    members ['vagrant']
+    only_if { node.role? 'base_ruby' }
   end
 
-  group node[:msmtp][:group] do
+  group node['msmtp']['group'] do
     append  true
     members ['vagrant']
   end

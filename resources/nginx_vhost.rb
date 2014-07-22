@@ -41,8 +41,8 @@ attribute :rewrites,         kind_of: Array, default: nil # Server rewrites
 attribute :file_rewrites,    kind_of: Array, default: nil # Server files rewrites
 attribute :php_rewrites,     kind_of: Array, default: nil # Server php rewrites
 attribute :hidden,           kind_of: Array, default: nil # Hidden paths
-attribute :cookbook,         kind_of: String, default: nil # Cookbook to find template
-attribute :template,         kind_of: String, default: nil # Template to use.
+attribute :cookbook,         kind_of: String, default: 'rails' # Cookbook to find template
+attribute :template,         kind_of: String, default: 'nginx_vhost.erb' # Template to use.
 attribute :error_pages,      kind_of: Array, default: nil # Template to use.
 attribute :auto_enable_site, kind_of: [TrueClass, FalseClass], default: true # Define if you want to link your newly created site conf from sites-availables to sites-enabled
 attribute :ssl,              kind_of: Hash, default: nil # Allow the creation of ssl cert files.

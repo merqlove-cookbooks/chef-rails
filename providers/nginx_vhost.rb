@@ -24,6 +24,7 @@ action :create do
   # upstream = JSON.parse(node.send(new_resource.precedence)[:nginx_conf][:upstream].to_hash.merge(new_resource.upstream).to_json)
   server_name = new_resource.server_name || new_resource.name
   name = new_resource.name
+  auto_enable_site = new_resource.auto_enable_site
 
   # if site_type == :dynamic
   #   locations.each do |name, location|
@@ -31,64 +32,64 @@ action :create do
   #       options['try_files'] << " #{name}" if name.index('@') == 0
   #     end
   #   end
-
+  #
   #   if socket && locations.has_key?('/')
   #     locations['/']['proxy_pass'] = node[:nginx_conf][:pre_socket].to_s + socket.to_s
   #   end
   # end
 
-#   if new_resource.ssl
-#     ssl_name = if new_resource.ssl['name']
-#       new_resource.ssl['name']
-#     else
-#       conf_name
-#     end
-
-#     directory "#{node[:nginx][:dir]}/ssl" do
-#       owner node[:nginx][:user]
-#       group node[:nginx][:group]
-#       mode '0755'
-#     end
-
-#     file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt" do
-#       owner node[:nginx][:user]
-#       group node[:nginx][:group]
-#       mode '0640'
-#       content  <<-EOH
-# # Managed by Chef.  Local changes will be overwritten.
-# #{new_resource.ssl['public']}
-# EOH
-#     end
-
-#     file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key" do
-#       owner node[:nginx][:user]
-#       group node[:nginx][:group]
-#       mode '0640'
-#       content <<-EOH
-# # Maintained by Chef.  Local changes will be overwritten.
-# #{new_resource.ssl['private']}
-# EOH
-#     end
-
-#     ssl = {
-#       certificate: "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt",
-#       certificate_key: "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key"
-#     }
-#   end
+  # if new_resource.ssl
+  #   ssl_name = if new_resource.ssl['name']
+  #     new_resource.ssl['name']
+  #   else
+  #     conf_name
+  #   end
+  #
+  #   directory "#{node[:nginx][:dir]}/ssl" do
+  #     owner node[:nginx][:user]
+  #     group node[:nginx][:group]
+  #     mode '0755'
+  #   end
+  #
+  #   file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt" do
+  #     owner node[:nginx][:user]
+  #     group node[:nginx][:group]
+  #     mode '0640'
+  #     content  <<-EOH
+  # # Managed by Chef.  Local changes will be overwritten.
+  # #{new_resource.ssl['public']}
+  # EOH
+  #   end
+  #
+  #   file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key" do
+  #     owner node[:nginx][:user]
+  #     group node[:nginx][:group]
+  #     mode '0640'
+  #     content <<-EOH
+  # # Maintained by Chef.  Local changes will be overwritten.
+  # #{new_resource.ssl['private']}
+  # EOH
+  #   end
+  #
+  #   ssl = {
+  #     certificate: "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt",
+  #     certificate_key: "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key"
+  #   }
+  # end
 
   test_nginx = execute "test-nginx-conf-#{name}-create" do
     action   :nothing
-    command  "#{node[:nginx][:binary]} -t"
+    command  "#{node['nginx']['binary']} -t"
     only_if  { new_resource.auto_enable_site }
     notifies :reload, 'service[nginx]', new_resource.reload
   end
 
-  template "#{node[:nginx][:dir]}/sites-available/#{name}" do
+  template "#{node['nginx']['dir']}/sites-available/#{name}" do
     owner 'root'
     group 'root'
     mode 00644
-    source(new_resource.template || 'nginx_vhost.erb')
-    cookbook new_resource.template ? new_resource.cookbook_name.to_s : 'rails'
+    source new_resource.template
+    cookbook new_resource.template ? new_resource.cookbook_name.to_s : new_resource.cookbook
     variables(
       block:         new_resource.block,
       # options:     options,
@@ -121,7 +122,7 @@ action :create do
   begin
     nginx_site name do
       enable true
-      only_if { new_resource.auto_enable_site }
+      only_if { auto_enable_site }
     end
   rescue => e
     log 'message' do
@@ -153,7 +154,7 @@ action :delete do
     end
   end
 
-  file "#{node[:nginx][:dir]}/sites-available/#{name}" do
+  file "#{node['nginx']['dir']}/sites-available/#{name}" do
     action :delete
     # notifies :restart, 'service[nginx]', new_resource.reload
   end

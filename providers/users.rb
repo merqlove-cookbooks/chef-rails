@@ -25,7 +25,7 @@ action :create do
   if users && secret && vcs
     name_pass = []
 
-    users.each do |u|
+    users.each do |u| # rubocop:disable Style/Next
       data = Chef::EncryptedDataBagItem.load('users', u, default_secret)
       next unless data
 
@@ -76,16 +76,15 @@ action :create do
         end
       end
 
-      if node.role? 'base_ruby'
-        group "#{node[:rbenv][:group]} #{u}" do
-          group_name node[:rbenv][:group]
-          append     true
-          members    [u]
-        end
+      group "#{node['rbenv']['group']} #{u}" do
+        group_name node['rbenv']['group']
+        append     true
+        members    [u]
+        only_if { node.role? 'base_ruby' }
       end
 
-      group "#{node[:msmtp][:group]} #{u}" do
-        group_name node[:msmtp][:group]
+      group "#{node['msmtp']['group']} #{u}" do
+        group_name node['msmtp']['group']
         append     true
         members    [u]
       end
@@ -158,4 +157,6 @@ action :create do
     end
 
   end
+
+  new_resource.updated_by_last_action(true)
 end

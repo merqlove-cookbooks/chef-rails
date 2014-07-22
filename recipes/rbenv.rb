@@ -18,12 +18,12 @@
 #
 
 if node['recipes'].include?('rbenv::default')
-  rbenv_ruby "#{node['rails']['rbenv']['version']}" do
-    ruby_version "#{node['rails']['rbenv']['version']}"
+  rbenv_ruby node['rails']['rbenv']['version'] do
+    ruby_version node['rails']['rbenv']['version']
     global       true
   end
 
   rbenv_gem 'bundler' do
-    ruby_version "#{node['rails']['rbenv']['version']}"
+    ruby_version node['rails']['rbenv']['version']
   end
 end

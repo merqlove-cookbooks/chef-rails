@@ -55,12 +55,12 @@ if node.default['php-fpm']['pools'].count > 0
 
   ruby_block 'cleanup php-fpm configuration' do
     block do
-      if Dir.exist? "#{node['php-fpm']['pool_conf_dir']}"
+      if Dir.exist? node['php-fpm']['pool_conf_dir']
         deleted = false
-        Dir.foreach("#{node['php-fpm']['pool_conf_dir']}") do |pool|
+        Dir.foreach(node['php-fpm']['pool_conf_dir']) do |pool|
           next if pool == '.' || pool == '..'
           if pool.include? '.conf'
-            unless Rails::Helpers.has_hash_in_array?(node['php-fpm']['pools'], pool.gsub(/\.conf/, ''))
+            unless Rails::Helpers.has_hash_in_array?(node['php-fpm']['pools'], pool.gsub(/\.conf/, '')) # rubocop:disable Style/BlockNesting
               File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")
               deleted = true
             end
@@ -81,8 +81,8 @@ if node.default['php-fpm']['pools'].count > 0
 
   include_recipe 'php-fpm::install'
 else
-  if Dir.exist? "#{node['php-fpm']['pool_conf_dir']}"
-    Dir.foreach("#{node['php-fpm']['pool_conf_dir']}") do |pool|
+  if Dir.exist? node['php-fpm']['pool_conf_dir']
+    Dir.foreach(node['php-fpm']['pool_conf_dir']) do |pool|
       next if pool == '.' || pool == '..'
       if pool.include? '.conf'
         File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")

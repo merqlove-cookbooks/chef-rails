@@ -19,9 +19,8 @@
 
 # TODO: Change to newest version
 
-if platform_family?('rhel')
-  package 'sqlite-devel' do
-    package_name 'sqlite-devel'
-    action       :install
-  end
+package 'sqlite-devel' do
+  package_name 'sqlite-devel'
+  action       :install
+  only_if { platform_family?('rhel') }
 end

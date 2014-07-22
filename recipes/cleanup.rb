@@ -17,23 +17,23 @@
 # limitations under the License.
 #
 
-node.default_attrs[:rails].delete(:databases) rescue nil
-node.default_attrs[:rails].delete(:mysql) rescue nil
-node.default_attrs[:msmtp].delete(:accounts) rescue nil
+node.default_attrs['rails'].delete('databases') rescue nil # rubocop:disable Style/RescueModifier
+node.default_attrs['rails'].delete('mysql') rescue nil # rubocop:disable Style/RescueModifier
+node.default_attrs['msmtp'].delete('accounts') rescue nil # rubocop:disable Style/RescueModifier
 
-node.default_attrs[:mysql].delete(:server_debian_password) rescue nil
-node.default_attrs[:mysql].delete(:server_root_password) rescue nil
-node.default_attrs[:mysql].delete(:server_repl_password) rescue nil
-node.normal_attrs[:mysql].delete(:server_debian_password) rescue nil
-node.normal_attrs[:mysql].delete(:server_root_password) rescue nil
-node.normal_attrs[:mysql].delete(:server_repl_password) rescue nil
-node.override_attrs[:mysql].delete(:server_debian_password) rescue nil
-node.override_attrs[:mysql].delete(:server_root_password) rescue nil
-node.override_attrs[:mysql].delete(:server_repl_password) rescue nil
+node.default_attrs['mysql'].delete('server_debian_password') rescue nil # rubocop:disable Style/RescueModifier
+node.default_attrs['mysql'].delete('server_root_password') rescue nil # rubocop:disable Style/RescueModifier
+node.default_attrs['mysql'].delete('server_repl_password') rescue nil # rubocop:disable Style/RescueModifier
+node.normal_attrs['mysql'].delete('server_debian_password') rescue nil # rubocop:disable Style/RescueModifier
+node.normal_attrs['mysql'].delete('server_root_password') rescue nil # rubocop:disable Style/RescueModifier
+node.normal_attrs['mysql'].delete('server_repl_password') rescue nil # rubocop:disable Style/RescueModifier
+node.override_attrs['mysql'].delete('server_debian_password') rescue nil # rubocop:disable Style/RescueModifier
+node.override_attrs['mysql'].delete('server_root_password') rescue nil # rubocop:disable Style/RescueModifier
+node.override_attrs['mysql'].delete('server_repl_password') rescue nil # rubocop:disable Style/RescueModifier
 
-node.default_attrs[:postgresql][:password].delete(:postgres) rescue nil
-node.normal_attrs[:postgresql][:password].delete(:postgres) rescue nil
-node.override_attrs[:postgresql][:password].delete(:postgres) rescue nil
+node.default_attrs['postgresql']['password'].delete('postgres') rescue nil # rubocop:disable Style/RescueModifier
+node.normal_attrs['postgresql']['password'].delete('postgres') rescue nil # rubocop:disable Style/RescueModifier
+node.override_attrs['postgresql']['password'].delete('postgres') rescue nil # rubocop:disable Style/RescueModifier
 
-node.default_attrs[:rails].delete(:sites) rescue nil
-node.default_attrs[:rails].delete(:apps) rescue nil
+node.default_attrs['rails'].delete('sites') rescue nil # rubocop:disable Style/RescueModifier
+node.default_attrs['rails'].delete('apps') rescue nil # rubocop:disable Style/RescueModifier

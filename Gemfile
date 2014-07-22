@@ -1,7 +1,12 @@
 source 'https://rubygems.org'
 
-gem 'berkshelf'
-gem 'serverspec'
+group :development do
+  gem 'berkshelf'
+  gem 'chef-zero'
+  gem 'serverspec'
+  gem 'rubocop'
+  gem 'foodcritic'
+end
 
 group :integration do
   gem 'test-kitchen',    '~> 1.0.0.beta'

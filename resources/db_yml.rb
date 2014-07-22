@@ -32,5 +32,5 @@ attribute :database_password, kind_of: String, default: nil, required: true # Pa
 attribute :owner, kind_of: String, default: 'root' # Owner
 attribute :group, kind_of: String, default: 'root' # Group
 attribute :path, kind_of: String, default: '/root' # Path
-attribute :cookbook, kind_of: String, default: nil # Cookbook to find template
-attribute :template, kind_of: String, default: nil # Template to use.
+attribute :cookbook, kind_of: String, default: 'rails' # Cookbook to find template
+attribute :template, kind_of: String, default: 'database.yml.erb' # Template to use.

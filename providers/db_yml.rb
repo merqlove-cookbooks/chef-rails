@@ -25,8 +25,8 @@ action :create do
     owner    new_resource.owner
     group    new_resource.group
     mode     00600
-    source   new_resource.template || 'database.yml.erb'
-    cookbook new_resource.template ? new_resource.cookbook_name.to_s : 'rails'
+    source   new_resource.template
+    cookbook new_resource.template ? new_resource.cookbook_name.to_s : new_resource.cookbook
     variables(
       host: new_resource.host,
       port: new_resource.port,

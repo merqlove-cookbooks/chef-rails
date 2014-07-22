@@ -22,16 +22,8 @@ action :create do
     a            = new_resource.application
     type         = new_resource.type
     base_path    = node['rails']["#{type}_base_path"]
-    project_path = if type.include? 'sites'
-      "#{a['user']}/#{a['name']}"
-    else
-      a['name']
-    end
-    backup_db_path = if type.include? 'sites'
-      "#{a['user']}/#{a['name']}_db"
-    else
-      "#{a['name']}_db"
-    end
+    project_path = resource_project_path(type, a)
+    backup_db_path = resource_backup_db_path(type, a)
     app_path = "#{base_path}/#{project_path}"
 
     directory "#{base_path} #{a['name']} #{a['user']}" do
@@ -88,10 +80,9 @@ action :create do
     end
 
     if a[:delete] && a[:name] && !a['name'].empty?
-      if type.include?('sites') && a.include?('nginx')
-        rails_nginx_vhost a['name'] do
-          action :delete
-        end
+      rails_nginx_vhost a['name'] do
+        action :delete
+        only_if { type.include?('sites') && a.include?('nginx') }
       end
 
       directory app_path do
@@ -101,29 +92,30 @@ action :create do
       next
     end
 
-    if type.include?('sites') && a.include?('nginx')
-      unless a[:enable]
-        rails_nginx_vhost a['name'] do
-          action :disable
-        end
-        next
+    if type.include?('sites') && a.include?('nginx') && !a[:enable]
+      rails_nginx_vhost a['name'] do
+        action :disable
       end
+      next
     end
 
     install_rbenv(a) if node.default['rails']['ruby'] && a.include?('rbenv')
 
-    if a.include? 'smtp'
-      begin
-        node.default['msmtp']['accounts'][a['user']][a['name']]          = a[:smtp]
-        node.default['msmtp']['accounts'][a['user']][a['name']][:syslog] = 'on'
-        node.default['msmtp']['accounts'][a['user']][a['name']][:syslog] = 'off'
-        node.default['msmtp']['accounts'][a['user']][a['name']][:log]    = "#{app_path}/log/msmtp.log"
-      rescue => e
-        log 'message' do
-          message "Upload MSMTP Cookbook.\n#{e.message}"
-          level :error
+    ruby_block "smtp #{a['user']} #{a['name']}" do
+      block do
+        begin
+          node.default['msmtp']['accounts'][a['user']][a['name']]          = a[:smtp]
+          node.default['msmtp']['accounts'][a['user']][a['name']][:syslog] = 'on'
+          node.default['msmtp']['accounts'][a['user']][a['name']][:syslog] = 'off'
+          node.default['msmtp']['accounts'][a['user']][a['name']][:log]    = "#{app_path}/log/msmtp.log"
+        rescue => e
+          log 'message' do
+            message "Upload MSMTP Cookbook.\n#{e.message}"
+            level :error
+          end
         end
       end
+      not_if { a.include?('smtp') }
     end
 
     if a.include? 'php'
@@ -175,7 +167,7 @@ action :create do
 
         if a[:php][:pool]
           a[:php][:pool].each do |key, value|
-            if key.include? 'php_options'
+            if key.include? 'php_options' # rubocop:disable Style/BlockNesting
               pool_custom[:"#{key}"] = pool_custom[:"#{key}"].merge(value)
             else
               pool_custom[:"#{key}"] = value
@@ -258,24 +250,43 @@ action :create do
       end
     end
   end
+
+  new_resource.updated_by_last_action(true)
 end
 
 action :delete do
+  new_resource.updated_by_last_action(true)
 end
 
-def install_rbenv(a)
+def resource_project_path(type, a)
+  if type.include? 'sites'
+    "#{a['user']}/#{a['name']}"
+  else
+    a['name']
+  end
+end
+
+def resource_backup_db_path(type, a)
+  if type.include? 'sites'
+    "#{a['user']}/#{a['name']}_db"
+  else
+    "#{a['name']}_db"
+  end
+end
+
+def install_rbenv(a) # rubocop:disable Style/MethodLength
   return unless a
 
   # set ruby
-  rbenv_ruby "#{a['rbenv']['version']}" do
-    ruby_version "#{a['rbenv']['version']}"
+  rbenv_ruby a['rbenv']['version'] do
+    ruby_version a['rbenv']['version']
   end
 
   # add gems
   a['rbenv']['gems'].each do |g|
-    rbenv_gem "#{g[:name]}" do
-      ruby_version "#{a['rbenv']['version']}"
-      version      g[:version] if g[:version]
+    rbenv_gem g['name'] do
+      ruby_version a['rbenv']['version']
+      version      g['version'] if g['version']
     end
   end
 

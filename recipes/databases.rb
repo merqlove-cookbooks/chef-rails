@@ -18,7 +18,7 @@
 #
 
 if Chef.const_defined? 'EncryptedDataBagItem'
-  default_secret = Chef::EncryptedDataBagItem.load_secret("#{node['rails']['secrets']['default']}")
+  default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
   date = 'NOW=$(date +"%Y%m%d")'
 
   # Backup Mongo User DB
@@ -37,7 +37,7 @@ if Chef.const_defined? 'EncryptedDataBagItem'
         'auth' => true
       )
       action   :nothing
-      notifies :restart, "service[#{node[:mongodb][:instance_name]}]"
+      notifies :restart, "service[#{node['mongodb']['instance_name']}]"
     end
     execute 'create-mongodb-root-user' do
       command  "mongo admin --eval 'db.addUser(\"#{admin['id']}\",\"#{admin['password']}\")'"
@@ -69,13 +69,13 @@ if Chef.const_defined? 'EncryptedDataBagItem'
             "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
           ]
           exec_before [
-            "#{date}",
+            date,
             "rm -rf #{d['app_backup_dir']}/*",
             "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d['name']} --out #{d['app_backup_dir']}/#{d['name']}.$NOW >> /dev/null 2>&1",
             "gzip #{d['app_backup_dir']}/#{d['name']}.$NOW",
             "rm -f #{d['app_backup_dir']}/#{d['name']}.$NOW"
           ]
-          include     ["#{d['app_backup_dir']}"]
+          include     [d['app_backup_dir']]
           archive_dir d['app_backup_archive']
           temp_dir    d['app_backup_temp']
         end
@@ -83,22 +83,21 @@ if Chef.const_defined? 'EncryptedDataBagItem'
         rails_backup "mongo_db_#{d['app_name']} delete" do
           action :delete
         end
-        Dir.delete(d['app_backup_archive']) if Dir.exist? d['app_backup_archive']
-        Dir.delete(d['app_backup_temp']) if Dir.exist? d['app_backup_temp']
+        Dir.delete(d['app_backup_archive']) if Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
+        Dir.delete(d['app_backup_temp']) if Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
       end
 
-      execute d['name'] do
+      execute "mongodb_#{d['name']}" do
         command "mongo admin -u #{admin['id']} -p #{admin['password']} --eval '#{d['name']}=db.getSiblingDB(\"#{d['name']}\"); #{d['name']}.addUser(\"#{d['user']}\",\"#{d['password']}\")'"
         action  :run
         not_if  "mongo #{d['name']} --eval 'db.auth(\"#{d['user']}\",\"#{d['password']}\")' | grep -q ^1$"
       end
     end
   else
-    mongo_init = File.join(node[:mongodb][:init_dir], node['mongodb']['instance_name'])
-    if FileTest.file? mongo_init
-      service node['mongodb']['instance_name'] do
-        action [:stop, :disable]
-      end
+    mongo_init = File.join(node['mongodb']['init_dir'], node['mongodb']['instance_name'])
+    service node['mongodb']['instance_name'] do
+      action [:stop, :disable]
+      only_if { FileTest.file? mongo_init }
     end
   end
 
@@ -157,7 +156,7 @@ if Chef.const_defined? 'EncryptedDataBagItem'
             "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
           ]
           exec_before [
-            "#{date}",
+            date,
             "rm -rf #{d['app_backup_dir']}/*",
             "su postgres -c 'pg_dump -U postgres #{d['name']} | gzip > /tmp/#{d['name']}.\"$0\".sql.gz' -- \"$NOW\"",
             "mv /tmp/#{d['name']}.$NOW.sql.gz #{d['app_backup_dir']}/",
@@ -171,8 +170,8 @@ if Chef.const_defined? 'EncryptedDataBagItem'
         rails_backup "pg_db_#{d['app_name']} delete" do
           action :delete
         end
-        Dir.delete(d['app_backup_archive']) if Dir.exist? d['app_backup_archive']
-        Dir.delete(d['app_backup_temp']) if Dir.exist? d['app_backup_temp']
+        Dir.delete(d['app_backup_archive']) if Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
+        Dir.delete(d['app_backup_temp']) if Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
       end
 
       postgresql_database_user d['user'] do
@@ -190,10 +189,9 @@ if Chef.const_defined? 'EncryptedDataBagItem'
     end
   else
     postgresql_init = File.join('/etc/init.d', node['postgresql']['server']['service_name'])
-    if FileTest.file? postgresql_init
-      service node['postgresql']['server']['service_name'] do
-        action [:stop, :disable]
-      end
+    service node['postgresql']['server']['service_name'] do
+      action [:stop, :disable]
+      only_if { FileTest.file? postgresql_init }
     end
   end
 
@@ -209,16 +207,15 @@ if Chef.const_defined? 'EncryptedDataBagItem'
 
     include_recipe 'mysql::client'
 
-    if node['rails'].include? 'mysql'
-      template '/etc/mysql/conf.d/tune.cnf' do
-        owner    'mysql'
-        owner    'mysql'
-        source   'mysql_tune.cnf.erb'
-        variables(
-          config: node['rails']['mysql']
-        )
-        notifies :restart, "mysql_service[#{node['mysql']['service_name']}]"
-      end
+    template '/etc/mysql/conf.d/tune.cnf' do
+      owner    'mysql'
+      owner    'mysql'
+      source   'mysql_tune.cnf.erb'
+      variables(
+        config: node['rails']['mysql']
+      )
+      only_if { node['rails'].include? 'mysql' }
+      notifies :restart, "mysql_service[#{node['mysql']['service_name']}]"
     end
 
     include_recipe 'mysql::server'
@@ -254,7 +251,7 @@ if Chef.const_defined? 'EncryptedDataBagItem'
             "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
           ]
           exec_before [
-            "#{date}",
+            date,
             "rm -rf #{d['app_backup_dir']}/*",
             "mysqldump -u root -p#{root['password']} #{d['name']} | gzip > #{d['app_backup_dir']}/#{d['name']}.$NOW.sql.gz"
           ]
@@ -266,8 +263,8 @@ if Chef.const_defined? 'EncryptedDataBagItem'
         rails_backup "mysql_db_#{d['app_name']} delete" do
           action :delete
         end
-        Dir.delete(d['app_backup_archive']) if Dir.exist? d['app_backup_archive']
-        Dir.delete(d['app_backup_temp']) if Dir.exist? d['app_backup_temp']
+        Dir.delete(d['app_backup_archive']) if Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
+        Dir.delete(d['app_backup_temp']) if Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
       end
 
       mysql_database_user d['user'] do
@@ -293,10 +290,9 @@ if Chef.const_defined? 'EncryptedDataBagItem'
     end
   else
     mysql_init = File.join('/etc/init.d', 'mysqld')
-    if FileTest.file? mysql_init
-      service 'mysqld' do
-        action [:stop, :disable]
-      end
+    service 'mysqld' do
+      action [:stop, :disable]
+      only_if { FileTest.file? mysql_init }
     end
   end
 
@@ -313,7 +309,7 @@ if Chef.const_defined? 'EncryptedDataBagItem'
     ]
 
     exec_before = [
-      "#{date}",
+      date,
       "rm -rf #{db_backup_dir}/*",
     ]
 
@@ -346,13 +342,20 @@ if Chef.const_defined? 'EncryptedDataBagItem'
   if Dir.exist? db_backup_root
     Dir.foreach(db_backup_root) do |db|
       next if db == '.' || db == '..'
-      unless node['rails']['duplicity']['db'].include? db
-        rails_backup "#{db}_db_delete" do
-          action :delete
+
+      ruby_block "#{db}_db_delete" do
+        block do
+          Dir.delete("/tmp/da-#{db}")
+          Dir.delete("/tmp/dt-#{db}")
+          Dir.delete("#{db_backup_root}/#{db}")
         end
-        Dir.delete("/tmp/da-#{db}")
-        Dir.delete("/tmp/dt-#{db}")
-        Dir.delete("#{db_backup_root}/#{db}")
+        action :nothing
+      end
+
+      rails_backup "#{db}_db_delete" do
+        action :delete
+        not_if { node['rails']['duplicity']['db'].include? db }
+        notifies :create, "ruby_block[#{db}_db_delete]"
       end
     end
   end

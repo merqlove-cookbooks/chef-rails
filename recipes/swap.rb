@@ -17,9 +17,8 @@
 # limitations under the License.
 #
 
-if node['rails']['swap']['enable']
-  swap_file '/swapfile' do
-    size      node[:rails][:swap][:size].to_i    # MBs
-    persist   true
-  end
+swap_file '/swapfile' do
+  size      node['rails']['swap']['size'].to_i # MBs
+  persist   true
+  only_if { node['rails']['swap']['enable'] }
 end

@@ -17,13 +17,11 @@
 # limitations under the License.
 #
 
-if platform_family?('rhel')
-  if node['platform_version'].to_i > 5
-    package 'authconfig'
-    execute 'ssh_fix' do
-      command 'authconfig --disablefingerprint --update'
-      user    'root'
-      group   'root'
-    end
+if platform_family?('rhel') && node['platform_version'].to_i > 5
+  package 'authconfig'
+  execute 'ssh_fix' do
+    command 'authconfig --disablefingerprint --update'
+    user    'root'
+    group   'root'
   end
 end
