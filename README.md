@@ -1,6 +1,7 @@
-rails cookbook
+chef-rails cookbook
 ===================
-TODO: Enter the cookbook description here.
+
+[![Build Status](https://travis-ci.org/merqlove/chef-rails.svg?branch=master)](https://travis-ci.org/merqlove/chef-rails)
 
 e.g.
 This cookbook makes your favorite breakfast sandwich.
