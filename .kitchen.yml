@@ -4,13 +4,92 @@ driver:
 
 provisioner:
   name: chef_zero
+  client_rb:
+    ssl_verify_mode: verify_peer
 
 platforms:
-- name: centos-6.4-i386
+- name: centos-6.5
   run_list:
 
 suites:
-- name: default
+- name: php
+  data_bags_path: "test/integration/default/data_bags"
+  roles_path: "test/integration/default/roles"
+  encrypted_data_bag_secret_key_path: "test/integration/default/encrypted_data_bag_secret"
   run_list:
-    - recipe[rails]
+    - role[vagrant]
+    - role[main_server]
+    - recipe[rails::vagrant]
   attributes:
+    tags:
+      - php
+      - mysql
+      - server_merqlove
+      - vagrant
+#
+#---
+#driver:
+#  name: vagrant
+#
+#provisioner:
+#  name: chef_zero
+#
+#platforms:
+#- name: centos-6.5
+#  run_list: recipe[yum-epel]
+#- name: centos-5.9
+#  run_list: recipe[yum-epel]
+#- name: ubuntu-14.04
+#  run_list: recipe[apt]
+#- name: ubuntu-13.10
+#  run_list: recipe[apt]
+#- name: ubuntu-12.04
+#  run_list: recipe[apt]
+#- name: debian-7.2.0
+#  run_list: recipe[apt]
+#
+#suites:
+#  - name: install_package
+#    run_list:
+#    - recipe[minitest-handler]
+#    - recipe[duplicity_ng::install]
+#
+#  - name: install_source
+#    run_list:
+#    - recipe[minitest-handler]
+#    - recipe[duplicity_ng::install]
+#    attributes:
+#      duplicity_ng:
+#        install_method: source
+#        path: /usr/bin/duplicity
+#        source:
+#          use_pip: false
+#
+#  - name: install_source_pip
+#    run_list:
+#    - recipe[minitest-handler]
+#    - recipe[python::pip]
+#    - recipe[duplicity_ng::install]
+#    attributes:
+#      duplicity_ng:
+#        install_method: source
+#        path: /usr/bin/duplicity
+#        source:
+#          use_pip: true
+#
+#  - name: install_source_pip_python
+#    run_list:
+#    - recipe[minitest-handler]
+#    - recipe[build-essential]
+#    - recipe[python]
+#    - recipe[duplicity_ng::install]
+#    attributes:
+#      build-essential:
+#        compile_time: true
+#      python:
+#        install_method: source
+#      duplicity_ng:
+#        install_method: source
+#        path: /usr/local/bin/duplicity
+#        source:
+#          use_pip: true

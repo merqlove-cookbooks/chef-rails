@@ -1,9 +1,18 @@
 module Rails
+  # include Chef::
   # Helpers for cookbook
   module Helpers
     def self.hash_in_array?(other_array, value)
       other_array.each { |h| return true if h.is_a?(Hash) && h.value?(value) }
       false
+    end
+
+    def vagrant?
+      node.role? 'vagrant'
+    end
+
+    def database_type_exist?(type)
+      node['rails']['databases'] && node['rails']['databases'].include?(type)
     end
   end
 end

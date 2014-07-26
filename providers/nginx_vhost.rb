@@ -119,16 +119,9 @@ action :create do
     notifies :run, test_nginx, new_resource.reload
   end
 
-  begin
-    nginx_site name do
-      enable true
-      only_if { auto_enable_site }
-    end
-  rescue => e
-    log 'message' do
-      message "Upload Nginx Cookbook.\n#{e.message}"
-      level :error
-    end
+  nginx_site name do
+    enable true
+    only_if { auto_enable_site }
   end
 
   # link "#{node[:nginx][:dir]}/sites-enabled/#{name}" do
@@ -146,11 +139,6 @@ action :delete do
   begin
     nginx_site name do
       enable false
-    end
-  rescue => e
-    log 'message' do
-      message "Upload Nginx Cookbook.\n#{e.message}"
-      level   :error
     end
   end
 
@@ -183,15 +171,8 @@ end
 action :enable do
   name = new_resource.name
 
-  begin
-    nginx_site name do
-      enable true
-    end
-  rescue => e
-    log 'message' do
-      message "Upload Nginx Cookbook.\n#{e.message}"
-      level   :error
-    end
+  nginx_site name do
+    enable true
   end
 
   new_resource.updated_by_last_action(true)
@@ -200,15 +181,8 @@ end
 action :disable do
   name = new_resource.name
 
-  begin
-    nginx_site name do
-      enable false
-    end
-  rescue => e
-    log 'message' do
-      message "Upload Nginx Cookbook.\n#{e.message}"
-      level   :error
-    end
+  nginx_site name do
+    enable false
   end
 
   new_resource.updated_by_last_action(true)

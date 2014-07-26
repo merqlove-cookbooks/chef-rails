@@ -13,9 +13,10 @@ Gemfile.lock
 bin/*
 .bundle/*
 /vendor/bundle
+tmp/
 
 .kitchen/*
 .kitchen.local.yml
 
 .idea
-
+.ruby-version

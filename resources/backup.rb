@@ -29,8 +29,8 @@ attribute :pass_key_id,     kind_of: String, default: nil
 attribute :storage_key_id,  kind_of: String, default: nil
 
 # Path
-attribute :path,    kind_of: String, default: node.default['rails']['duplicity']['path']
-attribute :target,  kind_of: String, default: node.default['rails']['duplicity']['target']
+attribute :path,    kind_of: String, default: node['rails']['duplicity']['path']
+attribute :target,  kind_of: String, default: node['rails']['duplicity']['target']
 
 # S3 EU region
 attribute :s3_eu,  kind_of: [TrueClass, FalseClass], default: node['rails']['duplicity']['s3']['eu']

@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Attributes:: secrets
+# Resource:: db
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2014 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,4 +17,12 @@
 # limitations under the License.
 #
 
-default['rails']['secrets']['default']      = '/etc/chef/encrypted_data_bag_secret'
+actions :create
+
+default_action :create
+
+attribute :name, name_attribute: true, kind_of: String
+attribute :secret, kind_of: String, default: nil, required: true # Secret for data_bags
+attribute :date, kind_of: String, default: 'NOW=$(date +"%Y%m%d")' # Current Date
+attribute :cookbook, kind_of: String, default: 'rails' # Cookbook to find template
+attribute :template, kind_of: String, default: 'database.yml.erb' # Template to use.

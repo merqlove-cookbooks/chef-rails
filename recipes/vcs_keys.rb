@@ -26,45 +26,44 @@ if node.role? 'vagrant'
         mode 00700
       end
 
-      if Chef.const_defined? 'EncryptedDataBagItem' # rubocop:disable Style/BlockNesting
-        vcs = data_bag('vcs_keys')
-        default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
-        if vcs # rubocop:disable Style/BlockNesting
-          vcs.each do |item|
-            key = Chef::EncryptedDataBagItem.load('vcs_keys', item, default_secret)
+      vcs = data_bag('vcs_keys')
+      default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
+      if vcs # rubocop:disable Style/BlockNesting
+        vcs.each do |item|
+          key = Chef::EncryptedDataBagItem.load('vcs_keys', item, default_secret)
 
-            file "/home/vagrant/.ssh/#{key['file-name']}" do
-              content key['file-content']
-              owner 'vagrant'
-              group 'vagrant'
-              mode 00600
-            end
-
-            ssh_known_hosts_entry key['host'] do
-              file '/home/vagrant/.ssh/known_hosts'
-              owner 'vagrant'
-            end
-          end
-          template '/home/vagrant/.ssh/config' do
-            source 'ssh_config.erb'
-            owner  'vagrant'
-            group  'vagrant'
-            mode    00600
-            variables vcs: vcs
-          end
-          template '/home/vagrant/.gitconfig' do
-            source 'gitconfig.erb'
+          file "/home/vagrant/.ssh/#{key['file-name']}" do
+            content key['file-content']
             owner 'vagrant'
             group 'vagrant'
-            mode '0644'
+            mode 00600
+          end
 
-            variables(
-              name:  'vagrant',
-              email: "vagrant@#{node['fqdn']}"
-            )
+          ssh_known_hosts_entry key['host'] do
+            file '/home/vagrant/.ssh/known_hosts'
+            owner 'vagrant'
           end
         end
+        template '/home/vagrant/.ssh/config' do
+          source 'ssh_config.erb'
+          owner  'vagrant'
+          group  'vagrant'
+          mode    00600
+          variables vcs: vcs
+        end
+        template '/home/vagrant/.gitconfig' do
+          source 'gitconfig.erb'
+          owner 'vagrant'
+          group 'vagrant'
+          mode '0644'
+
+          variables(
+            name:  'vagrant',
+            email: "vagrant@#{node['fqdn']}"
+          )
+        end
       end
+
     end
   end
 end

@@ -43,7 +43,7 @@ node['rails']['apps'].each do |k, a|
 end
 
 # PHP pools
-if node.default['php-fpm']['pools'].count > 0
+if node['php-fpm']['pools'].count > 0
   include_recipe 'php-fpm::configure'
   template '/etc/php.d/php_fix.ini' do
     owner 'root'
@@ -114,5 +114,6 @@ rails_backup 'system' do
   main true
 end
 
-include_recipe 'msmtp'
+msmtp_system   'base msmtp account'
+msmtp_accounts 'user msmtp accounts'
 include_recipe 'rails::cleanup'

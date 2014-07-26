@@ -25,36 +25,14 @@ action :create do
   if users && secret && vcs
     name_pass = []
 
+    user_nginx
+
     users.each do |u| # rubocop:disable Style/Next
-      data = Chef::EncryptedDataBagItem.load('users', u, default_secret)
+      data = Chef::EncryptedDataBagItem.load('users', u, secret)
       next unless data
 
-      if data['ftp']
-        data['ftp'].each do |ftp|
-          name_pass.push('name' => ftp['name'], 'password' => ftp['password'])
-          local_root = ftp['local_root'] || "#{node['rails']['sites_base_path']}/#{u}"
-          node.default['vsftpd']['users'].push(
-            'name' => ftp['name'],
-            'config' => {
-              'local_root' => local_root,
-              'dirlist_enable' => 'YES',
-              'download_enable' => 'YES',
-              'write_enable' => 'YES',
-              'chown_username' => u,
-              'guest_username' => u,
-              'ftp_username' => u,
-            }
-          )
-
-          node.default['vsftpd']['allowed'].push(ftp['name'])
-        end
-
-        group "#{node['nginx']['user']} #{u}" do
-          group_name node['nginx']['user']
-          append     true
-          members    [u]
-        end
-      end
+      ftp_list = user_ftps(u, data)
+      name_pass = name_pass.push(ftp_list).flatten.compact unless ftp_list.empty?
 
       user u do
         home      "/home/#{u}"
@@ -64,88 +42,17 @@ action :create do
         supports  manage_home: true
       end
 
-      if u == node['rails']['user']['deploy']
-        group 'admin' do
-          append  true
-          members [node['rails']['user']['deploy']]
-        end
-      else
-        group u do
-          append  true
-          members [node['nginx']['user'], node['rails']['user']['deploy']]
-        end
-      end
-
-      group "#{node['rbenv']['group']} #{u}" do
-        group_name node['rbenv']['group']
-        append     true
-        members    [u]
-        only_if { node.role? 'base_ruby' }
-      end
-
-      group "#{node['msmtp']['group']} #{u}" do
-        group_name node['msmtp']['group']
+      group "#{node['nginx']['user']} #{u}" do
+        group_name node['nginx']['user']
         append     true
         members    [u]
       end
 
-      if data['ssh-keys']
-        directory "/home/#{u}/.ssh" do
-          action :create
-          owner  u
-          group  u
-          mode   00700
-        end
+      user_groups(u)
 
-        template "/home/#{u}/.ssh/authorized_keys" do
-          source 'authorized_keys.erb'
-          owner     u
-          group     u
-          mode      00600
-          variables keys: data['ssh-keys']
-        end
-      end
+      user_ssh_keys(u, data)
 
-      if data['vcs']
-        data['vcs'].each do |v|
-          next unless vcs.include?(v)
-
-          key = Chef::EncryptedDataBagItem.load('vcs_keys', v, default_secret)
-
-          file "/home/#{u}/.ssh/#{key['file-name']}" do
-            content key['file-content']
-            owner   u
-            group   u
-            mode    00600
-          end
-
-          ssh_known_hosts_entry "#{key['host']} #{u}" do
-            host key['host']
-            file "/home/#{u}/.ssh/known_hosts"
-            owner u
-          end
-        end
-
-        template "/home/#{u}/.ssh/config" do
-          source 'ssh_config.erb'
-          owner  u
-          group  u
-          mode  '0600'
-          variables vcs: data['vcs']
-        end
-        template "/home/#{u}/.gitconfig" do
-          source 'gitconfig.erb'
-          owner u
-          group u
-          mode 00644
-
-          variables(
-            name:  u,
-            email: "#{u}@#{node['fqdn']}"
-          )
-        end
-      end
-
+      user_vcs_keys(u, data, vcs, secret)
     end
 
     node.default['vsftpd']['config']['ftp_username'] = node['nginx']['user']
@@ -155,8 +62,132 @@ action :create do
     vsftpd_virtual_users 'vsftpd_credentials' do
       users name_pass
     end
-
   end
 
   new_resource.updated_by_last_action(true)
+end
+
+def user_ssh_keys(u, data) # rubocop:disable Style/MethodLength
+  return unless data['ssh-keys'] && u
+
+  directory "/home/#{u}/.ssh" do
+    action :create
+    owner  u
+    group  u
+    mode   00700
+  end
+
+  template "/home/#{u}/.ssh/authorized_keys" do
+    source 'authorized_keys.erb'
+    owner     u
+    group     u
+    mode      00600
+    variables keys: data['ssh-keys']
+  end
+end
+
+def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Style/MethodLength
+  return unless data['vcs'] && u && secret
+
+  data['vcs'].each do |v|
+    next unless vcs.include?(v)
+
+    key = Chef::EncryptedDataBagItem.load('vcs_keys', v, secret)
+
+    file "/home/#{u}/.ssh/#{key['file-name']}" do
+      content key['file-content']
+      owner   u
+      group   u
+      mode    00600
+    end
+
+    ssh_known_hosts_entry "#{key['host']} #{u}" do
+      host key['host']
+      file "/home/#{u}/.ssh/known_hosts"
+      owner u
+    end
+  end
+
+  template "/home/#{u}/.ssh/config" do
+    source 'ssh_config.erb'
+    owner  u
+    group  u
+    mode  '0600'
+    variables vcs: data['vcs']
+  end
+  template "/home/#{u}/.gitconfig" do
+    source 'gitconfig.erb'
+    owner u
+    group u
+    mode 00644
+
+    variables(
+        name:  u,
+        email: "#{u}@#{node['fqdn']}"
+    )
+  end
+end
+
+def user_groups(u) # rubocop:disable Style/MethodLength
+  return unless u
+
+  if u == node['rails']['user']['deploy']
+    group 'admin' do
+      append  true
+      members [node['rails']['user']['deploy']]
+    end
+  else
+    group u do
+      append  true
+      members [node['nginx']['user'], node['rails']['user']['deploy']]
+    end
+  end
+
+  group "#{node['rbenv']['group']} #{u}" do
+    group_name node['rbenv']['group']
+    append     true
+    members    [u]
+    only_if { node.role? 'base_ruby' }
+  end
+
+  group "#{node['msmtp']['group']} #{u}" do
+    group_name node['msmtp']['group']
+    append     true
+    members    [u]
+  end
+end
+
+def user_ftps(u, data) # rubocop:disable Style/MethodLength
+  return %w() unless data['ftp'] && u
+
+  list = []
+  data['ftp'].each do |ftp|
+    list.push('name' => ftp['name'], 'password' => ftp['password'])
+    local_root = ftp['local_root'] || "#{node['rails']['sites_base_path']}/#{u}"
+    node.default['vsftpd']['users'].push(
+      'name' => ftp['name'],
+      'config' => {
+        'local_root' => local_root,
+        'dirlist_enable' => 'YES',
+        'download_enable' => 'YES',
+        'write_enable' => 'YES',
+        'chown_username' => u,
+        'guest_username' => u,
+        'ftp_username' => u,
+      }
+    )
+
+    node.default['vsftpd']['allowed'].push(ftp['name'])
+  end
+  list
+end
+
+def user_nginx
+  return if !node['nginx'] || node['nginx']['source']['use_existing_user']
+
+  user node['nginx']['user'] do
+    system true
+    shell  '/bin/false'
+    home   '/var/www'
+  end
 end

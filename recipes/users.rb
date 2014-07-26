@@ -25,9 +25,9 @@ if node['rails']['apps'] || node['rails']['sites']
   node['rails']['sites'].each do |_k, a|
     users.push a['user']
   end
-  users = users.push(node['rails']['user']['deploy']).uniq.compact
+  users = users.unshift(node['rails']['user']['deploy']).uniq.compact
 
-  if File.exist?(node['rails']['secrets']['default']) && Chef.const_defined?('EncryptedDataBagItem')
+  if File.exist?(node['rails']['secrets']['default'])
     default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
     vcs            = data_bag('vcs_keys')
 

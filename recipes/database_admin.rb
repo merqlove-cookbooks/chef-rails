@@ -17,79 +17,77 @@
 # limitations under the License.
 #
 
-if Chef.const_defined? 'EncryptedDataBagItem'
-  default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
+default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
 
-  if node['recipes'].include?('mysql::server') && File.exist?('/usr/bin/mysqladmin') && node.default['rails']['databases'].include?('mysql')
-    mysql = data_bag('mysql')
-    if mysql # rubocop:disable Style/BlockNesting
-      root = Chef::EncryptedDataBagItem.load('mysql', 'root', default_secret)
-      mysql_connection_info = {
-        host:     'localhost',
-        username: root['id'],
-        password: root['password']
-      }
+if node['recipes'].include?('mysql::server') && File.exist?('/usr/bin/mysqladmin') && node['rails']['databases'].include?('mysql')
+  mysql = data_bag('mysql')
+  if mysql # rubocop:disable Style/BlockNesting
+    root = Chef::EncryptedDataBagItem.load('mysql', 'root', default_secret)
+    mysql_connection_info = {
+      host:     'localhost',
+      username: root['id'],
+      password: root['password']
+    }
 
-      include_recipe 'database::mysql'
-      (mysql - ['root']).each do |m|
-        u = Chef::EncryptedDataBagItem.load('mysql', m, default_secret)
-        mysql_database_user u['id'] do
-          connection mysql_connection_info
-          password   u['password']
-          action     [:create, :grant]
-        end
+    include_recipe 'database::mysql'
+    (mysql - ['root']).each do |m|
+      u = Chef::EncryptedDataBagItem.load('mysql', m, default_secret)
+      mysql_database_user u['id'] do
+        connection mysql_connection_info
+        password   u['password']
+        action     [:create, :grant]
       end
     end
   end
+end
 
-  if node['recipes'].include?('postgresql::server') && File.exist?('/usr/bin/psql') && node.default['rails']['databases'].include?('postgresql')
-    psql = data_bag('postgresql')
-    if psql # rubocop:disable Style/BlockNesting
-      postgres = Chef::EncryptedDataBagItem.load('postgresql', 'postgres', default_secret)
-      postgresql_connection_info = {
-        host:     '127.0.0.1',
-        port:     node['postgresql']['config']['port'],
-        username: postgres['id'],
-        password: postgres['password']
-      }
-      (psql - ['postgres']).each do |p|
-        u = Chef::EncryptedDataBagItem.load('postgresql', p, default_secret)
-        postgresql_database 'template1' do
-          connection postgresql_connection_info
-          sql <<-EOH
-          DO
-          $body$
-          BEGIN
-             IF NOT EXISTS (
-                SELECT *
-                FROM   pg_catalog.pg_user
-                WHERE  usename = '#{u['id']}')
-             THEN
-                CREATE ROLE #{u['id']} WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{u['password']}';
-             ELSE
-                ALTER ROLE #{u['id']} WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{u['password']}';
-             END IF;
-          END
-          $body$
-          EOH
-          action :query
-        end
+if node['recipes'].include?('postgresql::server') && File.exist?('/usr/bin/psql') && node['rails']['databases'].include?('postgresql')
+  psql = data_bag('postgresql')
+  if psql # rubocop:disable Style/BlockNesting
+    postgres = Chef::EncryptedDataBagItem.load('postgresql', 'postgres', default_secret)
+    postgresql_connection_info = {
+      host:     '127.0.0.1',
+      port:     node['postgresql']['config']['port'],
+      username: postgres['id'],
+      password: postgres['password']
+    }
+    (psql - ['postgres']).each do |p|
+      u = Chef::EncryptedDataBagItem.load('postgresql', p, default_secret)
+      postgresql_database 'template1' do
+        connection postgresql_connection_info
+        sql <<-EOH
+        DO
+        $body$
+        BEGIN
+           IF NOT EXISTS (
+              SELECT *
+              FROM   pg_catalog.pg_user
+              WHERE  usename = '#{u['id']}')
+           THEN
+              CREATE ROLE #{u['id']} WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{u['password']}';
+           ELSE
+              ALTER ROLE #{u['id']} WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{u['password']}';
+           END IF;
+        END
+        $body$
+        EOH
+        action :query
       end
     end
   end
+end
 
-  if node['recipes'].include? 'mongodb::default'
-    if File.exist?('/usr/bin/mongo') && node.default['rails']['databases'].include?('mongodb')
-      mongo = data_bag('mongodb')
-      if mongo # rubocop:disable Style/BlockNesting
-        admin = Chef::EncryptedDataBagItem.load('mongodb', 'admin', default_secret)
-        (mongo - ['admin']).each do |m|
-          u = Chef::EncryptedDataBagItem.load('mongodb', m, default_secret)
-          execute 'create-mongodb-admin-user' do
-            command "mongo admin -u #{admin['id']} -p #{admin['password']} --eval 'db.addUser(\"#{u['id']}\",\"#{u['password']}\")'"
-            action :run
-            not_if "mongo admin --eval 'db.auth(\"#{u['id']}\",\"#{u['password']}\")' | grep -q ^1$"
-          end
+if node['recipes'].include? 'mongodb::default'
+  if File.exist?('/usr/bin/mongo') && node['rails']['databases'].include?('mongodb')
+    mongo = data_bag('mongodb')
+    if mongo # rubocop:disable Style/BlockNesting
+      admin = Chef::EncryptedDataBagItem.load('mongodb', 'admin', default_secret)
+      (mongo - ['admin']).each do |m|
+        u = Chef::EncryptedDataBagItem.load('mongodb', m, default_secret)
+        execute 'create-mongodb-admin-user' do
+          command "mongo admin -u #{admin['id']} -p #{admin['password']} --eval 'db.addUser(\"#{u['id']}\",\"#{u['password']}\")'"
+          action :run
+          not_if "mongo admin --eval 'db.auth(\"#{u['id']}\",\"#{u['password']}\")' | grep -q ^1$"
         end
       end
     end

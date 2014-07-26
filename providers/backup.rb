@@ -18,20 +18,18 @@
 #
 
 action :create do
-  unless node.role? 'vagrant'
-    if Chef.const_defined?('EncryptedDataBagItem')
-      if aws?
-        store_keys = data_bag('aws')
-      elsif gs?
-        store_keys = data_bag('gs')
-      end
-      duplicity = data_bag('duplicity')
-      pass_key_id = new_resource.pass_key_id
-      storage_key_id = new_resource.storage_key_id
-      if duplicity.include?(pass_key_id) && store_keys.include?(storage_key_id)
-        config new_resource, storage_key_id, pass_key_id
-      end
-    end
+  if aws?
+    store_keys = data_bag('aws')
+  elsif gs?
+    store_keys = data_bag('gs')
+  else
+    return
+  end
+  duplicity = data_bag('duplicity')
+  pass_key_id = new_resource.pass_key_id
+  storage_key_id = new_resource.storage_key_id
+  if duplicity.include?(pass_key_id) && store_keys.include?(storage_key_id)
+    config new_resource, storage_key_id, pass_key_id
   end
 
   new_resource.updated_by_last_action(true)
@@ -74,7 +72,7 @@ def use_config(new_resource, pass_key_id, store)
   cronjob_script new_resource, boto, duplicity if duplicity['passphrase']
 end
 
-def cronjob_script(new_resource, boto) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
+def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
   aws_eu  = (new_resource.s3_eu) ? '--s3-use-new-style --s3-european-buckets ' : ''
   logfile = (new_resource.log) ? (new_resource.logfile) : '/dev/null'
   method  = node.default['rails']['duplicity']['method']
