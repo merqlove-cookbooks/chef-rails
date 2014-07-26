@@ -99,6 +99,29 @@ def create_mysql_dbs(secret, date)
       action        :nothing
     end
   end
+
+  create_mysql_admin(secret, root)
+end
+
+def create_mysql_admin(secret, root)
+  return unless secret && root
+  mysql = data_bag('mysql')
+  return unless mysql
+
+  mysql_connection_info = {
+      host:     'localhost',
+      username: root['id'],
+      password: root['password']
+  }
+
+  (mysql - ['root']).each do |m|
+    u = Chef::EncryptedDataBagItem.load('mysql', m, secret)
+    mysql_database_user u['id'] do
+      connection mysql_connection_info
+      password   u['password']
+      action     [:create, :grant]
+    end
+  end
 end
 
 def install_mysql
@@ -231,6 +254,44 @@ def create_postgresql_dbs(secret, date)
       action           :create
     end
   end
+
+  create_postgresql_admin(secret, postgres)
+end
+
+def create_postgresql_admin(secret, postgres)
+  return unless secret && postgres
+  psql = data_bag('postgresql')
+  return unless psql
+
+  postgresql_connection_info = {
+      host:     '127.0.0.1',
+      port:     node['postgresql']['config']['port'],
+      username: postgres['id'],
+      password: postgres['password']
+  }
+  (psql - ['postgres']).each do |p|
+    u = Chef::EncryptedDataBagItem.load('postgresql', p, secret)
+    postgresql_database 'template1' do
+      connection postgresql_connection_info
+      sql <<-EOH
+      DO
+      $body$
+      BEGIN
+         IF NOT EXISTS (
+            SELECT *
+            FROM   pg_catalog.pg_user
+            WHERE  usename = '#{u['id']}')
+         THEN
+            CREATE ROLE #{u['id']} WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{u['password']}';
+         ELSE
+            ALTER ROLE #{u['id']} WITH SUPERUSER LOGIN CREATEDB REPLICATION PASSWORD '#{u['password']}';
+         END IF;
+      END
+      $body$
+      EOH
+      action :query
+    end
+  end
 end
 
 def install_postgresql
@@ -326,6 +387,23 @@ def create_mongodb_dbs(secret, date)
       command "mongo admin -u #{admin['id']} -p #{admin['password']} --eval '#{d['name']}=db.getSiblingDB(\"#{d['name']}\"); #{d['name']}.addUser(\"#{d['user']}\",\"#{d['password']}\")'"
       action  :run
       not_if  "mongo #{d['name']} --eval 'db.auth(\"#{d['user']}\",\"#{d['password']}\")' | grep -q ^1$"
+    end
+  end
+
+  create_mongodb_admin(secret, admin)
+end
+
+def create_mongodb_admin(secret, admin)
+  return unless secret && admin
+  mongo = data_bag('mongodb')
+  return unless mongo # rubocop:disable Style/BlockNesting
+
+  (mongo - ['admin']).each do |m|
+    u = Chef::EncryptedDataBagItem.load('mongodb', m, secret)
+    execute 'create-mongodb-admin-user' do
+      command "mongo admin -u #{admin['id']} -p #{admin['password']} --eval 'db.addUser(\"#{u['id']}\",\"#{u['password']}\")'"
+      action :run
+      not_if "mongo admin --eval 'db.auth(\"#{u['id']}\",\"#{u['password']}\")' | grep -q ^1$"
     end
   end
 end

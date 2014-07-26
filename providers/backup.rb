@@ -57,6 +57,8 @@ def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/Cy
     store = Chef::EncryptedDataBagItem.load('aws', storage_key_id, default_secret)
   elsif gs?
     store = Chef::EncryptedDataBagItem.load('gs', storage_key_id, default_secret)
+  else
+    return
   end
 
   use_config(new_resource, pass_key_id, store) if store['access_key_id'] && store['secret_access_key']

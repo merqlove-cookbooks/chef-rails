@@ -42,57 +42,7 @@ node['rails']['apps'].each do |k, a|
   end
 end
 
-# PHP pools
-if node['php-fpm']['pools'].count > 0
-  include_recipe 'php-fpm::configure'
-  template '/etc/php.d/php_fix.ini' do
-    owner 'root'
-    group 'root'
-    mode 00755
-    source 'php_fix.erb'
-    notifies :restart, 'service[php-fpm]', :delayed
-  end
-
-  ruby_block 'cleanup php-fpm configuration' do
-    block do
-      if Dir.exist? node['php-fpm']['pool_conf_dir']
-        deleted = false
-        Dir.foreach(node['php-fpm']['pool_conf_dir']) do |pool|
-          next if pool == '.' || pool == '..'
-          if pool.include? '.conf'
-            unless Rails::Helpers.has_hash_in_array?(node['php-fpm']['pools'], pool.gsub(/\.conf/, '')) # rubocop:disable Style/BlockNesting
-              File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")
-              deleted = true
-            end
-          end
-        end
-
-        resources(service: node['php-fpm']['service']).run_action(:restart) if deleted
-      end
-    end
-    action :create
-  end
-
-  directory '/var/lib/php/session' do
-    owner 'root'
-    group 'root'
-    mode 00777
-  end
-
-  include_recipe 'php-fpm::install'
-else
-  if Dir.exist? node['php-fpm']['pool_conf_dir']
-    Dir.foreach(node['php-fpm']['pool_conf_dir']) do |pool|
-      next if pool == '.' || pool == '..'
-      if pool.include? '.conf'
-        File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")
-      end
-    end
-    service node['php-fpm']['service'] do
-      action [:disable, :stop]
-    end
-  end
-end
+rails_php_fpm "initialize"
 
 # Sites cleanup
 if node['rails']['sites'].count > 0
@@ -108,12 +58,11 @@ if node['rails']['sites'].count > 0
 end
 
 include_recipe 'rails::databases'
-include_recipe 'rails::database_admin'
 
 rails_backup 'system' do
   main true
 end
 
-msmtp_system   'base msmtp account'
-msmtp_accounts 'user msmtp accounts'
+msmtp_system   'initialize base msmtp account'
+msmtp_accounts 'initialize user msmtp accounts'
 include_recipe 'rails::cleanup'

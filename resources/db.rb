@@ -24,5 +24,6 @@ default_action :create
 attribute :name, name_attribute: true, kind_of: String
 attribute :secret, kind_of: String, default: nil, required: true # Secret for data_bags
 attribute :date, kind_of: String, default: 'NOW=$(date +"%Y%m%d")' # Current Date
+# attribute :type, kind_of: String, default: nil # Type of database
 attribute :cookbook, kind_of: String, default: 'rails' # Cookbook to find template
 attribute :template, kind_of: String, default: 'database.yml.erb' # Template to use.

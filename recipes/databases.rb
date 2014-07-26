@@ -20,7 +20,7 @@
 default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
 date = 'NOW=$(date +"%Y%m%d")'
 
-rails_db "create databases" do
+rails_db "initialize" do
   secret default_secret
   date   date
 end

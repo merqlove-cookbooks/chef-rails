@@ -23,7 +23,7 @@ default['rails']['duplicity']['storage_key_id'] = node.default['rails']['duplici
 default['rails']['duplicity']['boto_cfg'] = true
 
 # path & log
-default['rails']['duplicity']['path'] = '/usr/local/bin/duplicity'
+default['rails']['duplicity']['path'] = '/usr/bin/duplicity'
 default['rails']['duplicity']['log'] = false # Log or not
 default['rails']['duplicity']['log_file'] = '/var/log/duplicity.log'
 

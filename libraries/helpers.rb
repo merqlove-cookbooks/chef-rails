@@ -14,6 +14,10 @@ module Rails
     def database_type_exist?(type)
       node['rails']['databases'] && node['rails']['databases'].include?(type)
     end
+
+    def php_fpm?
+      node['php-fpm'] && node['php-fpm']['pools'].count > 0
+    end
   end
 end
 

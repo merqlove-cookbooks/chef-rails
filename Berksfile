@@ -48,7 +48,7 @@ end
 # base
 group :production do
   cookbook 'chef-client'
-  cookbook 'duplicity_ng', github: 'merqlove/duplicity_ng'
+  cookbook 'duplicity_ng', github: 'merqlove/duplicity_ng', branch: 'centos59-support'
 
   cookbook 'database', github: 'opscode-cookbooks/database'
   cookbook 'memcached'
@@ -56,7 +56,7 @@ group :production do
   cookbook 'build-essential'
   cookbook 'yum-corporate'
   cookbook 'yum-epel'
-  cookbook 'yum-remi', github: 'aiming-cookbooks/yum-remi'
+  # cookbook 'yum-remi', github: 'aiming-cookbooks/yum-remi'
   cookbook 'iptables'
   cookbook 'git'
 
