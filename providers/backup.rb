@@ -164,5 +164,5 @@ end
 
 def clean_path(path)
   return unless path
-  swift? ? path[/[a-z_\-\.]+$/] : path
+  path[/[a-z0-9_\-\.]+$/]
 end
