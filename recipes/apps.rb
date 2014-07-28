@@ -42,7 +42,7 @@ node['rails']['apps'].each do |k, a|
   end
 end
 
-rails_php_fpm "initialize"
+rails_php_fpm 'initialize'
 
 # Sites cleanup
 if node['rails']['sites'].count > 0

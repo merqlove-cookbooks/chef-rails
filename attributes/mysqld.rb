@@ -21,7 +21,7 @@ base_dir     = ''
 service_name = 'mysql'
 
 if platform_family?('rhel')
-  version = node['mysql']['version'].sub('.','')
+  version = node['mysql']['version'].sub('.', '')
   case node['platform_version']
   when /^5/
     base_dir     = "/opt/rh/mysql#{version}/root"

@@ -20,7 +20,7 @@
 default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
 date = 'NOW=$(date +"%Y%m%d")'
 
-rails_db "initialize" do
+rails_db 'initialize' do
   secret default_secret
   date   date
 end
@@ -44,7 +44,6 @@ node['rails']['duplicity']['db'].each do |db|
 
   case db
   when 'postgresql'
-    postgres ||= Chef::EncryptedDataBagItem.load(db, 'postgres', default_secret)
     exec_before.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.\"$0\".sql.gz' -- \"$NOW\""
     exec_before.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
     exec_before.push "chown -R root:root #{db_backup_dir}/*"
@@ -52,7 +51,6 @@ node['rails']['duplicity']['db'].each do |db|
     root ||= Chef::EncryptedDataBagItem.load(db, 'root', default_secret)
     exec_before.push "mysqldump --all-databases -u root -p#{root['password']} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
   when 'mongodb'
-    admin ||= Chef::EncryptedDataBagItem.load(db, 'admin', default_secret)
     exec_before.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
     exec_before.push "ar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
     exec_before.push "rm -rf #{db_backup_dir}/#{db}.$NOW"

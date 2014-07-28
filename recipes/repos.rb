@@ -23,9 +23,9 @@ if rhel?
   include_recipe 'yum-epel::default'
 
   exclude = node['yum']['remi']['exclude'].to_s
-  exclude << " curl*" if rhel5x?
+  exclude << ' curl*' if rhel5x?
 
-  yum_repository "remi" do
+  yum_repository 'remi' do
     description "Les RPM de remi pour Enterprise Linux #{node['platform_version']} - $basearch"
     mirrorlist  "http://rpms.famillecollet.com/enterprise/#{node['platform_version'].to_i}/remi/mirror"
     enabled     true

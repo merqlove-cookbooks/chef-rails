@@ -3,7 +3,7 @@ require 'ridley'
 require 'json'
 
 module Rails
-  module Import
+  module Import # robocop:disable Style/Documentation
     class API
       PROJECT_ROOT = File.expand_path('../../..', __FILE__)
 
@@ -23,10 +23,10 @@ module Rails
         self.file ||= resource
       end
 
-      def save_all
-        Dir.glob("tmp/**/*").each do |d|
+      def save_all # rubocop:disable Style/CyclomaticComplexity
+        Dir.glob('tmp/**/*').each do |d|
           next if d == '.' || d == '..' || File.file?(d)
-          dir = resource_path(d.sub('tmp/',''))
+          dir = resource_path(d.sub('tmp/', ''))
           FileUtils.mkdir_p(dir)
           Dir.glob("#{d}/*").each do |i|
             next if i == '.' || i == '..' || File.directory?(i)
@@ -38,7 +38,7 @@ module Rails
       end
 
       def clean
-        Dir.glob("tmp/*").each do |d|
+        Dir.glob('tmp/*').each do |d|
           next if d == '.' || d == '..'
           FileUtils.remove_dir(d, true)
         end

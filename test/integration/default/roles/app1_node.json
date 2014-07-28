@@ -27,6 +27,12 @@
               "user": "christ",
               "password": "12345678",
               "pool": 8
+            },
+            {
+              "type": "mongodb",
+              "name": "bobrtube_db",
+              "user": "bobr",
+              "password": "12345678"
             }
           ],
           "name": "www_christ_leather_ru",

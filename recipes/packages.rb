@@ -32,46 +32,46 @@ package 'libtool'
 
 if ruby_exists.count > 0
   case node['platform_family']
-    when 'rhel'
-      package 'libyaml-devel'
-      package 'libffi-devel'
-    when 'debian'
-      package 'libyaml-dev'
-      package 'libffi-dev'
+  when 'rhel'
+    package 'libyaml-devel'
+    package 'libffi-devel'
+  when 'debian'
+    package 'libyaml-dev'
+    package 'libffi-dev'
   end
   node.default['rails']['ruby'] = true
 else
   case node['platform_family']
-    when 'rhel'
-      package 'openssl-devel'
-      package 'zlib-devel'
-      package 'readline-devel'
-      package 'libxml2-devel'
-      package 'libxslt-devel'
-      package 'libyaml-devel'
-      package 'libffi-devel'
-    when 'debian'
-      package 'libssl-dev'
-      package 'zlib1g-dev'
-      package 'libreadline6-dev'
-      package 'libxml2-dev'
-      package 'libxslt1-dev'
-      package 'libyaml-dev'
-      package 'libffi-dev'
+  when 'rhel'
+    package 'openssl-devel'
+    package 'zlib-devel'
+    package 'readline-devel'
+    package 'libxml2-devel'
+    package 'libxslt-devel'
+    package 'libyaml-devel'
+    package 'libffi-devel'
+  when 'debian'
+    package 'libssl-dev'
+    package 'zlib1g-dev'
+    package 'libreadline6-dev'
+    package 'libxml2-dev'
+    package 'libxslt1-dev'
+    package 'libyaml-dev'
+    package 'libffi-dev'
   end
   node.default['rails']['ruby'] = false
 end
 
 # Install Db4
 case node['platform_family']
-  when 'debian'
-    if ubuntu14x?
-      package 'libdb5.3'
-    else
-      package 'libdb5.1'
-    end
-    package 'db-util'
-  when 'rhel'
-    package 'db4-utils'
-    package 'db4'
+when 'debian'
+  if ubuntu14x?
+    package 'libdb5.3'
+  else
+    package 'libdb5.1'
+  end
+  package 'db-util'
+when 'rhel'
+  package 'db4-utils'
+  package 'db4'
 end

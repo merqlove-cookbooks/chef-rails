@@ -19,6 +19,6 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
-rails_secrets "init" unless vagrant?
+rails_secrets 'init' unless vagrant?
 
 include_recipe 'selinux::disabled' if rhel5x?

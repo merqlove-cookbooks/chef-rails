@@ -19,7 +19,7 @@
 
 node.default_attrs['rails'].delete('databases') rescue nil # rubocop:disable Style/RescueModifier
 node.default_attrs['rails'].delete('mysql') rescue nil # rubocop:disable Style/RescueModifier
-node.default_attrs['msmtp']['accounts'] = {} rescue nil # rubocop:disable Style/RescueModifier
+node.default['msmtp']['accounts'] = {} rescue nil # rubocop:disable Style/RescueModifier
 
 node.default_attrs['mysql'].delete('server_debian_password') rescue nil # rubocop:disable Style/RescueModifier
 node.default_attrs['mysql'].delete('server_root_password') rescue nil # rubocop:disable Style/RescueModifier

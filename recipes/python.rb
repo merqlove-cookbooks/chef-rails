@@ -19,4 +19,4 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
-rails_python "set alter as main python" if rhel5x?
+rails_python 'set alter as main python' if rhel5x?

@@ -1,9 +1,8 @@
 require 'import/api'
 
 module Rails
-  module Import
+  module Import # robocop:disable Style/Documentation
     class Role < API
-
       def download
         super
 

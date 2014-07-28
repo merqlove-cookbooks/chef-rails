@@ -2,9 +2,8 @@ require 'chef'
 require 'import/api'
 
 module Rails
-  module Import
+  module Import # robocop:disable Style/Documentation
     class DataBag < API
-
       attr_accessor :secret_file
 
       def download
@@ -31,7 +30,6 @@ module Rails
       end
 
       def encode
-
       end
 
       protected
@@ -40,9 +38,9 @@ module Rails
 
       def auth
         auth = {
-            server_url: "https://api.opscode.com/organizations/#{ENV['ORGNAME']}",
-            client_name: "#{ENV['ORGNAME']}-validator",
-            client_key: "#{ENV['HOME']}/.chef/#{ENV['ORGNAME']}-validator.pem"
+          server_url: "https://api.opscode.com/organizations/#{ENV['ORGNAME']}",
+          client_name: "#{ENV['ORGNAME']}-validator",
+          client_key: "#{ENV['HOME']}/.chef/#{ENV['ORGNAME']}-validator.pem"
         }
         secret = test ? test_secret_file : secret_file
         auth.merge(encrypted_data_bag_secret: secret) if secret

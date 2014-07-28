@@ -50,7 +50,7 @@ end
 
 # Makers
 
-def cleanup_php_fpm
+def cleanup_php_fpm # rubocop:disable Style/MethodLength
   return unless ::Dir.exist? node['php-fpm']['pool_conf_dir']
 
   deleted = false

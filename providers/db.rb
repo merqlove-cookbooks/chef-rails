@@ -46,7 +46,7 @@ end
 
 # Makers
 
-def create_mysql_dbs(secret, date)
+def create_mysql_dbs(secret, date) # rubocop:disable Style/MethodLength
   root = ::Chef::EncryptedDataBagItem.load('mysql', 'root', secret)
   if root
     node.normal['mysql']['server_debian_password'] = root['debian_password']
@@ -57,9 +57,9 @@ def create_mysql_dbs(secret, date)
   install_mysql
 
   mysql_connection_info = {
-      host:     'localhost',
-      username: 'root',
-      password: root['password']
+    host:     'localhost',
+    username: 'root',
+    password: root['password']
   }
 
   node['rails']['databases']['mysql'].each do |_k, d|
@@ -105,7 +105,7 @@ def create_mysql_dbs(secret, date)
   create_mysql_admin(secret, root)
 end
 
-def install_mysql
+def install_mysql # rubocop:disable Style/MethodLength
   run_context.include_recipe 'mysql::client'
 
   run_context.include_recipe 'mysql::server'
@@ -119,7 +119,7 @@ def install_mysql
 
   run_context.include_recipe 'database::mysql'
 
-  if php?
+  if php? # rubocop:disable Style/GuardClause
     case node['platform_family']
     when 'rhel'
       package 'php-mysqlnd'
@@ -129,8 +129,8 @@ def install_mysql
   end
 end
 
-def tune_mysql
-  ruby_block "cleanup_innodb_logfiles" do
+def tune_mysql # rubocop:disable Style/MethodLength
+  ruby_block 'cleanup_innodb_logfiles' do
     block do
       ::Dir.glob("#{node['mysql']['data_dir']}/ib*").each do |f|
         next if f == '.' || f == '..' || ::File.directory?(f)
@@ -149,19 +149,19 @@ def tune_mysql
         config: node['rails']['mysql']
     )
     notifies :stop, "service[#{node['rails']['mysqld']['service_name']}]", :immediately
-    notifies :run, "ruby_block[cleanup_innodb_logfiles]", :immediately
+    notifies :run, 'ruby_block[cleanup_innodb_logfiles]', :immediately
   end
 end
 
-def create_mysql_admin(secret, root)
+def create_mysql_admin(secret, root) # rubocop:disable Style/MethodLength
   return unless secret && root
   mysql = data_bag('mysql')
   return unless mysql
 
   mysql_connection_info = {
-      host:     'localhost',
-      username: root['id'],
-      password: root['password']
+    host:     'localhost',
+    username: root['id'],
+    password: root['password']
   }
 
   (mysql - ['root']).each do |m|
@@ -174,20 +174,20 @@ def create_mysql_admin(secret, root)
   end
 end
 
-def backup_mysql_db(d, date, password)
+def backup_mysql_db(d, date, password) # rubocop:disable Style/MethodLength,Style/CyclomaticComplexity
   return unless d && date && password
 
   if d['app_backup']
     rails_backup "mysql_db_#{d['app_name']}" do
       path        d['app_backup_path']
       exec_pre    [
-                      "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
-                  ]
+        "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
+      ]
       exec_before [
-                      date,
-                      "rm -rf #{d['app_backup_dir']}/*",
-                      "mysqldump -u root -p#{password} #{d['name']} | gzip > #{d['app_backup_dir']}/#{d['name']}.$NOW.sql.gz"
-                  ]
+        date,
+        "rm -rf #{d['app_backup_dir']}/*",
+        "mysqldump -u root -p#{password} #{d['name']} | gzip > #{d['app_backup_dir']}/#{d['name']}.$NOW.sql.gz"
+      ]
       include     [d['app_backup_dir']]
       archive_dir d['app_backup_archive']
       temp_dir    d['app_backup_temp']
@@ -210,7 +210,7 @@ def stop_mysql
   end
 end
 
-def create_postgresql_dbs(secret, date)
+def create_postgresql_dbs(secret, date) # rubocop:disable Style/MethodLength
   postgres = ::Chef::EncryptedDataBagItem.load('postgresql', 'postgres', secret)
   node.normal['postgresql']['password']['postgres'] = postgres['password']
 
@@ -228,10 +228,10 @@ def create_postgresql_dbs(secret, date)
   end
 
   postgresql_connection_info = {
-      host:     '127.0.0.1',
-      port:     node['postgresql']['config']['port'],
-      username: 'postgres',
-      password: postgres['password']
+    host:     '127.0.0.1',
+    port:     node['postgresql']['config']['port'],
+    username: 'postgres',
+    password: postgres['password']
   }
 
   node['rails']['databases']['postgresql'].each do |_k, d|
@@ -270,16 +270,16 @@ def create_postgresql_dbs(secret, date)
   create_postgresql_admin(secret, postgres)
 end
 
-def create_postgresql_admin(secret, postgres)
+def create_postgresql_admin(secret, postgres) # rubocop:disable Style/MethodLength
   return unless secret && postgres
   psql = data_bag('postgresql')
   return unless psql
 
   postgresql_connection_info = {
-      host:     '127.0.0.1',
-      port:     node['postgresql']['config']['port'],
-      username: postgres['id'],
-      password: postgres['password']
+    host:     '127.0.0.1',
+    port:     node['postgresql']['config']['port'],
+    username: postgres['id'],
+    password: postgres['password']
   }
   (psql - ['postgres']).each do |p|
     u = Chef::EncryptedDataBagItem.load('postgresql', p, secret)
@@ -306,7 +306,7 @@ def create_postgresql_admin(secret, postgres)
   end
 end
 
-def install_postgresql
+def install_postgresql # rubocop:disable Style/MethodLength
   case node['platform_family']
   when 'debian'
     node.default['postgresql']['enable_pgdg_apt'] = true
@@ -331,22 +331,22 @@ def install_postgresql
   run_context.include_recipe 'postgresql::ruby'
 end
 
-def backup_postgresql_db(d, date)
+def backup_postgresql_db(d, date) # rubocop:disable Style/MethodLength
   return unless d && date
 
   if d['app_backup']
     rails_backup "pg_db_#{d['app_name']}" do
       path        d['app_backup_path']
       exec_pre    [
-                      "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
-                  ]
+        "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
+      ]
       exec_before [
-                      date,
-                      "rm -rf #{d['app_backup_dir']}/*",
-                      "su postgres -c 'pg_dump -U postgres #{d['name']} | gzip > /tmp/#{d['name']}.\"$0\".sql.gz' -- \"$NOW\"",
-                      "mv /tmp/#{d['name']}.$NOW.sql.gz #{d['app_backup_dir']}/",
-                      "chown -R #{d['app_user']}:#{d['app_user']} #{d['app_backup_dir']}/*"
-                  ]
+        date,
+        "rm -rf #{d['app_backup_dir']}/*",
+        "su postgres -c 'pg_dump -U postgres #{d['name']} | gzip > /tmp/#{d['name']}.\"$0\".sql.gz' -- \"$NOW\"",
+        "mv /tmp/#{d['name']}.$NOW.sql.gz #{d['app_backup_dir']}/",
+        "chown -R #{d['app_user']}:#{d['app_user']} #{d['app_backup_dir']}/*"
+      ]
       include     [d['app_backup_dir']]
       archive_dir d['app_backup_archive']
       temp_dir    d['app_backup_temp']
@@ -369,7 +369,7 @@ def stop_postgresql
   end
 end
 
-def create_mongodb_dbs(secret, date)
+def create_mongodb_dbs(secret, date) # rubocop:disable Style/MethodLength
   admin = ::Chef::EncryptedDataBagItem.load('mongodb', 'admin', secret)
   run_context.include_recipe 'mongodb::default'
   node.default['mongodb']['config']['auth'] = true if node['rails']['mongodb']['auth']
@@ -382,15 +382,14 @@ def create_mongodb_dbs(secret, date)
     database   'admin'
     connection node['mongodb']
     action     :add
-    notifies   :restart, "service[#{node['mongodb']['instance_name']}]", :delayed
   end
 
   if php?
     case node['platform_family']
-      when 'rhel'
-        package 'php-pecl-mongo'
-      when 'debian'
-        package 'php5-mongo'
+    when 'rhel'
+      package 'php-pecl-mongo'
+    when 'debian'
+      package 'php5-mongo'
     end
   end
 
@@ -424,7 +423,7 @@ def create_mongodb_dbs(secret, date)
   create_mongodb_admin(secret, admin)
 end
 
-def create_mongodb_admin(secret, admin)
+def create_mongodb_admin(secret, admin) # rubocop:disable Style/MethodLength
   return unless secret && admin
   mongo = data_bag('mongodb')
   return unless mongo # rubocop:disable Style/BlockNesting
@@ -442,22 +441,22 @@ def create_mongodb_admin(secret, admin)
   end
 end
 
-def backup_mongodb_db(d, date)
+def backup_mongodb_db(d, date) # rubocop:disable Style/MethodLength
   return unless d && date
 
   if d['app_backup']
     rails_backup "mongo_db_#{d['app_name']}" do
       path        d['app_backup_path']
       exec_pre    [
-                      "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
-                  ]
+        "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
+      ]
       exec_before [
-                      date,
-                      "rm -rf #{d['app_backup_dir']}/*",
-                      "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d['name']} --out #{d['app_backup_dir']}/#{d['name']}.$NOW >> /dev/null 2>&1",
-                      "gzip #{d['app_backup_dir']}/#{d['name']}.$NOW",
-                      "rm -f #{d['app_backup_dir']}/#{d['name']}.$NOW"
-                  ]
+        date,
+        "rm -rf #{d['app_backup_dir']}/*",
+        "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d['name']} --out #{d['app_backup_dir']}/#{d['name']}.$NOW >> /dev/null 2>&1",
+        "gzip #{d['app_backup_dir']}/#{d['name']}.$NOW",
+        "rm -f #{d['app_backup_dir']}/#{d['name']}.$NOW"
+      ]
       include     [d['app_backup_dir']]
       archive_dir d['app_backup_archive']
       temp_dir    d['app_backup_temp']
