@@ -77,14 +77,12 @@ def use_config(new_resource, pass_key_id, store, default_secret)
 
   boto = new_resource.boto_cfg
   boto_config(store) if boto && new_resource.main && !swift?
-  p store
-  p node['rails']['duplicity']['method']
-  p store['username']
+
   duplicity = Chef::EncryptedDataBagItem.load('duplicity', pass_key_id, default_secret)
-  cronjob_script new_resource, boto, duplicity if duplicity['passphrase']
+  cronjob_script new_resource, store, boto, duplicity if duplicity['passphrase']
 end
 
-def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
+def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
   aws_eu  = (new_resource.s3_eu) ? '--s3-use-new-style --s3-european-buckets ' : ''
   logfile = (new_resource.log) ? (new_resource.logfile) : '/dev/null'
   method  = node['rails']['duplicity']['method']
@@ -117,9 +115,9 @@ def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/C
 
     #
     # # In case you use Swift as you backend, specify the credentials here
-    swift_username store['username'] if swift?
-    swift_password store['password'] if swift?
-    swift_authurl  store['authurl'] if swift?
+    swift_username       store['username'] if swift?
+    swift_password       store['password'] if swift?
+    swift_authurl        store['authurl'] if swift?
 
     # In case you use Google Cloud Storage as your backend, your credentials go here
     gs_access_key_id     store['access_key_id'] if gs? && !boto
