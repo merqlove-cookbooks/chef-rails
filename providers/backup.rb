@@ -54,7 +54,7 @@ action :delete do
   new_resource.updated_by_last_action(true)
 end
 
-def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/CyclomaticComplexity
+def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
   return unless storage_key_id || pass_key_id
 
   default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
