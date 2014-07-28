@@ -75,8 +75,6 @@ group :production do
   cookbook 'vsftpd', github: 'merqlove/chef-vsftpd'
   cookbook 'newrelic'
 
-  cookbook 'rails', '~> 0.3.1', github: 'merqlove/chef-rails'
-
   cookbook 'selinux'
   cookbook 'vim'
   cookbook 'curl'
