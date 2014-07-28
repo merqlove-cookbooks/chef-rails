@@ -195,6 +195,7 @@
   },
   "run_list": [
     "recipe[chef-client::config]",
+    "recipe[selinux::disabled]",
     "recipe[rails::secrets]",
     "recipe[rails::swap]",
     "recipe[rails::repos]",

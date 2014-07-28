@@ -22,8 +22,6 @@ action :create do
     store_keys = data_bag('aws')
   elsif gs?
     store_keys = data_bag('gs')
-  else
-    return
   end
 
   duplicity = data_bag('duplicity')
@@ -141,5 +139,5 @@ def gs?
 end
 
 def aws?
-  node['rails']['duplicity']['method'].include?('aws')
+  node['rails']['duplicity']['method'].include?('s3')
 end
