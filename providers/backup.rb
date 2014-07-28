@@ -77,7 +77,7 @@ def use_config(new_resource, pass_key_id, store, default_secret)
 
   boto = new_resource.boto_cfg
   boto_config(store) if boto && new_resource.main && !swift?
-
+  p store
   duplicity = Chef::EncryptedDataBagItem.load('duplicity', pass_key_id, default_secret)
   cronjob_script new_resource, boto, duplicity if duplicity['passphrase']
 end
