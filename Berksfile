@@ -56,7 +56,7 @@ group :production do
   cookbook 'build-essential'
   cookbook 'yum-corporate'
   cookbook 'yum-epel'
-  # cookbook 'yum-remi', github: 'aiming-cookbooks/yum-remi'
+  cookbook 'yum'
   cookbook 'iptables'
   cookbook 'git'
 
@@ -65,6 +65,7 @@ group :production do
   cookbook 'swap'
   cookbook 'openssh'
   cookbook 'openssl-fips', github: 'merqlove/chef-openssl-fips'
+  cookbook 'openssl'
   cookbook 'ssh_known_hosts', '~> 1.1.2', github: 'merqlove/chef-ssh_known_hosts'
   cookbook 'sudo'
   cookbook 'fail2ban'
@@ -87,7 +88,7 @@ end
 metadata
 
 group :integration do
-  cookbook 'minitest-handler', github: 'btm/minitest-handler-cookbook', ref: 'f51f50925049cfcb856d527123fda90961d739e5'
+  cookbook 'minitest-handler', '>= 1.3'
 end
 
 

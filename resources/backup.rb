@@ -25,8 +25,8 @@ attribute :name,     kind_of: String, name_attribute: true
 attribute :cookbook, kind_of: String, default: 'rails' # Cookbook to find template
 
 # Data Bag Ids
-attribute :pass_key_id,     kind_of: String, default: nil
-attribute :storage_key_id,  kind_of: String, default: nil
+attribute :pass_key_id,     kind_of: String, default: node['rails']['duplicity']['pass_key_id']
+attribute :storage_key_id,  kind_of: String, default: node['rails']['duplicity']['storage_key_id']
 
 # Path
 attribute :path,    kind_of: String, default: node['rails']['duplicity']['path']

@@ -1,0 +1,17 @@
+{
+  "chef_type": "node",
+  "json_class": "Chef::Node",
+  "name": "mrcr.ru",
+  "normal": {
+    "tags": [
+      "php",
+      " mysql",
+      "server_merqlove"
+    ],
+    "mysql": {
+    }
+  },
+  "run_list": [
+    "role[main_server]"
+  ]
+}

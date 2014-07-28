@@ -1,0 +1,231 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "name": "base",
+  "description": "",
+  "default_attributes": {
+    "chef_client": {
+      "config": {
+        "ssl_verify_mode": ":verify_peer",
+        "log_location": "STDOUT",
+        "log_level": ":auto"
+      }
+    },
+    "duplicity_ng": {
+    },
+    "nodejs": {
+      "version": "0.10.29",
+      "checksum": "47379d01f765f87c1a1498b4e65de30e45201de50334954860d7375a8258b15d",
+      "checksum_linux_64": "ac52da27a4e298a6de610de25b22628bdb97b78cb29d11464ef5cfa2e57847d5",
+      "checksum_linux_86": "6caaea6c350a143a69ab0b89063476292437091ca96f9896413e1972aadae093"
+    },
+    "fail2ban": {
+      "services": {
+        "ssh": {
+          "maxretry": 10
+        }
+      }
+    },
+    "memcached": {
+      "listen": "127.0.0.1"
+    },
+    "mongodb": {
+      "install_method": "mongodb-org",
+      "config": {
+        "bind_ip": "127.0.0.1"
+      }
+    },
+    "mysql": {
+      "version": "5.5",
+      "remove_test_database": true,
+      "bind_address": "localhost",
+      "remove_anonymous_users": true,
+      "client": {
+        "packages": [
+          "mysql",
+          "mysql-devel"
+        ]
+      }
+    },
+    "yum": {
+      "epel": {
+        "exclude": "postgresql* mongo* mysql*",
+        "managed": true
+      },
+      "remi": {
+        "exclude": "postgresql* mongo* mysql*"
+      }
+    },
+    "postgresql": {
+      "version": "9.3",
+      "config": {
+        "port": "5432",
+        "listen_addresses": "localhost",
+        "log_rotation_size": "10MB"
+      },
+      "config_pgtune": {
+        "max_connections": "200",
+        "db_type": "web"
+      }
+    },
+    "build_essential": {
+      "compile_time": true
+    },
+    "openssh": {
+      "server": {
+        "permit_root_login": "no",
+        "password_authentication": "no",
+        "port": "22",
+        "protocol": "2",
+        "pubkey_authentication": "yes",
+        "x11_forwarding": "yes",
+        "subsystem": "sftp /usr/libexec/openssh/sftp-server",
+        "use_p_a_m": "no",
+        "log_level": "info"
+      },
+      "client": {
+        "*": {
+          "g_s_s_a_p_i_authentication": "yes",
+          "send_env": "LANG LC_*",
+          "hash_known_hosts": "yes"
+        },
+        "localhost": {
+          "user_known_hosts_file": "/dev/null",
+          "strict_host_key_checking": "no"
+        },
+        "127.0.0.1": {
+          "user_known_hosts_file": "/dev/null",
+          "strict_host_key_checking": "no"
+        },
+        "other*": {
+          "user_known_hosts_file": "/dev/null",
+          "strict_host_key_checking": "no"
+        }
+      }
+    },
+    "authorization": {
+      "sudo": {
+        "groups": [
+          "admin",
+          "sudo"
+        ],
+        "passwordless": true
+      }
+    },
+    "tz": "Europe/Moscow",
+    "nginx": {
+      "enable_rate_limiting": true,
+      "rate_limiting_zone_name": "bots",
+      "rate_limiting_backoff": "10m",
+      "rate_limit": "20r/s",
+      "default_site_enabled": false,
+      "disable_access_log": false,
+      "server_tokens": "off",
+      "client_body_buffer_size": "10m",
+      "client_max_body_size": "16m"
+    },
+    "rails": {
+      "mongodb": {
+        "auth": true
+      },
+      "duplicity": {
+        "target": "backup_merqlove",
+        "pass_key_id": "main",
+        "method": "gs",
+        "keep_full": 5,
+        "log": true,
+        "s3": {
+          "eu": false
+        }
+      },
+      "secrets": {
+        "default": "/etc/chef/encrypted_data_bag_secret"
+      },
+      "ports": [
+        80,
+        21,
+        123
+      ]
+    },
+    "packages": [
+      "mc"
+    ],
+    "php": {
+      "directives": {
+        "expose_php": "off",
+        "upload_max_filesize": "32M",
+        "post_max_size": "32M",
+        "max_execution_time": 240
+      }
+    }
+  },
+  "override_attributes": {
+    "postgresql": {
+      "pg_hba": [
+        {
+          "type": "local",
+          "db": "all",
+          "user": "postgres",
+          "addr": null,
+          "method": "ident"
+        },
+        {
+          "type": "local",
+          "db": "all",
+          "user": "all",
+          "addr": null,
+          "method": "ident"
+        },
+        {
+          "type": "host",
+          "db": "all",
+          "user": "all",
+          "addr": "127.0.0.1/32",
+          "method": "md5"
+        },
+        {
+          "type": "host",
+          "db": "all",
+          "user": "all",
+          "addr": "::1/128",
+          "method": "md5"
+        }
+      ]
+    }
+  },
+  "run_list": [
+    "recipe[chef-client::config]",
+    "recipe[rails::secrets]",
+    "recipe[rails::swap]",
+    "recipe[rails::repos]",
+    "recipe[build-essential]",
+    "recipe[rails::openssl]",
+    "recipe[rails::packages]",
+    "recipe[vsftpd]",
+    "recipe[rails::users]",
+    "recipe[git]",
+    "recipe[timezone-ii]",
+    "recipe[locale]",
+    "recipe[iptables]",
+    "recipe[rails::iptables]",
+    "recipe[rails::openssh]",
+    "recipe[openssh]",
+    "recipe[openssh::iptables]",
+    "recipe[sudo]",
+    "recipe[python]",
+    "recipe[rails::python]",
+    "recipe[fail2ban]",
+    "recipe[vim]",
+    "recipe[curl]",
+    "recipe[rsync]",
+    "recipe[msmtp]",
+    "recipe[msmtp::no_postfix]",
+    "recipe[msmtp::sasl]",
+    "recipe[packages]",
+    "recipe[nginx::repo]",
+    "recipe[nginx]",
+    "recipe[duplicity_ng::package]",
+    "recipe[duplicity_ng::install_boto]",
+    "recipe[memcached]"
+  ]
+}

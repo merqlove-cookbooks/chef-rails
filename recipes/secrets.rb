@@ -17,34 +17,8 @@
 # limitations under the License.
 #
 
-if Gem.const_defined?('Version') && Gem::Version.new(Chef::VERSION) < Gem::Version.new('10.12.0')
-  gem_package 'chef-vault' do
-    action :nothing
-  end.run_action(:install)
-  Gem.clear_paths
-else
-  chef_gem 'chef-vault' do
-    action :nothing
-  end.run_action(:install)
-end
+::Chef::Recipe.send(:include, Rails::Helpers)
 
-ruby_block 'secrets' do
-  block do
-    require 'rubygems'
-    require 'chef-vault'
-    if Class.const_defined? 'ChefVault'
-      Chef::DataBag.load('secrets').each do |item|
-        next unless item[0] == node['rails']['secrets']['key']
+rails_secrets "init" unless vagrant?
 
-        key = ChefVault::Item.load('secrets', item[0])
-        s   = Chef::Resource::File.new(node['rails']['secrets']['default'], run_context)
-        s.content key['file-content']
-        s.owner   'root'
-        s.group   'root'
-        s.mode    00600
-        s.run_action(:create)
-      end
-    end
-  end
-  action :nothing
-end.run_action(:create)
+include_recipe 'selinux::disabled' if rhel5x?

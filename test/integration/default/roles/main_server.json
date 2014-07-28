@@ -1,0 +1,227 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "name": "main_server",
+  "description": "",
+  "default_attributes": {
+    "nginx": {
+      "client_header_timeout": 240,
+      "client_body_timeout": 240,
+      "fastcgi_read_timeout": 240,
+      "client_max_body_size": "32m"
+    },
+    "vsftpd": {
+      "enabled": true,
+      "allowed": [
+
+      ],
+      "config": {
+        "listen": "YES",
+        "session_support": "NO",
+        "local_umask": "027",
+        "chown_uploads": "YES",
+        "chmod_enable": "YES",
+        "dirmessage_enable": "YES",
+        "anonymous_enable": "NO",
+        "guest_enable": "YES",
+        "local_enable": "YES",
+        "chroot_local_user": "YES",
+        "write_enable": "YES",
+        "pam_service_name": "vsftpd_virtual",
+        "local_root": "/srv/sites/$USER",
+        "user_sub_token": "$USER",
+        "virtual_use_local_privs": "YES",
+        "hide_ids": "YES",
+        "user_config_dir": "/etc/vsftpd/users.d",
+        "ascii_upload_enable": "YES",
+        "ascii_download_enable": "YES",
+        "ftpd_banner": "Welcome to MRCR",
+        "use_localtime": "YES"
+      }
+    },
+    "php-fpm": {
+      "listen_mode": "0777",
+      "listen_owner": "nginx",
+      "listen_group": "nginx",
+      "emergency_restart_threshold": 10,
+      "emergency_restart_interval": "1m",
+      "process_control_timeout": "1s",
+      "log_level": "debug",
+      "upload_max_filesize": "16M",
+      "post_max_size": "16M"
+    },
+    "msmtp": {
+      "host": "smtp.gmail.com",
+      "port": "587",
+      "domain": "mrcr.ru",
+      "username": "noreply@mrcr.ru",
+      "from": "noreply@mrcr.ru",
+      "password": "12345678",
+      "default": true
+    },
+    "rails": {
+      "swap": {
+        "enable": true,
+        "size": 512
+      },
+      "duplicity": {
+        "db": [
+          "mysql"
+        ]
+      },
+      "sites": {
+        "www_mrcr_ru": {
+          "backup": true,
+          "enable": true,
+          "name": "www_mrcr_ru",
+          "user": "merkulov",
+          "php": {
+            "modules": [
+              "php-mysql",
+              "php-memcached"
+            ],
+            "pool": {
+              "allowed_clients": "127.0.0.1",
+              "process_manager": "dynamic",
+              "max_children": 4,
+              "start_servers": 2,
+              "min_spare_servers": 1,
+              "max_spare_servers": 3,
+              "max_requests": 200,
+              "catch_workers_output": "yes",
+              "php_options": {
+                "request_slowlog_timeout": "5s",
+                "listen.backlog": "-1",
+                "rlimit_files": "131072",
+                "rlimit_core": "unlimited",
+                "php_admin_value[error_reporting]": 1
+              }
+            }
+          },
+          "smtp": {
+            "host": "smtp.gmail.com",
+            "port": "587",
+            "domain": "mrcr.ru",
+            "username": "noreply@mrcr.ru",
+            "from": "noreply@mrcr.ru",
+            "password": "12345678"
+          },
+          "nginx": {
+            "vagrant_server_name": "mrcr",
+            "access_log": false,
+            "error_log": true,
+            "default": false,
+            "deferred": false,
+            "disable_www": true,
+            "admin": false,
+            "server_name": [
+              "mrcr.ru"
+            ],
+            "php_rewrites": [
+              {
+                "ext": "html"
+              },
+              {
+                "location": "/admin/"
+              }
+            ],
+            "rewrites": [
+              {
+                "query": "/admin$",
+                "uri": "$scheme://$host$uri/",
+                "options": "permanent"
+              }
+            ]
+          },
+          "db": [
+            {
+              "type": "mysql",
+              "name": "mrcr_db",
+              "user": "mrcr",
+              "password": "12345678"
+            }
+          ]
+        },
+          "test_mrcr_ru": {
+              "backup": true,
+              "delete": false,
+              "name": "test_mrcr_ru",
+              "user": "merkulov",
+              "php": {
+                  "modules": [
+                      "php-mysql",
+                      "php-memcached"
+                  ],
+                  "pool": {
+                      "allowed_clients": "127.0.0.1",
+                      "process_manager": "dynamic",
+                      "max_children": 4,
+                      "start_servers": 2,
+                      "min_spare_servers": 1,
+                      "max_spare_servers": 3,
+                      "max_requests": 200,
+                      "catch_workers_output": "yes",
+                      "php_options": {
+                          "request_slowlog_timeout": "5s",
+                          "listen.backlog": "-1",
+                          "rlimit_files": "131072",
+                          "rlimit_core": "unlimited",
+                          "php_admin_value[error_reporting]": 1
+                      }
+                  }
+              },
+              "smtp": {
+                  "host": "smtp.gmail.com",
+                  "port": "587",
+                  "domain": "mrcr.ru",
+                  "username": "noreply@mrcr.ru",
+                  "from": "noreply@mrcr.ru",
+                  "password": "12345678"
+              },
+              "nginx": {
+                  "vagrant_server_name": "mrcr",
+                  "access_log": false,
+                  "error_log": true,
+                  "default": false,
+                  "deferred": false,
+                  "disable_www": true,
+                  "admin": false,
+                  "server_name": [
+                      "test.mrcr.ru"
+                  ],
+                  "php_rewrites": [
+                      {
+                          "ext": "html"
+                      },
+                      {
+                          "location": "/admin/"
+                      }
+                  ],
+                  "rewrites": [
+                      {
+                          "query": "/admin$",
+                          "uri": "$scheme://$host$uri/",
+                          "options": "permanent"
+                      }
+                  ]
+              },
+              "db": [
+                  {
+                      "type": "mysql",
+                      "name": "mrcr_test_db",
+                      "user": "mrcr_test",
+                      "password": "123456789"
+                  }
+              ]
+          }
+      }
+    }
+  },
+  "run_list": [
+    "role[mysql_512m_1e]",
+    "role[base]",
+    "recipe[rails]",
+    "recipe[vsftpd::_pam_virtual]",
+    "recipe[vsftpd::_user_configure]"
+  ]
+}

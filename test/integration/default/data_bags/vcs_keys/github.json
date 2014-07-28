@@ -1,0 +1,21 @@
+{
+  "id": "github",
+  "host": {
+    "encrypted_data": "ufw+B3sQeRlxghn6303ragc6Dbgnr08S/yCmp281pcc=\n",
+    "iv": "eLvHkI81FEk9J6xJHBiMJg==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "file-name": {
+    "encrypted_data": "yGkWR5PREnrsxExohi1bit8Xzj6XjOJRBuoiX5Cn/V8=\n",
+    "iv": "Y6Bv3A+VnVZ2Er4YugoSew==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "file-content": {
+    "encrypted_data": "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\n29U+R9YWEC4w/298TdaNbMmz\n",
+    "iv": "ObcvQUfyZzQEU6VZZAozGQ==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  }
+}

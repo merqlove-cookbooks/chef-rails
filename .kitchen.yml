@@ -1,6 +1,9 @@
 ---
 driver:
   name: vagrant
+  network:
+  - ["forwarded_port", {guest: 80, host: 8080, guest: 28017, host: 28018}]
+  - ["private_network", {ip: "192.168.33.33"}]
 
 provisioner:
   name: chef_zero
@@ -10,6 +13,10 @@ provisioner:
 platforms:
 - name: centos-6.5
   run_list:
+- name: centos-5.10
+  run_list:
+- name: ubuntu-12.04
+  run_list:
 
 suites:
 - name: php
@@ -17,79 +24,27 @@ suites:
   roles_path: "test/integration/default/roles"
   encrypted_data_bag_secret_key_path: "test/integration/default/encrypted_data_bag_secret"
   run_list:
-    - role[vagrant]
+    - recipe[minitest-handler]
+    - role[kitchen]
     - role[main_server]
     - recipe[rails::vagrant]
   attributes:
     tags:
       - php
       - mysql
-      - server_merqlove
       - vagrant
-#
-#---
-#driver:
-#  name: vagrant
-#
-#provisioner:
-#  name: chef_zero
-#
-#platforms:
-#- name: centos-6.5
-#  run_list: recipe[yum-epel]
-#- name: centos-5.9
-#  run_list: recipe[yum-epel]
-#- name: ubuntu-14.04
-#  run_list: recipe[apt]
-#- name: ubuntu-13.10
-#  run_list: recipe[apt]
-#- name: ubuntu-12.04
-#  run_list: recipe[apt]
-#- name: debian-7.2.0
-#  run_list: recipe[apt]
-#
-#suites:
-#  - name: install_package
-#    run_list:
-#    - recipe[minitest-handler]
-#    - recipe[duplicity_ng::install]
-#
-#  - name: install_source
-#    run_list:
-#    - recipe[minitest-handler]
-#    - recipe[duplicity_ng::install]
-#    attributes:
-#      duplicity_ng:
-#        install_method: source
-#        path: /usr/bin/duplicity
-#        source:
-#          use_pip: false
-#
-#  - name: install_source_pip
-#    run_list:
-#    - recipe[minitest-handler]
-#    - recipe[python::pip]
-#    - recipe[duplicity_ng::install]
-#    attributes:
-#      duplicity_ng:
-#        install_method: source
-#        path: /usr/bin/duplicity
-#        source:
-#          use_pip: true
-#
-#  - name: install_source_pip_python
-#    run_list:
-#    - recipe[minitest-handler]
-#    - recipe[build-essential]
-#    - recipe[python]
-#    - recipe[duplicity_ng::install]
-#    attributes:
-#      build-essential:
-#        compile_time: true
-#      python:
-#        install_method: source
-#      duplicity_ng:
-#        install_method: source
-#        path: /usr/local/bin/duplicity
-#        source:
-#          use_pip: true
+
+- name: ror
+  data_bags_path: "test/integration/default/data_bags"
+  roles_path: "test/integration/default/roles"
+  encrypted_data_bag_secret_key_path: "test/integration/default/encrypted_data_bag_secret"
+  run_list:
+    - recipe[minitest-handler]
+    - role[kitchen]
+    - role[app1_node]
+    - recipe[rails::vagrant]
+  attributes:
+    tags:
+      - ror
+      - postgresql
+      - vagrant

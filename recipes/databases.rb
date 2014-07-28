@@ -81,7 +81,8 @@ if Dir.exist? db_backup_root
       action :nothing
     end
 
-    rails_backup "#{db}_db_delete" do
+    rails_backup "delete #{db}_db_backup" do
+      name "#{db}_db_backup"
       action :delete
       not_if { node['rails']['duplicity']['db'].include? db }
       notifies :create, "ruby_block[#{db}_db_delete]"

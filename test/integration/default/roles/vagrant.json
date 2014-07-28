@@ -1,0 +1,40 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "name": "vagrant",
+  "description": "",
+  "default_attributes": {
+    "rails": {
+      "ports": [
+        1234,
+        2222
+      ]
+    },
+    "authorization": {
+      "sudo": {
+        "groups": [
+          "vagrant"
+        ]
+      }
+    },
+    "rbenv": {
+      "group_users": [
+        "vagrant"
+      ]
+    },
+    "vagrant": {
+      "fqdn": "rails.dev"
+    }
+  },
+  "override_attributes": {
+    "authorization": {
+      "sudo": {
+        "passwordless": true
+      }
+    }
+  },
+  "run_list": [
+    "recipe[vagrant-ohai]",
+    "recipe[rails::vcs_keys]"
+  ]
+}

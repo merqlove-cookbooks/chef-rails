@@ -63,6 +63,10 @@ def create_mysql_dbs(secret, date)
   }
 
   node['rails']['databases']['mysql'].each do |_k, d|
+    backup_mysql_db(d, date, root['password'])
+
+    next if d['app_delete']
+
     rails_db_yml        "#{d['name']}_mysql" do
       database_name     d['name']
       database_user     d['user']
@@ -75,8 +79,6 @@ def create_mysql_dbs(secret, date)
       group             d['app_user']
       action            :create
     end
-
-    backup_mysql_db(d, date, root['password'])
 
     mysql_database_user d['user'] do
       connection mysql_connection_info
@@ -103,6 +105,54 @@ def create_mysql_dbs(secret, date)
   create_mysql_admin(secret, root)
 end
 
+def install_mysql
+  run_context.include_recipe 'mysql::client'
+
+  run_context.include_recipe 'mysql::server'
+
+  service node['rails']['mysqld']['service_name'] do
+    supports status: true, restart: true, reload: true, start: true, stop: true
+    action :nothing
+  end
+
+  tune_mysql
+
+  run_context.include_recipe 'database::mysql'
+
+  if php?
+    case node['platform_family']
+    when 'rhel'
+      package 'php-mysqlnd'
+    when 'ubuntu'
+      package 'php5-mysqlnd'
+    end
+  end
+end
+
+def tune_mysql
+  ruby_block "cleanup_innodb_logfiles" do
+    block do
+      ::Dir.glob("#{node['mysql']['data_dir']}/ib*").each do |f|
+        next if f == '.' || f == '..' || ::File.directory?(f)
+        ::File.delete(f) if f.include?('ib_logfile') || f.include?('ibdata')
+      end
+    end
+    action :nothing
+    notifies :start, "service[#{node['rails']['mysqld']['service_name']}]", :immediately
+  end
+
+  template "#{node['rails']['mysqld']['include_dir']}/tune.cnf" do
+    owner    'mysql'
+    owner    'mysql'
+    source   'mysql_tune.cnf.erb'
+    variables(
+        config: node['rails']['mysql']
+    )
+    notifies :stop, "service[#{node['rails']['mysqld']['service_name']}]", :immediately
+    notifies :run, "ruby_block[cleanup_innodb_logfiles]", :immediately
+  end
+end
+
 def create_mysql_admin(secret, root)
   return unless secret && root
   mysql = data_bag('mysql')
@@ -121,47 +171,6 @@ def create_mysql_admin(secret, root)
       password   u['password']
       action     [:create, :grant]
     end
-  end
-end
-
-def install_mysql
-  run_context.include_recipe 'mysql::client'
-
-  run_context.include_recipe 'mysql::server'
-
-  service 'mysqld' do
-    supports status: true, restart: true, reload: true, start: true, stop: true
-    action :nothing
-  end
-
-  tune_mysql
-
-  run_context.include_recipe 'database::mysql'
-
-  package 'php-mysqlnd' if ::FileTest.exist?('/usr/bin/php')
-end
-
-def tune_mysql
-  ruby_block "cleanup_innodb_logfiles" do
-    block do
-      ::Dir.glob("#{node['mysql']['data_dir']}/ib*").each do |f|
-        next if f == '.' || f == '..' || ::File.directory?(f)
-        ::File.delete(f) if f.include?('ib_logfile') || f.include?('ibdata')
-      end
-    end
-    action :nothing
-    notifies :start, "service[mysqld]", :immediately
-  end
-
-  template '/etc/mysql/conf.d/tune.cnf' do
-    owner    'mysql'
-    owner    'mysql'
-    source   'mysql_tune.cnf.erb'
-    variables(
-        config: node['rails']['mysql']
-    )
-    notifies :stop, "service[mysqld]", :immediately
-    notifies :run, "ruby_block[cleanup_innodb_logfiles]", :immediately
   end
 end
 
@@ -184,7 +193,8 @@ def backup_mysql_db(d, date, password)
       temp_dir    d['app_backup_temp']
     end
   else
-    rails_backup "mysql_db_#{d['app_name']} delete" do
+    rails_backup "delete mysql_db_#{d['app_name']}" do
+      name "mysql_db_#{d['app_name']}"
       action :delete
     end
     ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
@@ -193,8 +203,8 @@ def backup_mysql_db(d, date, password)
 end
 
 def stop_mysql
-  mysql_init = ::File.join('/etc/init.d', 'mysqld')
-  service 'mysqld' do
+  mysql_init = ::File.join('/etc/init.d', node['rails']['mysqld']['service_name'])
+  service node['rails']['mysqld']['service_name'] do
     action [:stop, :disable]
     only_if { ::FileTest.file? mysql_init }
   end
@@ -225,6 +235,10 @@ def create_postgresql_dbs(secret, date)
   }
 
   node['rails']['databases']['postgresql'].each do |_k, d|
+    backup_postgresql_db(d, date)
+
+    next if d['app_delete']
+
     rails_db_yml        "#{d['name']}_postgresql" do
       database_name     d['name']
       database_user     d['user']
@@ -238,8 +252,6 @@ def create_postgresql_dbs(secret, date)
       group             d['app_user']
       action            :create
     end
-
-    backup_postgresql_db(d, date)
 
     postgresql_database_user d['user'] do
       connection postgresql_connection_info
@@ -295,9 +307,23 @@ def create_postgresql_admin(secret, postgres)
 end
 
 def install_postgresql
-  run_context.include_recipe 'postgresql::server'
+  case node['platform_family']
+  when 'debian'
+    node.default['postgresql']['enable_pgdg_apt'] = true
+  when 'rhel', 'fedora', 'suse'
+    node.default['postgresql']['enable_pgdg_yum'] = true
+  end
 
-  package 'php-postgresql' if ::FileTest.exist?('/usr/bin/php')
+  run_context.include_recipe 'postgresql::contrib'
+
+  if php?
+    case node['platform_family']
+    when 'rhel'
+      package 'php-postgresql'
+    when 'debian'
+      package 'php5-pgsql'
+    end
+  end
 
   run_context.include_recipe 'postgresql::config_initdb'
   run_context.include_recipe 'postgresql::config_pgtune'
@@ -326,7 +352,8 @@ def backup_postgresql_db(d, date)
       temp_dir    d['app_backup_temp']
     end
   else
-    rails_backup "pg_db_#{d['app_name']} delete" do
+    rails_backup "delete pg_db_#{d['app_name']}" do
+      name "pg_db_#{d['app_name']}"
       action :delete
     end
     ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
@@ -345,35 +372,39 @@ end
 def create_mongodb_dbs(secret, date)
   admin = ::Chef::EncryptedDataBagItem.load('mongodb', 'admin', secret)
   run_context.include_recipe 'mongodb::default'
+  node.default['mongodb']['config']['auth'] = true if node['rails']['mongodb']['auth']
 
-  auth = template node['mongodb']['dbconfig_file'] do
-    cookbook node['mongodb']['template_cookbook']
-    source   node['mongodb']['dbconfig_file_template']
-    group    node['mongodb']['root_group']
-    owner    'root'
-    mode     00644
-    variables(
-        'auth' => true
-    )
-    action   :nothing
-    notifies :restart, "service[#{node['mongodb']['instance_name']}]"
-  end
-  execute 'create-mongodb-root-user' do
-    command  "mongo admin --eval 'db.addUser(\"#{admin['id']}\",\"#{admin['password']}\")'"
-    action   :run
-    not_if   "mongo admin --eval 'db.auth(\"#{admin['id']}\",\"#{admin['password']}\")' | grep -q ^1$"
-    notifies :create, auth, :immediately
+  chef_gem 'mongo'
+
+  mongodb_user admin['id'] do
+    password   admin['password']
+    roles      %w(userAdminAnyDatabase dbAdminAnyDatabase)
+    database   'admin'
+    connection node['mongodb']
+    action     :add
+    notifies   :restart, "service[#{node['mongodb']['instance_name']}]", :delayed
   end
 
-  package 'php-pecl-mongo' if FileTest.exist?('/usr/bin/php')
+  if php?
+    case node['platform_family']
+      when 'rhel'
+        package 'php-pecl-mongo'
+      when 'debian'
+        package 'php5-mongo'
+    end
+  end
 
   node['rails']['databases']['mongodb'].each do |_k, d|
+    backup_mongodb_db(d, date)
+
+    next if d['app_delete']
+
     rails_db_yml "#{d['name']}_mongodb" do
       database_name     d['name']
       database_user     d['user']
       database_password d['password']
       type              'mongodb'
-      port              node['mongodb']['config']['port']
+      port              node['mongodb']['config']['port'].to_s
       host              node['mongodb']['config']['bind_ip']
       path              d['app_path']
       owner             d['app_user']
@@ -381,12 +412,12 @@ def create_mongodb_dbs(secret, date)
       action            :create
     end
 
-    backup_mongodb_db(d, date)
-
-    execute "mongodb_#{d['name']}" do
-      command "mongo admin -u #{admin['id']} -p #{admin['password']} --eval '#{d['name']}=db.getSiblingDB(\"#{d['name']}\"); #{d['name']}.addUser(\"#{d['user']}\",\"#{d['password']}\")'"
-      action  :run
-      not_if  "mongo #{d['name']} --eval 'db.auth(\"#{d['user']}\",\"#{d['password']}\")' | grep -q ^1$"
+    mongodb_user d['user'] do
+      password   d['password']
+      database   d['name']
+      roles      %w(readWrite)
+      connection node['mongodb']
+      action     :add
     end
   end
 
@@ -400,10 +431,13 @@ def create_mongodb_admin(secret, admin)
 
   (mongo - ['admin']).each do |m|
     u = Chef::EncryptedDataBagItem.load('mongodb', m, secret)
-    execute 'create-mongodb-admin-user' do
-      command "mongo admin -u #{admin['id']} -p #{admin['password']} --eval 'db.addUser(\"#{u['id']}\",\"#{u['password']}\")'"
-      action :run
-      not_if "mongo admin --eval 'db.auth(\"#{u['id']}\",\"#{u['password']}\")' | grep -q ^1$"
+
+    mongodb_user u['id'] do
+      password   u['password']
+      roles      %w(userAdminAnyDatabase dbAdminAnyDatabase)
+      database   'admin'
+      connection node['mongodb']
+      action     :add
     end
   end
 end
@@ -429,7 +463,8 @@ def backup_mongodb_db(d, date)
       temp_dir    d['app_backup_temp']
     end
   else
-    rails_backup "mongo_db_#{d['app_name']} delete" do
+    rails_backup "delete mongo_db_#{d['app_name']}" do
+      name "mongo_db_#{d['app_name']}"
       action :delete
     end
     ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting

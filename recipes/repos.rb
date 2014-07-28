@@ -17,13 +17,24 @@
 # limitations under the License.
 #
 
-yum_repository "remi" do
-  description "Les RPM de remi pour Enterprise Linux #{node['platform_version']} - $basearch"
-  mirrorlist  "http://rpms.famillecollet.com/enterprise/#{node['platform_version'].to_i}/remi/mirror"
-  enabled     true
-  exclude     node['yum']['remi']['exclude']
-  gpgcheck    true
-  gpgkey      "http://rpms.famillecollet.com/RPM-GPG-KEY-remi"
+::Chef::Recipe.send(:include, Rails::Helpers)
 
-  action      :create
+if rhel?
+  include_recipe 'yum-epel::default'
+
+  exclude = node['yum']['remi']['exclude'].to_s
+  exclude << " curl*" if rhel5x?
+
+  yum_repository "remi" do
+    description "Les RPM de remi pour Enterprise Linux #{node['platform_version']} - $basearch"
+    mirrorlist  "http://rpms.famillecollet.com/enterprise/#{node['platform_version'].to_i}/remi/mirror"
+    enabled     true
+    exclude     exclude
+    gpgcheck    true
+    gpgkey      'http://rpms.famillecollet.com/RPM-GPG-KEY-remi'
+
+    action      :create
+  end
+elsif platform_family?('debian')
+  include_recipe 'apt::default'
 end

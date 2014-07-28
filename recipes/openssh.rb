@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: default
+# Recipe:: openssh
 #
 # Copyright (C) 2013 Alexander Merkulov
 #
@@ -15,26 +15,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-service 'memcached' do
-  action [:enable, :start]
-  only_if { node['recipes'].include?('memcached::default') }
+case node['platform_family']
+when 'debian'
+  node.default['openssh']['server']['subsystem'] = 'sftp /usr/lib/openssh/sftp-server'
+when 'rhel'
+  if node['platform_version'].to_i > 5
+    package 'authconfig'
+    execute 'ssh_fix' do
+      command 'authconfig --disablefingerprint --update'
+      user    'root'
+      group   'root'
+    end
+  end
 end
-
-directory node['rails']['apps_base_path'] do
-  mode      00755
-  owner     node['rails']['user']['deploy']
-  group     node['rails']['user']['deploy']
-  action    :create
-  recursive true
-end
-
-directory node['rails']['sites_base_path'] do
-  mode      00755
-  owner     node['rails']['user']['deploy']
-  group     node['rails']['user']['deploy']
-  action    :create
-  recursive true
-end
-
-include_recipe 'rails::apps'

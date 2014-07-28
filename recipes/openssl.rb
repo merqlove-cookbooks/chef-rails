@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Recipe:: sqlite_dev
+# Recipe:: openssl
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2014 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@
 #
 
 case node['platform_family']
-when 'rhel'
-  package 'sqlite-devel' do
-    action :upgrade
-  end
 when 'debian'
-  package 'sqlite-dev' do
-    action :upgrade
-  end
+  include_recipe 'openssl::upgrade'
+when 'rhel'
+  include_recipe 'openssl-fips'
 end

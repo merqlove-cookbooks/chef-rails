@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Recipe:: sqlite_dev
+# Provider:: python
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2014 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
 # limitations under the License.
 #
 
-case node['platform_family']
-when 'rhel'
-  package 'sqlite-devel' do
-    action :upgrade
+action :create do
+  link "#{node['python']['prefix_dir']}/local/bin/python" do
+    to node['python']['binary']
+    only_if { ::File.exist?(node['python']['binary']) }
   end
-when 'debian'
-  package 'sqlite-dev' do
-    action :upgrade
-  end
+
+  new_resource.updated_by_last_action(true)
 end

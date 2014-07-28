@@ -1,0 +1,14 @@
+{
+  "chef_type": "node",
+  "json_class": "Chef::Node",
+  "name": "a1.mrcr.ru",
+  "normal": {
+    "tags": [
+      "ror",
+      "server_merqlove"
+    ]
+  },
+  "run_list": [
+    "role[app1_node]"
+  ]
+}

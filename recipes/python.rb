@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: default
+# Recipe:: python
 #
 # Copyright (C) 2013 Alexander Merkulov
 #
@@ -15,26 +15,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-service 'memcached' do
-  action [:enable, :start]
-  only_if { node['recipes'].include?('memcached::default') }
-end
+::Chef::Recipe.send(:include, Rails::Helpers)
 
-directory node['rails']['apps_base_path'] do
-  mode      00755
-  owner     node['rails']['user']['deploy']
-  group     node['rails']['user']['deploy']
-  action    :create
-  recursive true
-end
-
-directory node['rails']['sites_base_path'] do
-  mode      00755
-  owner     node['rails']['user']['deploy']
-  group     node['rails']['user']['deploy']
-  action    :create
-  recursive true
-end
-
-include_recipe 'rails::apps'
+rails_python "set alter as main python" if rhel5x?

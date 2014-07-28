@@ -1,0 +1,15 @@
+{
+  "id": "main",
+  "access_key_id": {
+    "encrypted_data": "DGn6a294mjKulf72Qx86nDR2dAMCMlyWYUN5Pth3nAE=\n",
+    "iv": "mGX8ZkxEA37DkjuCifqXog==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "secret_access_key": {
+    "encrypted_data": "zBnESCTrx0dE0203HDgCAb4xH+cziSsvr8QL9p5SeXJ+b4BXgQ5MJQbvoaEy\nF4Ie\n",
+    "iv": "wqZGQtvJEe8w1FqIfv7XMw==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  }
+}

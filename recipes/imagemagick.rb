@@ -17,10 +17,13 @@
 # limitations under the License.
 #
 
-imagemagick_package = 'imagemagick'
-imagemagick_package = 'ImageMagick-last' if platform_family?('rhel')
-
-package 'imagemagick' do
-  package_name imagemagick_package
-  action       :install
+case node['platform_family']
+when 'rhel'
+  package 'ImageMagick-last' do
+    action :upgrade
+  end
+when 'debian'
+  package 'imagemagick' do
+    action :upgrade
+  end
 end

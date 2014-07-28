@@ -1,8 +1,8 @@
-#
+
 # Cookbook Name:: rails
-# Recipe:: centos_ssh
+# Resource:: secrets
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2014 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,9 @@
 # limitations under the License.
 #
 
-if platform_family?('rhel') && node['platform_version'].to_i > 5
-  package 'authconfig'
-  execute 'ssh_fix' do
-    command 'authconfig --disablefingerprint --update'
-    user    'root'
-    group   'root'
-  end
-end
+actions :create
+
+default_action :create
+
+attribute :name, name_attribute: true, kind_of: String
+attribute :cookbook, kind_of: String, default: 'rails'

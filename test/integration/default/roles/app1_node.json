@@ -1,0 +1,57 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "name": "app1_node",
+  "description": "",
+  "default_attributes": {
+    "nginx": {
+      "default_site_enabled": true
+    },
+    "rails": {
+      "swap": {
+        "enable": true,
+        "size": 512
+      },
+      "duplicity": {
+        "db": [
+          "postgresql"
+        ]
+      },
+      "apps": {
+        "www_christ_leather_ru": {
+          "backup": true,
+          "db": [
+            {
+              "type": "postgresql",
+              "name": "christ_db",
+              "user": "christ",
+              "password": "12345678",
+              "pool": 8
+            }
+          ],
+          "name": "www_christ_leather_ru",
+          "user": "merkulov",
+          "folders": [
+
+          ],
+          "rbenv": {
+            "version": "2.1.2",
+            "gems": [
+              {
+                "name": "bundler"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "run_list": [
+    "role[base]",
+    "role[base_ruby]",
+    "recipe[rails]",
+    "recipe[vsftpd::_pam_virtual]",
+    "recipe[vsftpd::_user_configure]",
+    "role[newrelic]"
+  ]
+}

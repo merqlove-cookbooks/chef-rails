@@ -1,0 +1,15 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "name": "newrelic",
+  "description": "",
+  "default_attributes": {
+    "newrelic": {
+      "server_monitoring": {
+        "license": "tjfhgfhgjfjhgfgjhfjhgghjfghrerttred65565"
+      }
+    }
+  },
+  "run_list": [
+  ]
+}

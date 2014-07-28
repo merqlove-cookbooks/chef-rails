@@ -1,0 +1,20 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "name": "kitchen",
+  "description": "",
+  "default_attributes": {},
+  "override_attributes": {
+    "rails": {
+      "secrets": {
+          "default": "/tmp/kitchen/encrypted_data_bag_secret"
+      }
+    },
+    "vagrant": {
+      "fqdn": "rails.dev"
+    }
+  },
+  "run_list": [
+    "role[vagrant]"
+  ]
+}

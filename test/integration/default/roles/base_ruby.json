@@ -1,0 +1,21 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "name": "base_ruby",
+  "description": "Base Ruby servers configuration",
+  "default_attributes": {
+    "rbenv": {
+      "group_users": [
+        "root"
+      ]
+    }
+  },
+  "run_list": [
+    "recipe[rails::nodejs]",
+    "recipe[nodejs::default]",
+    "recipe[rails::npm]",
+    "recipe[rails::imagemagick]",
+    "recipe[rbenv::default]",
+    "recipe[rbenv::ruby_build]"
+  ]
+}

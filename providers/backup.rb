@@ -25,6 +25,7 @@ action :create do
   else
     return
   end
+
   duplicity = data_bag('duplicity')
   pass_key_id = new_resource.pass_key_id
   storage_key_id = new_resource.storage_key_id
@@ -36,7 +37,8 @@ action :create do
 end
 
 action :delete do
-  duplicity_ng_cronjob "backup #{new_resource.name}" do
+  duplicity_ng_cronjob "delete backup #{new_resource.name}" do
+    name new_resource.name
     action :delete
   end
 
@@ -61,10 +63,10 @@ def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/Cy
     return
   end
 
-  use_config(new_resource, pass_key_id, store) if store['access_key_id'] && store['secret_access_key']
+  use_config(new_resource, pass_key_id, store, default_secret) if store['access_key_id'] && store['secret_access_key']
 end
 
-def use_config(new_resource, pass_key_id, store)
+def use_config(new_resource, pass_key_id, store, default_secret)
   return unless store
 
   boto = new_resource.boto_cfg

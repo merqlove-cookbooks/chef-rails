@@ -1,0 +1,15 @@
+{
+  "id": "admin",
+  "password": {
+    "encrypted_data": "nFXzc7GjXlRKPaalpimPKIi9zx73HLtz3qpHFED5ckk=\n",
+    "iv": "dEtUq9Nc6N8EiKO+xYtCSg==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "admin": {
+    "encrypted_data": "yC+YqwJWbi54aE8PluBtGPY3q1nG1VsxA5SACEZ7hXg=\n",
+    "iv": "rbJ/O+rJ6am67MHjcK1rUA==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  }
+}

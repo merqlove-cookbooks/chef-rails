@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Recipe:: sqlite_dev
+# Resource:: php_fpm
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2014 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,13 +17,10 @@
 # limitations under the License.
 #
 
-case node['platform_family']
-when 'rhel'
-  package 'sqlite-devel' do
-    action :upgrade
-  end
-when 'debian'
-  package 'sqlite-dev' do
-    action :upgrade
-  end
-end
+actions :create
+
+default_action :create
+
+attribute :name, name_attribute: true, kind_of: String
+attribute :cookbook, kind_of: String, default: 'rails' # Cookbook to find template
+attribute :template, kind_of: String, default: 'database.yml.erb' # Template to use.

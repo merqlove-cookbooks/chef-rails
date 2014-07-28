@@ -1,0 +1,39 @@
+{
+  "id": "deploy",
+  "groups": {
+    "encrypted_data": "TYLcCVnzcA44Du0uU5e3RRjup09Pr4Vs79APc1UWoYA=\n",
+    "iv": "GbXdHdxMlHlg82Mec3GMuw==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "shell": {
+    "encrypted_data": "CzG9Ma3xgymLZ/XrRu3L7M1WcVLKa2FP1TTCTM/eQbA=\n",
+    "iv": "r+hMx9lgQrIvgp3pMOOBnw==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "password": {
+    "encrypted_data": "SYO+aPUMzgPdDKeXB/JGsQSeWBSGA0BYCuY5KXiXGEQ=\n",
+    "iv": "kez5plt8kYLnBVV26Kdd4Q==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "comment": {
+    "encrypted_data": "obkIazeE0FFC7KFtuJkldrXd/pfkK/J/WX2vyQ//tLc=\n",
+    "iv": "UqR5ZDuJgq3rW6Ag6kFb8A==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "vcs": {
+    "encrypted_data": "Bnn/uGTOS9MTyDQ46JkUutzRKXChI9QFc5LE3eoFWfw=\n",
+    "iv": "a4l6WU4S70zOXaG8xwH0uA==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "ssh-keys": {
+    "encrypted_data": "a1nJ4neqQVNPwwk+nKjcBSRp1WgLiD8ZoyKLblJEH/sDBTaD3EgWVK+zlRGH\nzbC9i1dIOr/doEF2PC+SNAn691P89VragtLKzcMwC+WW8b93VtNrjWvEEI2u\n2rjhUIcPxBEF36DwGv/+BlUf53iOVFSh816Ko8fHzyO+z6Aj9OtGKY+cAdpZ\nRPjDXLxyoOf/uJ5LBipXFzaTjKbiCVRttEShFxiohSrPGd33ssWTWjn+bNh6\npf0ZBNWp44pq03htpsjjOws5CxLHUTCRaRLVJ/LLGg6jIUUeHQbxgcnPMG90\nystdsg4xtMOfDOV9ixHC+Td21i8dsfhtgWXF8ZADnYsSnn93TLnhH+BmFOwt\nZG02VeXm32GyysAd1hOcig0I4SDwCOOq+Jit2ElhIzmpBYYYAml8WbdC9eRx\nuGinqYpXzjIIS+9c/J5b/oMrngmPIfYl4BVCRJxHGjh152fhScNEGR3o9x/8\nw7LUJ32DxNvj9Y7EGi85fi77iNQmDN2CRUmXkebjni9ltCgEApSWrb0dM12m\nnm7ZXJ1kYBhsTv8OMtIeydfQqEoJX+L1NHySsrkFp20VVCHtL1N3Gi0/nBBS\nvy5YAzgabSU17I2Lo11GQGZA1WGmOw9zF1EER9Sn1FHL49t5O+tayfjY6S7G\nMxLcnC1fJoTbjD65dwaexd0h3AgSkloA71JjrwO+jAbIE5jjfBFy7p8Hq8sG\nC4z2yG0SdwW7QaPDyBQGr8d1ds75Vmuv3EHloWClARTT3g/s9NFjvVOO7/NQ\n+4Daqn9ExvzbQ1nKafQaYnxvWonXFFQ0i/Hu5yO+lLngnGGS0LIulzckhq2U\n0TH1L0EpXyFYy4LuVsKQGNlMRRyWWwJ9STIwOUTLI2MfbHP19vqWpObos7Rk\n+akH0Tn3ePf7XCZRs9R/sDSM/oesXo52q9v5p+AR53xhlj2W9efNO62JAcOU\nnq68RZSONGTJuLIdGXHzfqWSEjwNEiMrrRkVhtLUNeHXY5Eqv7ArwJvYCEl+\n8l8M\n",
+    "iv": "9gDbxsZJHgOc5sRoOoRn+g==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  }
+}

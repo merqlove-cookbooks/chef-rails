@@ -2,13 +2,13 @@ module Rails
   # include Chef::
   # Helpers for cookbook
   module Helpers
-    def self.hash_in_array?(other_array, value)
+    def hash_in_array?(other_array, value)
       other_array.each { |h| return true if h.is_a?(Hash) && h.value?(value) }
       false
     end
 
     def vagrant?
-      node.role? 'vagrant'
+      node.role?('vagrant') || node.role?('kitchen')
     end
 
     def database_type_exist?(type)
@@ -17,6 +17,55 @@ module Rails
 
     def php_fpm?
       node['php-fpm'] && node['php-fpm']['pools'].count > 0
+    end
+    #
+    # Determine if the current node using old RHEL.
+    #
+    # @return [Boolean]
+    #
+    def rhel5x?
+      major_version = node['platform_version'].split('.').first.to_i
+      platform_family?('rhel') && major_version < 6
+    end
+    #
+    # Determine if the current node using old RHEL.
+    #
+    # @return [Boolean]
+    #
+    def rhel?
+      platform_family?('rhel')
+    end
+    #
+    # Determine if the current node using old RHEL.
+    #
+    # @return [Boolean]
+    #
+    def debian?
+      platform_family?('debian')
+    end
+    #
+    # Determine if the current node using old RHEL.
+    #
+    # @return [Boolean]
+    #
+    def php?
+      ::FileTest.exist?('/usr/bin/php')
+    end
+    #
+    # Determine if the current node using old RHEL.
+    #
+    # @return [Boolean]
+    #
+    def ubuntu12x?
+      platform_family?('debian') && node['platform_version'][/^12/]
+    end
+    #
+    # Determine if the current node using old RHEL.
+    #
+    # @return [Boolean]
+    #
+    def ubuntu14x?
+      platform_family?('debian') && node['platform_version'][/^14/]
     end
   end
 end

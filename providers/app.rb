@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+::Chef::Provider.send(:include, Rails::Helpers)
+
 action :create do
   return unless new_resource.application
 
@@ -196,18 +198,27 @@ def install_nginx(a, app_path) # rubocop:disable Style/MethodLength
 end
 
 def install_php(a, app_path) # rubocop:disable Style/MethodLength
-  if node['platform_version'].to_f < 6
-    node.default['php']['packages'] = %w(php php-devel php-cli php-pear)
-  end
-
   if ::File.exist?('/usr/bin/php')
     run_context.include_recipe 'composer::self_update'
   else
-    run_context.include_recipe 'php'
-    package 'php-gd'
-    package 'php-pecl-memcached'
-    package 'php-pecl-apcu'
-    package 'php-mbstring'
+    case node['platform_family']
+    when 'debian'
+      apt_repository 'php' do
+        uri          'http://ppa.launchpad.net/ondrej/php5-oldstable/ubuntu'
+        distribution node['lsb']['codename']
+        components   ['main']
+        keyserver    'keyserver.ubuntu.com'
+        key          'E5267A6C'
+      end
+      run_context.include_recipe 'php'
+      php_ubuntu_packages
+    when 'rhel'
+      if node['platform_version'].to_f < 6
+        node.default['php']['packages'] = %w(php php-devel php-cli php-pear)
+      end
+      run_context.include_recipe 'php'
+      php_rhel_packages
+    end
     run_context.include_recipe 'composer'
   end
 
@@ -220,6 +231,19 @@ def install_php(a, app_path) # rubocop:disable Style/MethodLength
   end
 
   fill_php_config(a, app_path)
+end
+
+def php_ubuntu_packages
+  package 'php5-gd'
+  package 'php5-memcached'
+  package 'php-apc'
+end
+
+def php_rhel_packages
+  package 'php-gd'
+  package 'php-pecl-memcached'
+  package 'php-pecl-apcu'
+  package 'php-mbstring'
 end
 
 def init_smtp(a, app_path) # rubocop:disable Style/MethodLength
