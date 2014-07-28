@@ -24,6 +24,8 @@ action :create do
     store_keys = data_bag('aws')
   elsif gs?
     store_keys = data_bag('gs')
+  elsif swift?
+    store_keys = data_bag('swift')
   end
 
   if store_keys
@@ -61,18 +63,20 @@ def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/Cy
     store = Chef::EncryptedDataBagItem.load('aws', storage_key_id, default_secret)
   elsif gs?
     store = Chef::EncryptedDataBagItem.load('gs', storage_key_id, default_secret)
+  elsif swift?
+    store = Chef::EncryptedDataBagItem.load('swift', storage_key_id, default_secret)
   else
     return
   end
 
-  use_config(new_resource, pass_key_id, store, default_secret) if store['access_key_id'] && store['secret_access_key']
+  use_config(new_resource, pass_key_id, store, default_secret)
 end
 
 def use_config(new_resource, pass_key_id, store, default_secret)
   return unless store
 
   boto = new_resource.boto_cfg
-  boto_config(store) if boto && new_resource.main
+  boto_config(store) if boto && new_resource.main && !swift?
 
   duplicity = Chef::EncryptedDataBagItem.load('duplicity', pass_key_id, default_secret)
   cronjob_script new_resource, boto, duplicity if duplicity['passphrase']
@@ -93,7 +97,7 @@ def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/C
 
     # duplicity parameters
     # Backend to use (default: nil, required!)
-    backend    "#{aws_eu}#{method}://#{target}/#{path}"
+    backend    backend_uri(method, target, path, aws_eu)
     passphrase duplicity_main['passphrase']  # duplicity passphrase (default: nil, required!)
 
     include                   new_resource.include # Default directories to backup
@@ -111,9 +115,9 @@ def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/C
 
     #
     # # In case you use Swift as you backend, specify the credentials here
-    # swift_username 'mySwiftUsername'
-    # swift_password 'mySwiftPassword'
-    # swift_authurl  'SwiftAuthURL'
+    swift_username store['username'] if swift?
+    swift_password store['password'] if swift?
+    swift_authurl  store['authurl'] if swift?
 
     # In case you use Google Cloud Storage as your backend, your credentials go here
     gs_access_key_id     store['access_key_id'] if gs? && !boto
@@ -122,6 +126,14 @@ def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/C
     # In case you use S3 as your backend, your credentials go here
     aws_access_key_id     store['access_key_id'] if aws? && !boto
     aws_secret_access_key store['secret_access_key'] if aws? && !boto
+  end
+end
+
+def backend_uri(method, target, path = '', aws_eu = '')
+  if swift?
+    "#{method}://#{target}"
+  else
+    "#{aws_eu}#{method}://#{target}/#{path}"
   end
 end
 
@@ -144,4 +156,8 @@ end
 
 def aws?
   node['rails']['duplicity']['method'].include?('s3')
+end
+
+def swift?
+  node['rails']['duplicity']['method'].include?('swift')
 end
