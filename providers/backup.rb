@@ -18,17 +18,21 @@
 #
 
 action :create do
+  store_keys = nil
+
   if aws?
     store_keys = data_bag('aws')
   elsif gs?
     store_keys = data_bag('gs')
   end
 
-  duplicity = data_bag('duplicity')
-  pass_key_id = new_resource.pass_key_id
-  storage_key_id = new_resource.storage_key_id
-  if duplicity.include?(pass_key_id) && store_keys.include?(storage_key_id)
-    config new_resource, storage_key_id, pass_key_id
+  if store_keys
+    duplicity = data_bag('duplicity')
+    pass_key_id = new_resource.pass_key_id
+    storage_key_id = new_resource.storage_key_id
+    if duplicity.include?(pass_key_id) && store_keys.include?(storage_key_id)
+      config new_resource, storage_key_id, pass_key_id
+    end
   end
 
   new_resource.updated_by_last_action(true)
