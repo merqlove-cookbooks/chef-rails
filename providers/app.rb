@@ -213,7 +213,7 @@ def install_php(a, app_path) # rubocop:disable Style/MethodLength
       php_ubuntu_packages
     when 'rhel'
       if node['platform_version'].to_f < 6
-        node.default['php']['packages'] = %w(php php-devel php-cli php-pear)
+        node.normal['php']['packages'] = %w(php php-devel php-cli php-pear)
       end
       run_context.include_recipe 'php'
       php_rhel_packages
