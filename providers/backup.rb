@@ -81,7 +81,7 @@ end
 def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
   aws_eu  = (new_resource.s3_eu) ? '--s3-use-new-style --s3-european-buckets ' : ''
   logfile = (new_resource.log) ? (new_resource.logfile) : '/dev/null'
-  method  = node.default['rails']['duplicity']['method']
+  method  = node['rails']['duplicity']['method']
   target  = new_resource.target
   path    = new_resource.path
   duplicity_ng_cronjob "backup #{new_resource.name}" do
