@@ -164,5 +164,7 @@ end
 
 def clean_path(path)
   return unless path
-  path[/[a-z0-9_\-\.]+$/].sub(/^\_/,'')
+  out = path[/[a-z0-9_\-\.]+$/].sub(/^\_/,'')
+  out << '_db' if path.include? 'db'
+  out
 end
