@@ -131,9 +131,9 @@ end
 
 def backend_uri(method, target, path = '', aws_eu = '')
   if swift?
-    "#{method}://#{target}"
+    "#{method}://#{node['fqdn']}_#{clean_path(path)}"
   else
-    "#{aws_eu}#{method}://#{target}/#{path}"
+    "#{aws_eu}#{method}://#{target}/#{node['fqdn']}/#{path}"
   end
 end
 
@@ -160,4 +160,9 @@ end
 
 def swift?
   node['rails']['duplicity']['method'].include?('swift')
+end
+
+def clean_path(path)
+  return unless path
+  swift? ? path[/[a-z_\-\.]+$/] : path
 end
