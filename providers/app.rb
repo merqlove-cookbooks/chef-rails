@@ -20,8 +20,6 @@
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
-  return unless new_resource.application
-
   a            = new_resource.application
   type         = new_resource.type
   base_path    = node['rails']["#{type}_base_path"]
