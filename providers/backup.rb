@@ -120,7 +120,7 @@ def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/C
     gs_secret_access_key store['secret_access_key'] if gs? && !boto
 
     # In case you use S3 as your backend, your credentials go here
-    aws_access_key_id     store['access_key_id'] if aws? && !boto_cfg
+    aws_access_key_id     store['access_key_id'] if aws? && !boto
     aws_secret_access_key store['secret_access_key'] if aws? && !boto
   end
 end

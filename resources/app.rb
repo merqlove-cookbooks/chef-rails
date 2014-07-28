@@ -23,7 +23,7 @@ default_action :create
 attribute :name, kind_of: String, name_attribute: true
 
 attribute :type,        kind_of: String, default: 'apps'
-attribute :application, kind_of: Hash,   default: nil
+attribute :application, kind_of: Hash,   default: nil, required: true
 
 # Cookbook to find template
 attribute :cookbook, kind_of: String, default: 'rails'
