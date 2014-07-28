@@ -222,6 +222,7 @@
     "role[base]",
     "recipe[rails]",
     "recipe[vsftpd::_pam_virtual]",
-    "recipe[vsftpd::_user_configure]"
+    "recipe[vsftpd::_user_configure]",
+    "role[newrelic]"
   ]
 }

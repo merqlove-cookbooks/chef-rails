@@ -11,5 +11,6 @@
     }
   },
   "run_list": [
+    "recipe[rails::newrelic]"
   ]
 }
