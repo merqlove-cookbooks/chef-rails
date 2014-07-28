@@ -197,6 +197,7 @@ def install_nginx(a, app_path) # rubocop:disable Style/MethodLength
 end
 
 def install_php(a, app_path) # rubocop:disable Style/MethodLength
+  node.default['php']['packages'] = %w(php php-devel php-cli php-pear) if rhel5x?
   if ::File.exist?('/usr/bin/php')
     run_context.include_recipe 'composer::self_update'
   else
@@ -212,9 +213,7 @@ def install_php(a, app_path) # rubocop:disable Style/MethodLength
       run_context.include_recipe 'php'
       php_ubuntu_packages
     when 'rhel'
-      node.normal['php']['packages'] = %w(php php-devel php-cli php-pear)
       run_context.include_recipe 'php'
-      p node['php']['packages']
       php_rhel_packages
     end
     run_context.include_recipe 'composer'
