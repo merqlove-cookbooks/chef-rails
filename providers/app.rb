@@ -32,6 +32,7 @@ action :create do
     owner a['user']
     group a['user']
     mode  00750
+    only_if { sites?(type) }
   end
 
   directory app_path do
