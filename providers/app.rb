@@ -214,6 +214,7 @@ def install_php(a, app_path) # rubocop:disable Style/MethodLength
     when 'rhel'
       node.normal['php']['packages'] = %w(php php-devel php-cli php-pear)
       run_context.include_recipe 'php'
+      p node['php']['packages']
       php_rhel_packages
     end
     run_context.include_recipe 'composer'
