@@ -65,8 +65,7 @@ def cleanup_php_fpm # rubocop:disable Style/MethodLength
     end
   end
 
-  service 'restart php-fpm' do
-    service_name 'php-fpm'
+  service 'php-fpm' do
     action [:restart]
     only_if { deleted }
   end

@@ -168,5 +168,5 @@ def clean_path(path)
     path[/[a-z_\-\.]+\/[a-z]+$/].sub('/', '_')
   else
     path[/[a-z0-9_\-\.]+$/]
-  end.sub(/^\_/,'')
+  end.sub(/^_/,'')
 end
