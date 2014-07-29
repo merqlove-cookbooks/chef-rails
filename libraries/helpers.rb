@@ -33,8 +33,7 @@ module Rails
     # @return [Boolean]
     #
     def rhel7x?
-      major_version = node['platform_version'].split('.').first.to_i
-      platform_family?('rhel') && major_version >= 6
+      platform_family?('rhel') && node['platform_version'].to_f >= 7
     end
     #
     # Determine if the current node using old RHEL.

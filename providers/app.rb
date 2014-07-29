@@ -200,7 +200,7 @@ end
 
 def install_php(a, app_path) # rubocop:disable Style/MethodLength
   node.default['php']['packages'] = %w(php php-devel php-cli php-pear) if rhel5x?
-  node.default['php']['ext_conf_dir'] = "/etc/php5/mods-available" if ubuntu14x?
+  node.default['php']['ext_conf_dir'] = '/etc/php5/mods-available' if ubuntu14x?
   if ::File.exist?('/usr/bin/php')
     run_context.include_recipe 'php::ini'
     run_context.include_recipe 'composer::self_update'

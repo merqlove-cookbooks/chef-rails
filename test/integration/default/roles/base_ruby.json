@@ -12,7 +12,6 @@
   },
   "run_list": [
     "recipe[rails::nodejs]",
-    "recipe[nodejs::default]",
     "recipe[rails::npm]",
     "recipe[rails::imagemagick]",
     "recipe[rbenv::default]",

@@ -18,4 +18,11 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
-node.default['nodejs']['install_method'] = 'source' if rhel5x?
+if rhel7x?
+  %w(nodejs nodejs-devel).each do |pkg|
+    package pkg
+  end
+else
+  node.default['nodejs']['install_method'] = 'source' if rhel5x?
+  include_recipe 'nodejs'
+end
