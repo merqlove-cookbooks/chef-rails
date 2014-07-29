@@ -29,7 +29,7 @@ group :python do
 end
 
 group :mail do
-  cookbook 'msmtp', '~> 0.4.0', path: '../msmtp' # github: 'merqlove/chef-msmtp'
+  cookbook 'msmtp', '~> 0.4.0', github: 'merqlove/chef-msmtp'
   cookbook 'postfix'
 end
 
@@ -48,7 +48,7 @@ end
 # base
 group :production do
   cookbook 'chef-client'
-  cookbook 'duplicity_ng', github: 'merqlove/duplicity_ng', branch: 'centos59-support'
+  cookbook 'duplicity_ng', github: 'merqlove/chef-duplicity_ng'
 
   cookbook 'database', github: 'opscode-cookbooks/database'
   cookbook 'memcached'
@@ -60,7 +60,7 @@ group :production do
   cookbook 'iptables'
   cookbook 'git'
 
-  cookbook 'locale', path: '../locale'#github: 'merqlove/chef-locale'
+  cookbook 'locale', github: 'merqlove/chef-locale'
   cookbook 'rsync'
   cookbook 'swap'
   cookbook 'openssh'
@@ -71,7 +71,7 @@ group :production do
   cookbook 'fail2ban'
 
   cookbook 'logrotate'
-  cookbook 'timezone-ii', path: '../timezone-ii'# github: 'merqlove/timezone-ii'
+  cookbook 'timezone-ii', github: 'merqlove/chef-timezone-ii'
   cookbook 'vsftpd', github: 'merqlove/chef-vsftpd'
   cookbook 'newrelic'
 
@@ -80,7 +80,7 @@ group :production do
   cookbook 'curl'
   cookbook 'packages'
 
-  cookbook 'vagrant-ohai', github: 'merqlove/cookbooks-vagrant-ohai'
+  cookbook 'vagrant-ohai', github: 'merqlove/chef-vagrant-ohai'
 end
 
 metadata
