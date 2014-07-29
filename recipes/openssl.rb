@@ -17,9 +17,15 @@
 # limitations under the License.
 #
 
+::Chef::Recipe.send(:include, Rails::Helpers)
+
 case node['platform_family']
 when 'debian'
   include_recipe 'openssl::upgrade'
 when 'rhel'
-  include_recipe 'openssl-fips'
+  if rhel5x?
+    include_recipe 'openssl-fips'
+  else
+    include_recipe 'openssl::upgrade'
+  end
 end

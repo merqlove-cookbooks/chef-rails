@@ -106,9 +106,8 @@ def create_mysql_dbs(secret, date) # rubocop:disable Style/MethodLength
 end
 
 def install_mysql # rubocop:disable Style/MethodLength
-  run_context.include_recipe 'mysql::client'
-
   run_context.include_recipe 'mysql::server'
+  run_context.include_recipe 'mysql::client'
 
   service node['rails']['mysqld']['service_name'] do
     supports status: true, restart: true, reload: true, start: true, stop: true

@@ -29,7 +29,7 @@ group :python do
 end
 
 group :mail do
-  cookbook 'msmtp', '~> 0.4.0', github: 'merqlove/chef-msmtp'
+  cookbook 'msmtp', '~> 0.4.0', path: '../msmtp' # github: 'merqlove/chef-msmtp'
   cookbook 'postfix'
 end
 
@@ -41,7 +41,7 @@ group :postgres do
 end
 
 group :mysql do
-  cookbook 'mysql', github: 'opscode-cookbooks/mysql'
+  cookbook 'mysql', github: 'LessonPlanet/mysql', ref: '4635b8c'
   cookbook 'yum-mysql-community'
 end
 
@@ -60,7 +60,7 @@ group :production do
   cookbook 'iptables'
   cookbook 'git'
 
-  cookbook 'locale', github: 'merqlove/chef-locale'
+  cookbook 'locale', path: '../locale'#github: 'merqlove/chef-locale'
   cookbook 'rsync'
   cookbook 'swap'
   cookbook 'openssh'
@@ -71,7 +71,7 @@ group :production do
   cookbook 'fail2ban'
 
   cookbook 'logrotate'
-  cookbook 'timezone-ii', github: 'L2G/timezone-ii'
+  cookbook 'timezone-ii', path: '../timezone-ii'# github: 'merqlove/timezone-ii'
   cookbook 'vsftpd', github: 'merqlove/chef-vsftpd'
   cookbook 'newrelic'
 
