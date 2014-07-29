@@ -17,7 +17,9 @@
 # limitations under the License.
 #
 
-default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
+require 'fileutils'
+
+default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
 date = 'NOW=$(date +"%Y%m%d")'
 
 rails_db 'initialize' do
@@ -48,7 +50,7 @@ node['rails']['duplicity']['db'].each do |db|
     exec_before.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
     exec_before.push "chown -R root:root #{db_backup_dir}/*"
   when 'mysql'
-    root ||= Chef::EncryptedDataBagItem.load(db, 'root', default_secret)
+    root ||= ::Chef::EncryptedDataBagItem.load(db, 'root', default_secret)
     exec_before.push "mysqldump --all-databases -u root -p#{root['password']} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
   when 'mongodb'
     exec_before.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
@@ -66,15 +68,15 @@ node['rails']['duplicity']['db'].each do |db|
   end
 end
 
-if Dir.exist? db_backup_root
-  Dir.foreach(db_backup_root) do |db|
+if ::Dir.exist? db_backup_root
+  ::Dir.foreach(db_backup_root) do |db|
     next if db == '.' || db == '..'
 
     ruby_block "#{db}_db_delete" do
       block do
-        Dir.delete("/tmp/da-#{db}")
-        Dir.delete("/tmp/dt-#{db}")
-        Dir.delete("#{db_backup_root}/#{db}")
+        ::FileUtils.remove_dir("/tmp/da-#{db}") if ::Dir.exist?("/tmp/da-#{db}")
+        ::FileUtils.remove_dir("/tmp/dt-#{db}") if ::Dir.exist?("/tmp/dt-#{db}")
+        ::FileUtils.remove_dir("#{db_backup_root}/#{db}") if ::Dir.exist?("#{db_backup_root}/#{db}")
       end
       action :nothing
     end

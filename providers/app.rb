@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+require 'fileutils'
+
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
@@ -287,8 +289,8 @@ def init_backup(a, type, app_path, project_path) # rubocop:disable Style/MethodL
     rails_backup a['name'] do
       action :delete
     end
-    Dir.delete(archive_dir) if Dir.exist? archive_dir
-    Dir.delete(temp_dir) if Dir.exist? temp_dir
+    ::FileUtils.remove_dir(archive_dir) if ::Dir.exist? archive_dir
+    ::FileUtils.remove_dir(temp_dir) if ::Dir.exist? temp_dir
   end
 end
 

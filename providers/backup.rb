@@ -57,14 +57,14 @@ end
 def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
   return unless storage_key_id || pass_key_id
 
-  default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
+  default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
 
   if aws?
-    store = Chef::EncryptedDataBagItem.load('aws', storage_key_id, default_secret)
+    store = ::Chef::EncryptedDataBagItem.load('aws', storage_key_id, default_secret)
   elsif gs?
-    store = Chef::EncryptedDataBagItem.load('gs', storage_key_id, default_secret)
+    store = ::Chef::EncryptedDataBagItem.load('gs', storage_key_id, default_secret)
   elsif swift?
-    store = Chef::EncryptedDataBagItem.load('swift', storage_key_id, default_secret)
+    store = ::Chef::EncryptedDataBagItem.load('swift', storage_key_id, default_secret)
   else
     return
   end
@@ -78,7 +78,7 @@ def use_config(new_resource, pass_key_id, store, default_secret)
   boto = new_resource.boto_cfg
   boto_config(store) if boto && new_resource.main && !swift?
 
-  duplicity = Chef::EncryptedDataBagItem.load('duplicity', pass_key_id, default_secret)
+  duplicity = ::Chef::EncryptedDataBagItem.load('duplicity', pass_key_id, default_secret)
   cronjob_script new_resource, store, boto, duplicity if duplicity['passphrase']
 end
 

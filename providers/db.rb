@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+require 'fileutils'
+
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
@@ -164,7 +166,7 @@ def create_mysql_admin(secret, root) # rubocop:disable Style/MethodLength
   }
 
   (mysql - ['root']).each do |m|
-    u = Chef::EncryptedDataBagItem.load('mysql', m, secret)
+    u = ::Chef::EncryptedDataBagItem.load('mysql', m, secret)
     mysql_database_user u['id'] do
       connection mysql_connection_info
       password   u['password']
@@ -196,8 +198,8 @@ def backup_mysql_db(d, date, password) # rubocop:disable Style/MethodLength,Styl
       name "mysql_db_#{d['app_name']}"
       action :delete
     end
-    ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
-    ::Dir.delete(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
   end
 end
 
@@ -281,7 +283,7 @@ def create_postgresql_admin(secret, postgres) # rubocop:disable Style/MethodLeng
     password: postgres['password']
   }
   (psql - ['postgres']).each do |p|
-    u = Chef::EncryptedDataBagItem.load('postgresql', p, secret)
+    u = ::Chef::EncryptedDataBagItem.load('postgresql', p, secret)
     postgresql_database 'template1' do
       connection postgresql_connection_info
       sql <<-EOH
@@ -355,8 +357,8 @@ def backup_postgresql_db(d, date) # rubocop:disable Style/MethodLength
       name "pg_db_#{d['app_name']}"
       action :delete
     end
-    ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
-    ::Dir.delete(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
   end
 end
 
@@ -428,7 +430,7 @@ def create_mongodb_admin(secret, admin) # rubocop:disable Style/MethodLength
   return unless mongo # rubocop:disable Style/BlockNesting
 
   (mongo - ['admin']).each do |m|
-    u = Chef::EncryptedDataBagItem.load('mongodb', m, secret)
+    u = ::Chef::EncryptedDataBagItem.load('mongodb', m, secret)
 
     mongodb_user u['id'] do
       password   u['password']
@@ -465,8 +467,8 @@ def backup_mongodb_db(d, date) # rubocop:disable Style/MethodLength
       name "mongo_db_#{d['app_name']}"
       action :delete
     end
-    ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
-    ::Dir.delete(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
   end
 end
 
