@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+require 'fileutils'
+
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
@@ -106,9 +108,8 @@ def create_mysql_dbs(secret, date) # rubocop:disable Style/MethodLength
 end
 
 def install_mysql # rubocop:disable Style/MethodLength
-  run_context.include_recipe 'mysql::client'
-
   run_context.include_recipe 'mysql::server'
+  run_context.include_recipe 'mysql::client'
 
   service node['rails']['mysqld']['service_name'] do
     supports status: true, restart: true, reload: true, start: true, stop: true
@@ -165,7 +166,7 @@ def create_mysql_admin(secret, root) # rubocop:disable Style/MethodLength
   }
 
   (mysql - ['root']).each do |m|
-    u = Chef::EncryptedDataBagItem.load('mysql', m, secret)
+    u = ::Chef::EncryptedDataBagItem.load('mysql', m, secret)
     mysql_database_user u['id'] do
       connection mysql_connection_info
       password   u['password']
@@ -177,29 +178,11 @@ end
 def backup_mysql_db(d, date, password) # rubocop:disable Style/MethodLength,Style/CyclomaticComplexity
   return unless d && date && password
 
-  if d['app_backup']
-    rails_backup "mysql_db_#{d['app_name']}" do
-      path        d['app_backup_path']
-      exec_pre    [
-        "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
-      ]
-      exec_before [
-        date,
-        "rm -rf #{d['app_backup_dir']}/*",
-        "mysqldump -u root -p#{password} #{d['name']} | gzip > #{d['app_backup_dir']}/#{d['name']}.$NOW.sql.gz"
-      ]
-      include     [d['app_backup_dir']]
-      archive_dir d['app_backup_archive']
-      temp_dir    d['app_backup_temp']
-    end
-  else
-    rails_backup "delete mysql_db_#{d['app_name']}" do
-      name "mysql_db_#{d['app_name']}"
-      action :delete
-    end
-    ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
-    ::Dir.delete(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
-  end
+  exec_before = [
+    "mysqldump -u root -p#{password} #{d['name']} | gzip > #{d['app_backup_dir']}/#{d['name']}.$NOW.sql.gz"
+  ]
+
+  backup_db('mysql', d, date, exec_before)
 end
 
 def stop_mysql
@@ -282,7 +265,7 @@ def create_postgresql_admin(secret, postgres) # rubocop:disable Style/MethodLeng
     password: postgres['password']
   }
   (psql - ['postgres']).each do |p|
-    u = Chef::EncryptedDataBagItem.load('postgresql', p, secret)
+    u = ::Chef::EncryptedDataBagItem.load('postgresql', p, secret)
     postgresql_database 'template1' do
       connection postgresql_connection_info
       sql <<-EOH
@@ -334,31 +317,13 @@ end
 def backup_postgresql_db(d, date) # rubocop:disable Style/MethodLength
   return unless d && date
 
-  if d['app_backup']
-    rails_backup "pg_db_#{d['app_name']}" do
-      path        d['app_backup_path']
-      exec_pre    [
-        "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
-      ]
-      exec_before [
-        date,
-        "rm -rf #{d['app_backup_dir']}/*",
-        "su postgres -c 'pg_dump -U postgres #{d['name']} | gzip > /tmp/#{d['name']}.\"$0\".sql.gz' -- \"$NOW\"",
-        "mv /tmp/#{d['name']}.$NOW.sql.gz #{d['app_backup_dir']}/",
-        "chown -R #{d['app_user']}:#{d['app_user']} #{d['app_backup_dir']}/*"
-      ]
-      include     [d['app_backup_dir']]
-      archive_dir d['app_backup_archive']
-      temp_dir    d['app_backup_temp']
-    end
-  else
-    rails_backup "delete pg_db_#{d['app_name']}" do
-      name "pg_db_#{d['app_name']}"
-      action :delete
-    end
-    ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
-    ::Dir.delete(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
-  end
+  exec_before = [
+    "su postgres -c 'pg_dump -U postgres #{d['name']} | gzip > /tmp/#{d['name']}.\"$0\".sql.gz' -- \"$NOW\"",
+    "mv /tmp/#{d['name']}.$NOW.sql.gz #{d['app_backup_dir']}/",
+    "chown -R #{d['app_user']}:#{d['app_user']} #{d['app_backup_dir']}/*"
+  ]
+
+  backup_db('pg', d, date, exec_before)
 end
 
 def stop_postgresql
@@ -429,7 +394,7 @@ def create_mongodb_admin(secret, admin) # rubocop:disable Style/MethodLength
   return unless mongo # rubocop:disable Style/BlockNesting
 
   (mongo - ['admin']).each do |m|
-    u = Chef::EncryptedDataBagItem.load('mongodb', m, secret)
+    u = ::Chef::EncryptedDataBagItem.load('mongodb', m, secret)
 
     mongodb_user u['id'] do
       password   u['password']
@@ -444,31 +409,13 @@ end
 def backup_mongodb_db(d, date) # rubocop:disable Style/MethodLength
   return unless d && date
 
-  if d['app_backup']
-    rails_backup "mongo_db_#{d['app_name']}" do
-      path        d['app_backup_path']
-      exec_pre    [
-        "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
-      ]
-      exec_before [
-        date,
-        "rm -rf #{d['app_backup_dir']}/*",
-        "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d['name']} --out #{d['app_backup_dir']}/#{d['name']}.$NOW >> /dev/null 2>&1",
-        "gzip #{d['app_backup_dir']}/#{d['name']}.$NOW",
-        "rm -f #{d['app_backup_dir']}/#{d['name']}.$NOW"
-      ]
-      include     [d['app_backup_dir']]
-      archive_dir d['app_backup_archive']
-      temp_dir    d['app_backup_temp']
-    end
-  else
-    rails_backup "delete mongo_db_#{d['app_name']}" do
-      name "mongo_db_#{d['app_name']}"
-      action :delete
-    end
-    ::Dir.delete(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
-    ::Dir.delete(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
-  end
+  exec_before = [
+    "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d['name']} --out #{d['app_backup_dir']}/#{d['name']}.$NOW >> /dev/null 2>&1",
+    "gzip #{d['app_backup_dir']}/#{d['name']}.$NOW",
+    "rm -f #{d['app_backup_dir']}/#{d['name']}.$NOW"
+  ]
+
+  backup_db('mongo', d, date, exec_before)
 end
 
 def stop_mongodb
@@ -476,5 +423,33 @@ def stop_mongodb
   service node['mongodb']['instance_name'] do
     action [:stop, :disable]
     only_if { ::FileTest.file? mongo_init }
+  end
+end
+
+def backup_db(name, d, date, before = [], pre = [], after = []) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength,Style/ParameterLists
+  return unless name && d && date
+
+  if d['app_backup']
+    rails_backup "#{name}_db_#{d['app_name']}" do
+      path        d['app_backup_path']
+      exec_pre    [
+        "mkdir -p #{d['app_backup_dir']} >> /dev/null 2>&1",
+      ].concat(pre)
+      exec_before [
+        date,
+        "rm -rf #{d['app_backup_dir']}/*"
+      ].concat(before)
+      exec_after  [].concat(after)
+      include     [d['app_backup_dir']]
+      archive_dir d['app_backup_archive']
+      temp_dir    d['app_backup_temp']
+    end
+  else
+    rails_backup "delete #{name}_db_#{d['app_name']}" do
+      name "#{name}_db_#{d['app_name']}"
+      action :delete
+    end
+    ::FileUtils.remove_dir(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
   end
 end

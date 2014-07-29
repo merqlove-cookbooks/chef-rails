@@ -16,4 +16,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'nodejs::npm' if node['nodejs']['install_method'].include? 'source'
+::Chef::Recipe.send(:include, Rails::Helpers)
+
+include_recipe 'nodejs::npm' if node['nodejs']['install_method'].include?('source')
+
+if rhel7x?
+  package 'curl'
+
+  npm_src_url = "http://registry.npmjs.org/npm/-/npm-#{node['nodejs']['npm']}.tgz"
+
+  bash 'install npm - package manager for node' do
+    cwd '/usr/local/src'
+    user 'root'
+    code <<-EOH
+    mkdir -p npm-v#{node['nodejs']['npm']} && \
+    cd npm-v#{node['nodejs']['npm']}
+    curl -L #{npm_src_url} | tar xzf - --strip-components=1 && \
+    make uninstall dev
+    EOH
+    not_if "#{node['nodejs']['dir']}/bin/npm -v 2>&1 | grep '#{node['nodejs']['npm']}'"
+  end
+end

@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+require 'fileutils'
+
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
@@ -197,7 +199,10 @@ def install_nginx(a, app_path) # rubocop:disable Style/MethodLength
 end
 
 def install_php(a, app_path) # rubocop:disable Style/MethodLength
+  node.default['php']['packages'] = %w(php php-devel php-cli php-pear) if rhel5x?
+  node.default['php']['ext_conf_dir'] = '/etc/php5/mods-available' if ubuntu14x?
   if ::File.exist?('/usr/bin/php')
+    run_context.include_recipe 'php::ini'
     run_context.include_recipe 'composer::self_update'
   else
     case node['platform_family']
@@ -212,9 +217,6 @@ def install_php(a, app_path) # rubocop:disable Style/MethodLength
       run_context.include_recipe 'php'
       php_ubuntu_packages
     when 'rhel'
-      if node['platform_version'].to_f < 6
-        node.default['php']['packages'] = %w(php php-devel php-cli php-pear)
-      end
       run_context.include_recipe 'php'
       php_rhel_packages
     end
@@ -287,8 +289,8 @@ def init_backup(a, type, app_path, project_path) # rubocop:disable Style/MethodL
     rails_backup a['name'] do
       action :delete
     end
-    Dir.delete(archive_dir) if Dir.exist? archive_dir
-    Dir.delete(temp_dir) if Dir.exist? temp_dir
+    ::FileUtils.remove_dir(archive_dir) if ::Dir.exist? archive_dir
+    ::FileUtils.remove_dir(temp_dir) if ::Dir.exist? temp_dir
   end
 end
 

@@ -68,7 +68,7 @@
         "db_type": "web"
       }
     },
-    "build_essential": {
+    "build-essential": {
       "compile_time": true
     },
     "openssh": {
@@ -225,7 +225,7 @@
     "recipe[packages]",
     "recipe[nginx::repo]",
     "recipe[nginx]",
-    "recipe[duplicity_ng::package]",
+    "recipe[duplicity_ng::source]",
     "recipe[duplicity_ng::install_boto]",
     "recipe[memcached]"
   ]

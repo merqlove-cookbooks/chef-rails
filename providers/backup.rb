@@ -54,17 +54,17 @@ action :delete do
   new_resource.updated_by_last_action(true)
 end
 
-def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/CyclomaticComplexity
+def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
   return unless storage_key_id || pass_key_id
 
-  default_secret = Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
+  default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
 
   if aws?
-    store = Chef::EncryptedDataBagItem.load('aws', storage_key_id, default_secret)
+    store = ::Chef::EncryptedDataBagItem.load('aws', storage_key_id, default_secret)
   elsif gs?
-    store = Chef::EncryptedDataBagItem.load('gs', storage_key_id, default_secret)
+    store = ::Chef::EncryptedDataBagItem.load('gs', storage_key_id, default_secret)
   elsif swift?
-    store = Chef::EncryptedDataBagItem.load('swift', storage_key_id, default_secret)
+    store = ::Chef::EncryptedDataBagItem.load('swift', storage_key_id, default_secret)
   else
     return
   end
@@ -78,11 +78,11 @@ def use_config(new_resource, pass_key_id, store, default_secret)
   boto = new_resource.boto_cfg
   boto_config(store) if boto && new_resource.main && !swift?
 
-  duplicity = Chef::EncryptedDataBagItem.load('duplicity', pass_key_id, default_secret)
-  cronjob_script new_resource, boto, duplicity if duplicity['passphrase']
+  duplicity = ::Chef::EncryptedDataBagItem.load('duplicity', pass_key_id, default_secret)
+  cronjob_script new_resource, store, boto, duplicity if duplicity['passphrase']
 end
 
-def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
+def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
   aws_eu  = (new_resource.s3_eu) ? '--s3-use-new-style --s3-european-buckets ' : ''
   logfile = (new_resource.log) ? (new_resource.logfile) : '/dev/null'
   method  = node['rails']['duplicity']['method']
@@ -115,9 +115,9 @@ def cronjob_script(new_resource, boto, duplicity_main) # rubocop:disable Style/C
 
     #
     # # In case you use Swift as you backend, specify the credentials here
-    swift_username store['username'] if swift?
-    swift_password store['password'] if swift?
-    swift_authurl  store['authurl'] if swift?
+    swift_username       store['username'] if swift?
+    swift_password       store['password'] if swift?
+    swift_authurl        store['authurl'] if swift?
 
     # In case you use Google Cloud Storage as your backend, your credentials go here
     gs_access_key_id     store['access_key_id'] if gs? && !boto
@@ -131,9 +131,9 @@ end
 
 def backend_uri(method, target, path = '', aws_eu = '')
   if swift?
-    "#{method}://#{target}"
+    "#{method}://#{node['fqdn']}_#{clean_path(path)}"
   else
-    "#{aws_eu}#{method}://#{target}/#{path}"
+    "#{aws_eu}#{method}://#{target}/#{node['fqdn']}/#{path}"
   end
 end
 
@@ -160,4 +160,13 @@ end
 
 def swift?
   node['rails']['duplicity']['method'].include?('swift')
+end
+
+def clean_path(path)
+  return unless path
+  if path.include? '_db'
+    path[/[a-z_\-\.]+\/[a-z]+$/].sub('/', '_')
+  else
+    path[/[a-z0-9_\-\.]+$/]
+  end.sub(/^_/, '')
 end
