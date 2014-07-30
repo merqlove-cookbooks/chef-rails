@@ -220,9 +220,8 @@
   "run_list": [
     "role[mysql_512m_1e]",
     "role[base]",
-    "recipe[rails]",
     "recipe[vsftpd::_pam_virtual]",
-    "recipe[vsftpd::_user_configure]",
+    "recipe[rails]",
     "role[newrelic]"
   ]
 }

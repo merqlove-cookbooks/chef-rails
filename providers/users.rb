@@ -23,7 +23,7 @@ action :create do
   vcs    = new_resource.vcs
 
   if users && secret && vcs
-    name_pass = []
+    users_data = []
 
     user_nginx
 
@@ -32,7 +32,7 @@ action :create do
       next unless data
 
       ftp_list = user_ftps(u, data)
-      name_pass = name_pass.push(ftp_list).flatten.compact unless ftp_list.empty?
+      users_data = users_data.push(ftp_list).flatten.compact unless ftp_list.empty?
 
       user u do
         home      "/home/#{u}"
@@ -60,7 +60,7 @@ action :create do
     node.default['vsftpd']['config']['guest_username'] = node['nginx']['user']
 
     vsftpd_virtual_users 'vsftpd_credentials' do
-      users name_pass
+      users users_data
     end
   end
 
@@ -160,12 +160,12 @@ end
 def user_ftps(u, data) # rubocop:disable Style/MethodLength
   return %w() unless data['ftp'] && u
 
-  list = []
+  users = []
   data['ftp'].each do |ftp|
-    list.push('name' => ftp['name'], 'password' => ftp['password'])
     local_root = ftp['local_root'] || "#{node['rails']['sites_base_path']}/#{u}"
-    node.default['vsftpd']['users'].push(
+    users.push(
       'name' => ftp['name'],
+      'password' => ftp['password'],
       'config' => {
         'local_root' => local_root,
         'dirlist_enable' => 'YES',
@@ -176,10 +176,8 @@ def user_ftps(u, data) # rubocop:disable Style/MethodLength
         'ftp_username' => u,
       }
     )
-
-    node.default['vsftpd']['allowed'].push(ftp['name'])
   end
-  list
+  users
 end
 
 def user_nginx

@@ -55,9 +55,8 @@
   "run_list": [
     "role[base]",
     "role[base_ruby]",
-    "recipe[rails]",
     "recipe[vsftpd::_pam_virtual]",
-    "recipe[vsftpd::_user_configure]",
+    "recipe[rails]",
     "role[newrelic]"
   ]
 }
