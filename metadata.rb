@@ -36,6 +36,7 @@ depends 'packages', '~> 0.1.0'
 
 depends 'database', '~> 2.2.0'
 depends 'memcached', '~> 1.7.2'
+# depends 'postfix', '~> 3.4.0'
 
 # App
 
@@ -43,6 +44,9 @@ depends 'python', '~> 1.4.6'
 depends 'yum-mysql-community', '~> 0.1.10'
 depends 'composer', '~> 1.0.3'
 depends 'php', '~> 1.4.6'
+# depends 'apache2'
+# depends 'java'
+# depends 'tomcat'
 
 # Other
 
@@ -59,8 +63,9 @@ depends 'mongodb'
 depends 'postgresql'
 depends 'php-fpm'
 depends 'msmtp'
+depends 'vagrant-ohai'
 
-# 3rd side repos
+# Official dev & 3rd side repos
 
 depends 'mysql'
 depends 'nodejs'
