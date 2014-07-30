@@ -171,7 +171,7 @@ def setup_unicorn_nginx(a, app_path) # rubocop:disable Style/MethodLength
       cookbook 'rails'
       source 'nginx_unicorn_crap.erb'
       owner 'root'
-      groop 'root'
+      group 'root'
       mode 00644
       variables app: a['name'],
                 server_name: a['unicorn']['server_name'],
