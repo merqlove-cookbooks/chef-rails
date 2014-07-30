@@ -158,13 +158,13 @@ def install_rbenv(a) # rubocop:disable Style/MethodLength
   end
 end
 
-def setup_unicorn_nginx(a, app_path)
+def setup_unicorn_nginx(a, app_path) # rubocop:disable Style/MethodLength
   if a['unicorn'].include? 'disabled'
-    rails_nginx_vhost a["name"] do
+    rails_nginx_vhost a['name'] do
       action :disable
     end
   else
-    rails_nginx_vhost a["name"] do
+    rails_nginx_vhost a['name'] do
       action :nothing
     end
     template "#{node['nginx']['dir']}/sites-available/#{a['name']}" do
