@@ -1,0 +1,41 @@
+# Maintained by Chef.  Local changes will be overwritten
+
+upstream unicorn_<%= @app %> {
+  server unix:<%= @path %>/shared/.sock fail_timeout=0;
+}
+
+server {
+  listen <%= @listen %>;
+  server_name <%= Array(@server_name).join(' ') %>;
+
+<% if @ssl %>
+  ssl on;
+  ssl_certificate <%= @ssl[:certificate] %>;
+  ssl_certificate_key <%= @ssl[:certificate_key] %>;
+<% end -%>
+
+  root   <%= @path %>/current/public;
+  autoindex off;
+  charset utf-8;
+
+  location ^~ /(assets|static|system)/ {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
+
+  try_files $uri/index.html $uri @unicorn_<%= @app %>;
+  location @unicorn_<%= @app %> {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://unicorn_<%= @app %>;
+  }
+
+  error_page 500 502 503 /500.html;
+  error_page 504 /504.html;
+
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+  server_tokens off;
+}

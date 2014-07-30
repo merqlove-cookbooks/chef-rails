@@ -72,6 +72,8 @@ action :create do
 
   init_smtp(a, app_path) if smtp?(a)
 
+  setup_unicorn_nginx(a, app_path) if unicorn?(a)
+
   install_php(a, app_path) if php?(a)
 
   directory "#{app_path}/backup" do
@@ -99,6 +101,10 @@ end
 
 def php?(a)
   a.include? 'php'
+end
+
+def unicorn?(a)
+  a.include? 'unicorn'
 end
 
 def smtp?(a)
@@ -148,6 +154,31 @@ def install_rbenv(a) # rubocop:disable Style/MethodLength
     rbenv_gem g['name'] do
       ruby_version a['rbenv']['version']
       version      g['version'] if g['version']
+    end
+  end
+end
+
+def setup_unicorn_nginx(a, app_path)
+  if a['unicorn'].include? 'disabled'
+    rails_nginx_vhost a["name"] do
+      action :disable
+    end
+  else
+    rails_nginx_vhost a["name"] do
+      action :nothing
+    end
+    template "#{node['nginx']['dir']}/sites-available/#{a['name']}" do
+      cookbook 'rails'
+      source 'nginx_unicorn_crap.erb'
+      owner 'root'
+      groop 'root'
+      mode 00644
+      variables app: a['name'],
+                server_name: a['unicorn']['server_name'],
+                listen: a['unicorn']['listen'],
+                path: app_path,
+                ssl: a['unicorn']['ssl']
+      notifies :enable, "rails_nginx_vhost[#{a['name']}]", :immediately
     end
   end
 end
