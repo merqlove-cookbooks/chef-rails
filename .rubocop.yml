@@ -9,3 +9,12 @@ SingleSpaceBeforeFirstArg:
 
 TrailingComma:
   Enabled: false
+
+Style/LeadingCommentSpace:
+  Exclude:
+    - 'Berksfile'
+
+Style/FileName:
+  Exclude:
+    - 'Berksfile'
+
