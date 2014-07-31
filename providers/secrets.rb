@@ -38,13 +38,12 @@ action :create do
           next unless item[0] == node['rails']['secrets']['key']
 
           key = ChefVault::Item.load('secrets', item[0])
-          file node['rails']['secrets']['default'] do
-            content key['file-content']
-            owner   'root'
-            group   'root'
-            mode    00600
-            action  :create
-          end
+          s = Chef::Resource::File.new(node['rails']['secrets']['default'], run_context)
+          s.owner      'root'
+          s.group      'root'
+          s.mode       00600
+          s.content    key['file-content']
+          s.run_action :create
         end
       end
     end
