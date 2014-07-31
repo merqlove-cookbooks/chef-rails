@@ -21,9 +21,10 @@
 default['rails']['duplicity']['pass_key_id'] = 'main'
 default['rails']['duplicity']['storage_key_id'] = node.default['rails']['duplicity']['pass_key_id']
 default['rails']['duplicity']['boto_cfg'] = true
+default['rails']['duplicity']['method'] = 's3+http' # possible 's3', "s3+http", 'gs', 'swift', 'ftp', 'ssh', ...
 
 # path & log
-default['rails']['duplicity']['path'] = '/usr/bin/duplicity'
+default['rails']['duplicity']['path'] = '_system' # must be not empty!
 default['rails']['duplicity']['log'] = false # Log or not
 default['rails']['duplicity']['log_file'] = '/var/log/duplicity.log'
 
@@ -43,9 +44,7 @@ default['rails']['duplicity']['nice'] = 10
 default['rails']['duplicity']['ionice'] = 3
 
 # Amazon S3, Google Cloud Storage defaults
-default['rails']['duplicity']['method'] = 's3+http' # possible 's3', "s3+http", 'gs', 'ftp', 'ssh', ...
 default['rails']['duplicity']['target'] = nil # must be not nil!
-default['rails']['duplicity']['path'] = '_system' # must be not empty!
 default['rails']['duplicity']['s3']['eu'] = false # eu buckets?
 default['rails']['duplicity']['s3']['host'] = 's3.amazonaws.com' # optional
 

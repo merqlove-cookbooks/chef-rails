@@ -54,7 +54,7 @@ node['rails']['duplicity']['db'].each do |db|
     exec_before.push "mysqldump --all-databases -u root -p#{root['password']} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
   when 'mongodb'
     exec_before.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
-    exec_before.push "ar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
+    exec_before.push "tar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
     exec_before.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
   end
 
