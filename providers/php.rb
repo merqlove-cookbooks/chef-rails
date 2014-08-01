@@ -69,7 +69,10 @@ def install_modules # rubocop:disable Style/MethodLength
   modules.push node['rails']['php']['modules'].flatten.compact
 
   modules.flatten.compact.uniq.each do |m|
-    package m
+    package m do
+      action :install
+      notifies :restart, 'service[php-fpm]', :delayed
+    end
   end
 end
 
