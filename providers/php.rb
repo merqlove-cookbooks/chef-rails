@@ -68,7 +68,7 @@ def install_modules # rubocop:disable Style/MethodLength
 
   modules.push node['rails']['php']['modules'].flatten.compact
 
-  modules.flatten.compact.each do |m|
+  modules.flatten.compact.uniq.each do |m|
     package m
   end
 end
