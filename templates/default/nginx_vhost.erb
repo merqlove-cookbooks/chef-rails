@@ -100,7 +100,7 @@
     }
     <% end %>
 
-    location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|pdf|doc|docx|xls|xlsx|ppt|pptx|dmg|tgz|tar.gz|zip|gz|bz2?|rar|txt|syx)$ {
+    location ~* ^.+\.(jpg|jpeg|gif|png|ico|svg|js|css|mp3|ogg|mpe?g|avi|pdf|doc|docx|xls|xlsx|ppt|pptx|dmg|tgz|tar.gz|zip|gz|bz2?|rar|ttf|woff|txt|syx)$ {
       <% if @file_rewrites %>
       try_files $uri @file_rewrite @engine_file_rewrite;
       <% end %>
