@@ -1,10 +1,16 @@
 location ~ .*wp-content/plugins.* {
 }
+
 location @engine_file_rewrite {
   rewrite ^/files/(.*(html|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|docx|xlsx|pptx|txt|tar|mid|midi|wav|bmp|rtf|js))$ /wp-content/blogs.php?file=$1 last;
   rewrite ^/.*(/wp-.*/.*\\.(html|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|docx|xlsx|pptx|txt|tar|mid|midi|wav|bmp|rtf|js))$ $1 last;
   rewrite ^/.*(/media/.*\\.(html|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|docx|xlsx|pptx|txt|tar|mid|midi|wav|bmp|rtf|js))$ $1 last;
 }
+
+location = / {
+  try_files @website @website;
+}
+
 location / {
   if ($request_uri ~ "^/wp-admin$"){
     rewrite ^(.+)$ $1/ redirect;

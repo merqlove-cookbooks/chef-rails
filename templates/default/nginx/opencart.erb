@@ -1,10 +1,32 @@
+index index.php index.html index.htm;
+
+rewrite ^sitemap.xml$ /index.php?route=feed/google_sitemap last;
+rewrite ^googlebase.xml$ /index.php?route=feed/google_base last;
+rewrite ^download/(.*) /index.php?route=error/not_found last;
+
 location ~ (\.tpl|\.ini|\.log) {
   access_log off;
   log_not_found off;
   deny all;
 }
+
 location @engine_file_rewrite {
 }
-location @website {
-  rewrite ^/(.+)$ /index.php?_route_=$1 last;
+
+location = / {
+  try_files @uri @uri/ @website;
 }
+
+location @website {
+ rewrite ^/(.+)$ /index.php?_route_=$1 last;
+}
+
+# if (!-f $request_filename) {
+#  set $rule_2 1$rule_2;
+# }
+# if (!-d $request_filename) {
+#  set $rule_2 2$rule_2;
+# }
+# if ($rule_2 = "21") {
+#  rewrite ^/([^?]*) /index.php?_route_=$1 last;
+# }

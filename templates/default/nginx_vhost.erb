@@ -58,11 +58,6 @@
 
     <% if @php %>
     <%= render 'nginx/_engine.erb' %>
-
-    location = / {
-      try_files @website @website;
-    }
-
       <% if @php_rewrites %>
         <% @php_rewrites.each do |r| %>
           <% if r[:ext] %>

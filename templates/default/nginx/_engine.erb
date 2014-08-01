@@ -4,8 +4,13 @@
 <% when 'opencart' %>
   <%= render 'nginx/opencart.erb' %>
 <% else %>
+location = / {
+  try_files @website @website;
+}
+
 location @engine_file_rewrite {
 }
+
 location @website {
   include fastcgi_params;
   fastcgi_pass  php_<%= @user %>_<%= @name %>;
