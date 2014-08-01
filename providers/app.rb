@@ -219,8 +219,6 @@ def setup_ruby_server(a, app_path) # rubocop:disable Style/MethodLength
   end
 end
 
-
-
 def setup_nginx(a, app_path) # rubocop:disable Style/MethodLength
   directory "#{app_path}/docs" do
     mode      00750
