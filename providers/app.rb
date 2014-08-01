@@ -208,7 +208,7 @@ def setup_ruby_server(a, app_path) # rubocop:disable Style/MethodLength
                 path: app_path,
                 ssl: a['ruby_server']['ssl'],
                 www: a['ruby_server']['www']
-      notifies :enable, "rails_nginx_vhost[#{a['name']}]", :delayed
+      notifies :enable, "rails_nginx_vhost[#{a['name']}]", :immediately
     end
     setup_ruby_server_init(a, app_path)
   else

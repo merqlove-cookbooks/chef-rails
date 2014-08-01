@@ -38,15 +38,15 @@ ULOCK="/var/lock/subsys/$NAME"
 # The options to use when running unicorn
 OPTS="-c $CONFIG -E <%= @environment || "production" %> -D"
 
-POSTGRESQL_BIN = "/usr/pgsql-<%= node['postgresql']['version'] %>/bin"
+POSTGRESQL_BIN="/usr/pgsql-<%= node['postgresql']['version'] %>/bin"
 
 # Ruby related path update
 RBENV_ROOT="<%= node['rbenv']['root_path'] %>"
 RBENV_SHIMS="$RBENV_ROOT/shims"
 RBENV_BIN="$RBENV_ROOT/bin"
 
-RBENV_ROOT_PATCH="export RBENV_ROOT && export POSTGRESQL_BIN"
-RUBY_PATH_PATCH="PATH=/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$POSTGRESQL_BIN && export PATH"
+RBENV_ROOT_PATCH="export RBENV_ROOT"
+RUBY_PATH_PATCH="PATH=/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$PATH:$POSTGRESQL_BIN && export PATH"
 
 start() {
 # Start unicorn
