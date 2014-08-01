@@ -20,6 +20,15 @@
       "apps": {
         "www_christ_leather_ru": {
           "backup": true,
+          "ruby_server": {
+            "enable": true,
+            "type": "unicorn",
+            "environment": "production",
+            "www": true,
+            "server_name": [
+                "christ-leather.ru"
+            ]
+          },
           "db": [
             {
               "type": "postgresql",
@@ -51,6 +60,15 @@
         },
           "stage_christ_leather_ru": {
               "backup": true,
+              "ruby_server": {
+                  "enable": true,
+                  "type": "unicorn",
+                  "environment": "staging",
+                  "www": false,
+                  "server_name": [
+                      "stage.christ-leather.ru"
+                  ]
+              },
               "db": [
                   {
                       "type": "postgresql",

@@ -72,8 +72,6 @@ action :create do
 
   init_smtp(a, app_path) if smtp?(a)
 
-  setup_unicorn_nginx(a, app_path) if unicorn?(a)
-
   setup_php(a, app_path) if php?(a)
 
   directory "#{app_path}/backup" do
@@ -85,6 +83,8 @@ action :create do
   end
 
   setup_nginx(a, app_path) if sites?(type) && nginx?(a)
+
+  setup_ruby_server(a, app_path) if ruby_server?(a)
 
   new_resource.updated_by_last_action(true)
 end
@@ -103,8 +103,8 @@ def php?(a)
   a.include? 'php'
 end
 
-def unicorn?(a)
-  a.include? 'unicorn'
+def ruby_server?(a)
+  a.include? 'ruby_server'
 end
 
 def smtp?(a)
@@ -158,30 +158,68 @@ def setup_rbenv(a) # rubocop:disable Style/MethodLength
   end
 end
 
-def setup_unicorn_nginx(a, app_path) # rubocop:disable Style/MethodLength
-  if a['unicorn'].include? 'disabled'
-    rails_nginx_vhost a['name'] do
-      action :disable
+def setup_ruby_server_init(a, app_path) # rubocop:disable Style/MethodLength
+  service_name = "#{a['ruby_server']['type']}_#{a['name']}"
+  init_file = "/etc/init.d/#{service_name}"
+
+  service service_name do
+    supports status: true, restart: true, stop: true, reload: true
+    action :nothing
+    ignore_failure true
+  end
+
+  if a['ruby_server']['enable']
+    template init_file do
+      cookbook 'rails'
+      source "server/#{a['ruby_server']['type']}.erb"
+      owner 'root'
+      group 'root'
+      mode 00755
+      variables app: a['name'],
+                user: a['user'],
+                path: app_path,
+                environment: a['ruby_server']['environment']
+      notifies :enable, "service[#{service_name}]", :immediately
     end
   else
+    file init_file do
+      action :delete
+      notifies :stop,    "service[#{service_name}]", :immediately
+      notifies :disable, "service[#{service_name}]", :delayed
+    end
+  end
+end
+
+def setup_ruby_server(a, app_path) # rubocop:disable Style/MethodLength
+  if a['ruby_server']['enable']
     rails_nginx_vhost a['name'] do
       action :nothing
     end
     template "#{node['nginx']['dir']}/sites-available/#{a['name']}" do
       cookbook 'rails'
-      source 'nginx_unicorn_crap.erb'
+      source 'nginx_ruby_crap.erb'
       owner 'root'
       group 'root'
       mode 00644
       variables app: a['name'],
-                server_name: a['unicorn']['server_name'],
-                listen: a['unicorn']['listen'],
+                type: a['ruby_server']['type'],
+                server_name: a['ruby_server']['server_name'],
+                listen: a['ruby_server']['listen'],
                 path: app_path,
-                ssl: a['unicorn']['ssl']
+                ssl: a['ruby_server']['ssl'],
+                www: a['ruby_server']['www']
       notifies :enable, "rails_nginx_vhost[#{a['name']}]", :delayed
     end
+    setup_ruby_server_init(a, app_path)
+  else
+    rails_nginx_vhost a['name'] do
+      action :disable
+    end
+    setup_ruby_server_init(a, app_path)
   end
 end
+
+
 
 def setup_nginx(a, app_path) # rubocop:disable Style/MethodLength
   directory "#{app_path}/docs" do

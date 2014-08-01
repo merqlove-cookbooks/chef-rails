@@ -1,0 +1,127 @@
+#!/bin/bash
+#
+# Alexander Merkulov sasha@merqlove.ru
+# Contributors  : @elvanja, @troyanov, @eiyaya, @foyo23, @nielsbasjes, @relip, @JasonMing, @andronat, @merqlove
+# App Version   : 6.x
+
+# chkconfig: 2345 82 55
+# processname: unicorn_<%= @app %>
+# description: Runs unicorn <%= @app %> for nginx integration.
+
+# Related (kudos @4sak3n0ne):
+# https://github.com/gitlabhq/gitlabhq/issues/1049#issuecomment-8386882
+# https://gist.github.com/3062860
+
+# Save original $PATH
+# /etc/rc.d/init.d/functions resets $PATH to default(/sbin:/usr/sbin:/bin:/usr/bin).
+# Consequently, rvm and compiled ruby with custom path (which isn't /usr/bin) cannot be executed.
+
+# Include RedHat function library
+. /etc/rc.d/init.d/functions
+
+# The name of the service
+NAME="unicorn_<%= @app %>"
+
+# The username and path to the gitlab source
+USER=<%= @user %>
+APP_ROOT=<%= @path %>
+APP_PATH="$APP_ROOT/current"
+APP_SHARED="$APP_ROOT/shared"
+
+CONFIG="$APP_SHARED/config/unicorn.rb"
+RETVAL=0
+
+# The PID and LOCK files used by unicorn
+UPID="$APP_SHARED/pids/unicorn.pid"
+ULOCK="/var/lock/subsys/$NAME"
+
+# The options to use when running unicorn
+OPTS="-c $CONFIG -E <%= @environment || "production" %> -D"
+
+POSTGRESQL_BIN = "/usr/pgsql-<%= node['postgresql']['version'] %>/bin"
+
+# Ruby related path update
+RBENV_ROOT="<%= node['rbenv']['root_path'] %>"
+RBENV_SHIMS="$RBENV_ROOT/shims"
+RBENV_BIN="$RBENV_ROOT/bin"
+
+RBENV_ROOT_PATCH="export RBENV_ROOT && export POSTGRESQL_BIN"
+RUBY_PATH_PATCH="PATH=/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$POSTGRESQL_BIN && export PATH"
+
+start() {
+# Start unicorn
+echo -n $"Starting $NAME: "
+cd $APP_PATH
+daemon --pidfile=$UPID --user=$USER "$RUBY_PATH_PATCH && $RBENV_ROOT_PATCH && bundle exec unicorn_rails $OPTS"
+RETVAL=$?
+echo
+[ $RETVAL = 0 ] && touch ${ULOCK}
+return $RETVAL
+}
+
+stop() {
+echo -n $"Stopping $NAME: "
+killproc -p ${UPID} ${NAME} -QUIT
+RETVAL=$?
+echo
+[ $RETVAL = 0 ] && rm -f ${ULOCK} ${UPID}
+}
+
+restart() {
+echo -n $"Restarting $NAME: "
+killproc -p ${UPID} ${NAME} -USR2
+RETVAL=$?
+echo
+}
+
+reload() {
+echo -n $"Restarting $NAME: "
+killproc -p ${UPID} ${NAME} -HUP
+RETVAL=$?
+echo
+}
+
+get_status() {
+status -p $UPID $NAME
+}
+
+query_status() {
+get_status >/dev/null 2>&1
+}
+
+case "$1" in
+start)
+get_status >/dev/null 2>&1 && exit 0
+start
+;;
+stop)
+get_status >/dev/null 2>&1 || exit 0
+stop
+;;
+restart)
+restart
+;;
+upgrade)
+upgrade
+;;
+condrestart|try-restart)
+if get_status >/dev/null 2>&1; then
+stop
+start
+fi
+;;
+force-reload|reload)
+reload
+;;
+status)
+get_status
+RETVAL=$?
+;;
+*)
+N=/etc/init.d/$NAME
+echo "Usage: $N {start|stop|restart|condrestart|reload|upgrade|force-reload|status|help}" >&2
+RETVAL=2
+;;
+esac
+
+exit $RETVAL

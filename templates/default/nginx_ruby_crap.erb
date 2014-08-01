@@ -1,12 +1,21 @@
 # Maintained by Chef.  Local changes will be overwritten
 
-upstream unicorn_<%= @app %> {
-  server unix:<%= @path %>/shared/.sock fail_timeout=0;
+upstream <%= @type %>_<%= @app %> {
+  server unix:///tmp/<%= @type %>.<%= @app %>.sock fail_timeout=0;
 }
 
+<% if @www %>
 server {
-  listen <%= @listen %>;
+  listen 80;
+  server_name  www.<%= Array(@server_name)[0] %>;
+  return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
+}
+<% end %>
+
+server {
+  listen <%= @listen || 80 %>;
   server_name <%= Array(@server_name).join(' ') %>;
+  root   <%= @path %>/current/public;
 
 <% if @ssl %>
   ssl on;
@@ -14,22 +23,21 @@ server {
   ssl_certificate_key <%= @ssl[:certificate_key] %>;
 <% end -%>
 
-  root   <%= @path %>/current/public;
   autoindex off;
   charset utf-8;
 
-  location ^~ /(assets|static|system)/ {
+  location ^~ /(assets|static|spree|system)/ {
     gzip_static on;
     expires max;
     add_header Cache-Control public;
   }
 
-  try_files $uri/index.html $uri @unicorn_<%= @app %>;
-  location @unicorn_<%= @app %> {
+  try_files $uri/index.html $uri @<%= @type %>_<%= @app %>;
+  location @<%= @type %>_<%= @app %> {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
     proxy_redirect off;
-    proxy_pass http://unicorn_<%= @app %>;
+    proxy_pass http://<%= @type %>_<%= @app %>;
   }
 
   error_page 500 502 503 /500.html;
