@@ -5,6 +5,6 @@ location ~ (\.tpl|\.ini|\.log) {
 }
 location @engine_file_rewrite {
 }
-localtion @website {
+location @website {
   rewrite ^/(.+)$ /index.php?_route_=$1 last;
 }
