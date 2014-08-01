@@ -181,11 +181,12 @@ def user_ftps(u, data) # rubocop:disable Style/MethodLength
 end
 
 def user_nginx
-  return if !node['nginx'] || node['nginx']['source']['use_existing_user']
+  return if node['nginx']['source']['use_existing_user']
 
   user node['nginx']['user'] do
     system true
     shell  '/bin/false'
     home   '/var/www'
   end
+  node.default['nginx']['source']['use_existing_user'] = true
 end
