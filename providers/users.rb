@@ -25,7 +25,7 @@ action :create do
   if users && secret && vcs
     users_data = []
 
-    user_nginx
+    # user_nginx
 
     users.each do |u| # rubocop:disable Style/Next
       data = ::Chef::EncryptedDataBagItem.load('users', u, secret)
