@@ -1,0 +1,11 @@
+
+# deny access to protected directories
+location ~ ^/(protected|framework|themes/w+/views) {
+  deny  all;
+}
+
+location / {
+  index  index.html index.php;
+  try_files $uri $uri/ /index.php?$args;
+}
+

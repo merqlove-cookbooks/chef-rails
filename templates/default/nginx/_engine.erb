@@ -1,6 +1,8 @@
 <% case @engine %>
 <% when 'wordpress' %>
   <%= render 'nginx/wordpress.erb' %>
+<% when 'yii' %>
+  <%= render 'nginx/yii.erb' %>
 <% when 'opencart' %>
   <%= render 'nginx/opencart.erb' %>
 <% else %>

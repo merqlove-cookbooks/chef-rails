@@ -255,6 +255,7 @@ def setup_nginx(a, app_path) # rubocop:disable Style/MethodLength
     engine           a['nginx']['engine']
     server_name      server_name
     path             app_path
+    path_suffix      a['nginx']['path_suffix']
     rewrites         a['nginx']['rewrites']
     file_rewrites    a['nginx']['file_rewrites']
     php_rewrites     a['nginx']['php_rewrites']

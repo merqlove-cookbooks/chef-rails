@@ -27,6 +27,7 @@ attribute :user,             kind_of: String, default: nil, required: true
 attribute :listen,           kind_of: String, default: '80'  # Listening port, ip, etc.
 attribute :server_name,      kind_of: Array, default: [] # Server name if different then the name attribute.
 attribute :path,             kind_of: String, default: nil, required: true # Server root
+attribute :path_suffix,      kind_of: String, default: '',  required: false # Server root
 attribute :default,          kind_of: [TrueClass, FalseClass], default: false  # Default host
 attribute :deferred,         kind_of: [TrueClass, FalseClass], default: false  # Deffered host
 attribute :disable_www,      kind_of: [TrueClass, FalseClass], default: true # Redirect www to domain

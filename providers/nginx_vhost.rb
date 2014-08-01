@@ -103,6 +103,7 @@ action :create do
               name:          name,
               user:          new_resource.user,
               path:          new_resource.path,
+              path_suffix:   new_resource.path_suffix,
               server_name:   server_name,
               php:           new_resource.php,
               engine:        new_resource.engine,

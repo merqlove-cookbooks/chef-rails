@@ -21,7 +21,7 @@
     ssl_certificate <%= @ssl[:certificate] %>;
     ssl_certificate_key <%= @ssl[:certificate_key] %>;<% end %>
 
-    root   <%= @path %>/docs;
+    root   <%= @path %>/docs/<%= @path_suffix || '' %>;
     autoindex off;
     charset utf-8;
 
