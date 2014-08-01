@@ -13,12 +13,12 @@ location ~ (\.tpl|\.ini|\.log) {
 location @engine_file_rewrite {
 }
 
-location = / {
+location / {
   try_files @uri @uri/ @website;
 }
 
 location @website {
- rewrite ^/(.+)$ /index.php?_route_=$1 last;
+  rewrite ^/(.+)$ /index.php?_route_=$1 last;
 }
 
 # if (!-f $request_filename) {
