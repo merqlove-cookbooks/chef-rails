@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Resource:: python
+# Provider:: rbenv
 #
 # Copyright (C) 2014 Alexander Merkulov
 #
@@ -17,9 +17,23 @@
 # limitations under the License.
 #
 
-actions :create
+action :create do
+  install_ruby
 
-default_action :create
+  new_resource.updated_by_last_action(true)
+end
 
-attribute :name, name_attribute: true, kind_of: String
-attribute :cookbook, kind_of: String, default: 'rails'
+def install_ruby
+  node['rails']['rbenv']['versions'].each do |version, setup|
+    rbenv_ruby version do
+      ruby_version version
+    end
+
+    setup['gems'].each do |g|
+      rbenv_gem g['name'] do
+        ruby_version version
+        version      g['version'] if g['version']
+      end
+    end
+  end
+end

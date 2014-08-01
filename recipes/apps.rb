@@ -22,8 +22,10 @@ file "#{node['nginx']['dir']}/conf.d/default.conf" do
   action :delete
 end
 
-# PHP fpm fix
-node.default['php-fpm']['pools']   = []
+node.default['rails']['rbenv']['versions'] = {}
+node.default['rails']['php']['install']    = false
+node.default['rails']['php']['modules']    = []
+node.default['php-fpm']['pools']           = []
 
 # Useful databases
 node.default['rails']['databases'] = {}
@@ -42,6 +44,8 @@ node['rails']['apps'].each do |k, a|
   end
 end
 
+rails_rbenv 'initialize'
+rails_php 'initialize'
 rails_php_fpm 'initialize'
 
 # Sites cleanup

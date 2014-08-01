@@ -18,48 +18,8 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
-ruby_exists = 0
-
-if Chef::Config[:solo]
-  Chef::Log.warn('This recipe uses search. Chef Solo does not support search.')
-else
-  ruby_exists = search(:node, "roles:base_ruby AND name:#{node.name}")
-end
-
-package 'patch'
-package 'automake'
-package 'libtool'
-
-if ruby_exists.count > 0
-  case node['platform_family']
-  when 'rhel'
-    package 'libyaml-devel'
-    package 'libffi-devel'
-  when 'debian'
-    package 'libyaml-dev'
-    package 'libffi-dev'
-  end
-  node.default['rails']['ruby'] = true
-else
-  case node['platform_family']
-  when 'rhel'
-    package 'openssl-devel'
-    package 'zlib-devel'
-    package 'readline-devel'
-    package 'libxml2-devel'
-    package 'libxslt-devel'
-    package 'libyaml-devel'
-    package 'libffi-devel'
-  when 'debian'
-    package 'libssl-dev'
-    package 'zlib1g-dev'
-    package 'libreadline6-dev'
-    package 'libxml2-dev'
-    package 'libxslt1-dev'
-    package 'libyaml-dev'
-    package 'libffi-dev'
-  end
-  node.default['rails']['ruby'] = false
+%w(patch automake libtool).each do |p|
+  package p
 end
 
 # Install Db4
@@ -72,6 +32,7 @@ when 'debian'
   end
   package 'db-util'
 when 'rhel'
-  package 'db4-utils'
-  package 'db4'
+  %w(db4-utils db4).each do |p|
+    package p
+  end
 end

@@ -1,0 +1,10 @@
+location ~ (\.tpl|\.ini|\.log) {
+  access_log off;
+  log_not_found off;
+  deny all;
+}
+location @engine_file_rewrite {
+}
+localtion @website {
+  rewrite ^/(.+)$ /index.php?_route_=$1 last;
+}

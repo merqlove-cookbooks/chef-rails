@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Resource:: python
+# Attributes:: php
 #
 # Copyright (C) 2014 Alexander Merkulov
 #
@@ -17,9 +17,5 @@
 # limitations under the License.
 #
 
-actions :create
-
-default_action :create
-
-attribute :name, name_attribute: true, kind_of: String
-attribute :cookbook, kind_of: String, default: 'rails'
+default['rails']['php']['install'] = false
+default['rails']['php']['modules'] = []

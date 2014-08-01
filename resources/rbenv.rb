@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Resource:: python
+# Resource:: rbenv
 #
 # Copyright (C) 2014 Alexander Merkulov
 #

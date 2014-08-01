@@ -1,0 +1,31 @@
+location ~ .*wp-content/plugins.* {
+}
+location @engine_file_rewrite {
+  rewrite ^/files/(.*(html|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|docx|xlsx|pptx|txt|tar|mid|midi|wav|bmp|rtf|js))$ /wp-content/blogs.php?file=$1 last;
+  rewrite ^/.*(/wp-.*/.*\\.(html|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|docx|xlsx|pptx|txt|tar|mid|midi|wav|bmp|rtf|js))$ $1 last;
+  rewrite ^/.*(/media/.*\\.(html|jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|docx|xlsx|pptx|txt|tar|mid|midi|wav|bmp|rtf|js))$ $1 last;
+}
+location @website {
+  if ($request_uri ~ "^/wp-admin$"){
+    rewrite ^(.+)$ $1/ redirect;
+  }
+  if (-e $request_filename){
+    rewrite ^/([_0-9a-zA-Z-]+/)?(wp-.*) /$2 break;
+  }
+  rewrite ^/([_0-9a-zA-Z-]+/)?(.*\.php)$ /$2 break;
+
+  if ($query_string ~* "(\<|%3C).*script.*(\>|%3E)"){
+    return 403;
+  }
+  if ($query_string ~ "GLOBALS(=|\[|\%[0-9A-Z]{0,2})"){
+    return 403;
+  }
+  if ($query_string ~ "_REQUEST(=|\[|\%[0-9A-Z]{0,2})"){
+    return 403;
+  }
+  if ($request_method !~ "^(GET|HEAD|POST|PROPFIND|OPTIONS|PUT)$"){
+    return 403;
+  }
+
+  try_files $uri $uri/ /index.php?$args;
+}

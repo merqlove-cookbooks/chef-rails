@@ -68,13 +68,13 @@ action :create do
     next
   end
 
-  install_rbenv(a) if rbenv?(a)
+  setup_rbenv(a) if rbenv?(a)
 
   init_smtp(a, app_path) if smtp?(a)
 
   setup_unicorn_nginx(a, app_path) if unicorn?(a)
 
-  install_php(a, app_path) if php?(a)
+  setup_php(a, app_path) if php?(a)
 
   directory "#{app_path}/backup" do
     mode      00750
@@ -84,7 +84,7 @@ action :create do
     recursive true
   end
 
-  install_nginx(a, app_path) if sites?(type) && nginx?(a)
+  setup_nginx(a, app_path) if sites?(type) && nginx?(a)
 
   new_resource.updated_by_last_action(true)
 end
@@ -96,7 +96,7 @@ end
 # Helpers
 
 def rbenv?(a)
-  node['rails']['ruby'] && a.include?('rbenv')
+  a.include? 'rbenv'
 end
 
 def php?(a)
@@ -141,20 +141,20 @@ end
 
 # Installers
 
-def install_rbenv(a) # rubocop:disable Style/MethodLength
+def setup_rbenv(a) # rubocop:disable Style/MethodLength
   return unless a
 
-  # set ruby
-  rbenv_ruby a['rbenv']['version'] do
-    ruby_version a['rbenv']['version']
-  end
+  version  = a['rbenv']['version']
+  app_gems = a['rbenv']['gems'] ||= []
+  if node['rails']['rbenv']['versions'].include? version
+    node.default['rails']['rbenv']['versions'][version]['gems'] ||= []
+    all_gems = node['rails']['rbenv']['versions'][version]['gems'].dup
 
-  # add gems
-  a['rbenv']['gems'].each do |g|
-    rbenv_gem g['name'] do
-      ruby_version a['rbenv']['version']
-      version      g['version'] if g['version']
-    end
+    all_gems = all_gems.push(app_gems).flatten.compact.uniq { |g| "#{g['name']} #{g['version']}" }
+
+    node.default['rails']['rbenv']['versions'][version]['gems'] = all_gems
+  else
+    node.default['rails']['rbenv']['versions'][version]['gems'] = a['rbenv']['gems']
   end
 end
 
@@ -178,12 +178,12 @@ def setup_unicorn_nginx(a, app_path) # rubocop:disable Style/MethodLength
                 listen: a['unicorn']['listen'],
                 path: app_path,
                 ssl: a['unicorn']['ssl']
-      notifies :enable, "rails_nginx_vhost[#{a['name']}]", :immediately
+      notifies :enable, "rails_nginx_vhost[#{a['name']}]", :delayed
     end
   end
 end
 
-def install_nginx(a, app_path) # rubocop:disable Style/MethodLength
+def setup_nginx(a, app_path) # rubocop:disable Style/MethodLength
   directory "#{app_path}/docs" do
     mode      00750
     owner     a['user']
@@ -216,9 +216,7 @@ def install_nginx(a, app_path) # rubocop:disable Style/MethodLength
     php a.include?   'php'
     block            a['nginx']['block']
     listen           a['nginx']['listen']
-    admin            a['nginx']['admin']
-    min              a['nginx']['min']
-    wordpress        a['nginx']['wordpress']
+    engine           a['nginx']['engine']
     server_name      server_name
     path             app_path
     rewrites         a['nginx']['rewrites']
@@ -229,30 +227,11 @@ def install_nginx(a, app_path) # rubocop:disable Style/MethodLength
   end
 end
 
-def install_php(a, app_path) # rubocop:disable Style/MethodLength
-  node.default['php']['packages'] = %w(php php-devel php-cli php-pear) if rhel5x?
-  node.default['php']['ext_conf_dir'] = '/etc/php5/mods-available' if ubuntu14x?
-  if ::File.exist?('/usr/bin/php')
-    run_context.include_recipe 'php::ini'
-    run_context.include_recipe 'composer::self_update'
-  else
-    case node['platform_family']
-    when 'debian'
-      apt_repository 'php' do
-        uri          'http://ppa.launchpad.net/ondrej/php5-oldstable/ubuntu'
-        distribution node['lsb']['codename']
-        components   ['main']
-        keyserver    'keyserver.ubuntu.com'
-        key          'E5267A6C'
-      end
-      run_context.include_recipe 'php'
-      php_ubuntu_packages
-    when 'rhel'
-      run_context.include_recipe 'php'
-      php_rhel_packages
-    end
-    run_context.include_recipe 'composer'
-  end
+def setup_php(a, app_path) # rubocop:disable Style/MethodLength
+  return unless a
+
+  node.default['rails']['php']['install']  = true
+  node.default['rails']['php']['modules'].push a['php']['modules']
 
   directory "/var/lib/php/session/#{a['user']}_#{a['name']}" do
     owner     a['user']
@@ -263,19 +242,6 @@ def install_php(a, app_path) # rubocop:disable Style/MethodLength
   end
 
   fill_php_config(a, app_path)
-end
-
-def php_ubuntu_packages
-  package 'php5-gd'
-  package 'php5-memcached'
-  package 'php-apc'
-end
-
-def php_rhel_packages
-  package 'php-gd'
-  package 'php-pecl-memcached'
-  package 'php-pecl-apcu'
-  package 'php-mbstring'
 end
 
 def init_smtp(a, app_path) # rubocop:disable Style/MethodLength

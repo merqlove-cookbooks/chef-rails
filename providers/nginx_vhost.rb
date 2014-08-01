@@ -90,32 +90,29 @@ action :create do
     mode 00644
     source new_resource.template
     cookbook new_resource.template ? new_resource.cookbook_name.to_s : new_resource.cookbook
-    variables(
-      block:         new_resource.block,
-      # options:     options,
-      # upstream:    upstream,
-      listen:        listen,
-      # locations:   locations,
-      default:       new_resource.default,
-      deferred:      new_resource.deferred,
-      disable_www:   new_resource.disable_www,
-      access_log:    new_resource.access_log,
-      error_log:     new_resource.error_log,
-      name:          name,
-      user:          new_resource.user,
-      admin:         new_resource.admin,
-      path:          new_resource.path,
-      server_name:   server_name,
-      php:           new_resource.php,
-      min:           new_resource.min,
-      wordpress:     new_resource.wordpress,
-      rewrites:      new_resource.rewrites,
-      file_rewrites: new_resource.file_rewrites,
-      php_rewrites:  new_resource.php_rewrites,
-      error_pages:   new_resource.error_pages,
-      hidden:        new_resource.hidden,
-      ssl:           new_resource.ssl
-    )
+    variables block:         new_resource.block,
+              # options:     options,
+              # upstream:    upstream,
+              listen:        listen,
+              # locations:   locations,
+              default:       new_resource.default,
+              deferred:      new_resource.deferred,
+              disable_www:   new_resource.disable_www,
+              access_log:    new_resource.access_log,
+              error_log:     new_resource.error_log,
+              name:          name,
+              user:          new_resource.user,
+              path:          new_resource.path,
+              server_name:   server_name,
+              php:           new_resource.php,
+              engine:        new_resource.engine,
+              rewrites:      new_resource.rewrites,
+              file_rewrites: new_resource.file_rewrites,
+              php_rewrites:  new_resource.php_rewrites,
+              error_pages:   new_resource.error_pages,
+              hidden:        new_resource.hidden,
+              ssl:           new_resource.ssl
+
     notifies :run, test_nginx, new_resource.reload
   end
 

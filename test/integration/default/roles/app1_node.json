@@ -48,7 +48,32 @@
               }
             ]
           }
-        }
+        },
+          "stage_christ_leather_ru": {
+              "backup": true,
+              "db": [
+                  {
+                      "type": "postgresql",
+                      "name": "christ_stage_db",
+                      "user": "christ",
+                      "password": "12345678",
+                      "pool": 8
+                  }
+              ],
+              "name": "stage_christ_leather_ru",
+              "user": "merkulov",
+              "folders": [
+
+              ],
+              "rbenv": {
+                  "version": "2.1.2",
+                  "gems": [
+                      {
+                          "name": "bundler"
+                      }
+                  ]
+              }
+          }
       }
     }
   },

@@ -77,7 +77,7 @@
           "user": "merkulov",
           "php": {
             "modules": [
-              "php-mysql",
+              "php-mysqlnd",
               "php-memcached"
             ],
             "pool": {
@@ -143,13 +143,14 @@
           ]
         },
           "test_mrcr_ru": {
+              "enable": true,
               "backup": true,
               "delete": false,
               "name": "test_mrcr_ru",
               "user": "merkulov",
               "php": {
                   "modules": [
-                      "php-mysql",
+                      "php-mysqlnd",
                       "php-memcached"
                   ],
                   "pool": {
@@ -179,7 +180,7 @@
                   "password": "12345678"
               },
               "nginx": {
-                  "vagrant_server_name": "mrcr",
+                  "vagrant_server_name": "mrcr_test",
                   "access_log": false,
                   "error_log": true,
                   "default": false,
@@ -210,6 +211,67 @@
                       "type": "mysql",
                       "name": "mrcr_test_db",
                       "user": "mrcr_test",
+                      "password": "123456789"
+                  }
+              ]
+          },
+          "wordpress_ru": {
+              "enable": true,
+              "backup": true,
+              "delete": false,
+              "name": "wordpress_ru",
+              "user": "merkulov",
+              "php": {
+                  "modules": [
+                      "php-mysqlnd",
+                      "php-memcached"
+                  ],
+                  "pool": {
+                      "allowed_clients": "127.0.0.1",
+                      "process_manager": "dynamic",
+                      "max_children": 4,
+                      "start_servers": 2,
+                      "min_spare_servers": 1,
+                      "max_spare_servers": 3,
+                      "max_requests": 200,
+                      "catch_workers_output": "yes",
+                      "php_options": {
+                          "request_slowlog_timeout": "5s",
+                          "listen.backlog": "-1",
+                          "rlimit_files": "131072",
+                          "rlimit_core": "unlimited",
+                          "php_admin_value[error_reporting]": 1
+                      }
+                  }
+              },
+              "smtp": {
+                  "host": "smtp.gmail.com",
+                  "port": "587",
+                  "domain": "mrcr.ru",
+                  "username": "noreply@mrcr.ru",
+                  "from": "noreply@mrcr.ru",
+                  "password": "12345678"
+              },
+              "nginx": {
+                  "vagrant_server_name": "wordpress",
+                  "access_log": false,
+                  "error_log": true,
+                  "default": false,
+                  "deferred": false,
+                  "disable_www": true,
+                  "engine": "wordpress",
+                  "server_name": [
+                      "wordpress.mrcr.ru"
+                  ],
+                  "rewrites": [
+
+                  ]
+              },
+              "db": [
+                  {
+                      "type": "mysql",
+                      "name": "wordpress_db",
+                      "user": "wordpress",
                       "password": "123456789"
                   }
               ]

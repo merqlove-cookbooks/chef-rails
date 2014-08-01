@@ -236,7 +236,8 @@ def create_postgresql_dbs(secret, date) # rubocop:disable Style/MethodLength
       action            :create
     end
 
-    postgresql_database_user d['user'] do
+    postgresql_database_user "#{d['user']} #{d['name']}" do
+      username   d['user']
       connection postgresql_connection_info
       password   d['password']
       action     :create
@@ -302,7 +303,7 @@ def install_postgresql # rubocop:disable Style/MethodLength
   if php?
     case node['platform_family']
     when 'rhel'
-      package 'php-postgresql'
+      package 'php-pgsql'
     when 'debian'
       package 'php5-pgsql'
     end

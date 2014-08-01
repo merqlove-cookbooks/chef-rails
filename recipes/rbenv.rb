@@ -17,13 +17,11 @@
 # limitations under the License.
 #
 
-if node['recipes'].include?('rbenv::default')
-  rbenv_ruby node['rails']['rbenv']['version'] do
-    ruby_version node['rails']['rbenv']['version']
-    global       true
-  end
-
-  rbenv_gem 'bundler' do
-    ruby_version node['rails']['rbenv']['version']
-  end
+case node['platform_family']
+when 'rhel'
+  package 'libyaml-devel'
+  package 'libffi-devel'
+when 'debian'
+  package 'libyaml-dev'
+  package 'libffi-dev'
 end
