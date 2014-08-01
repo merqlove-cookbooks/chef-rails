@@ -57,7 +57,7 @@ def install_php # rubocop:disable Style/MethodLength
   run_context.include_recipe 'composer'
 end
 
-def install_modules
+def install_modules # rubocop:disable Style/MethodLength
   modules = []
 
   case node['platform_family']
