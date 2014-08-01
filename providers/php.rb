@@ -43,14 +43,13 @@ def install_php # rubocop:disable Style/MethodLength
   node.default['php']['packages'] = %w(php php-devel php-cli php-pear) if rhel5x?
   node.default['php']['ext_conf_dir'] = '/etc/php5/mods-available' if ubuntu14x?
 
-  if debian?
-    apt_repository 'php' do
-      uri          'http://ppa.launchpad.net/ondrej/php5-oldstable/ubuntu'
-      distribution node['lsb']['codename']
-      components   ['main']
-      keyserver    'keyserver.ubuntu.com'
-      key          'E5267A6C'
-    end
+  apt_repository 'php' do
+    uri          'http://ppa.launchpad.net/ondrej/php5-oldstable/ubuntu'
+    distribution node['lsb']['codename']
+    components   ['main']
+    keyserver    'keyserver.ubuntu.com'
+    key          'E5267A6C'
+    only_if { debian? }
   end
 
   run_context.include_recipe 'php'
