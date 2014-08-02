@@ -50,6 +50,11 @@ rails_php_fpm 'initialize'
 
 # Sites cleanup
 if node['rails']['sites'].count > 0
+  execute 'no execute on files' do
+    command "chmod -R -x+X #{node['rails']['sites_base_path']}/*/*/docs"
+    action :run
+  end
+
   execute 'deny site groups from write' do
     command "chmod -R g-w #{node['rails']['sites_base_path']}/*/*/docs"
     action :run
