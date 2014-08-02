@@ -1,0 +1,8 @@
+
+location ~ (/(modules/|include/){
+  access_log off;
+  log_not_found off;
+  deny all;
+}
+
+<%= render 'nginx/default.erb' %>

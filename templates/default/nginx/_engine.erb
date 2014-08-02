@@ -5,17 +5,8 @@
   <%= render 'nginx/yii.erb' %>
 <% when 'opencart' %>
   <%= render 'nginx/opencart.erb' %>
+<% when 'santafox' %>
+  <%= render 'nginx/santafox.erb' %>
 <% else %>
-location = / {
-  try_files @website @website;
-}
-
-location @engine_file_rewrite {
-}
-
-location @website {
-  include fastcgi_params;
-  fastcgi_pass  php_<%= @user %>_<%= @name %>;
-  fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;
-}
+  <%= render 'nginx/default.erb' %>
 <% end -%>
