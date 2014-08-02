@@ -1,3 +1,12 @@
+rewrite .*\.log$ 403 permanent;
+rewrite /+not_imported_.*\.txt 403 permanent;
+rewrite /+(soap|cache|xtemplate|data|examples|include|log4php|metadata|modules)/+.*\.(php|tpl) 403 permanent;
+rewrite /+emailmandelivery\.php 403 permanent;
+rewrite /+upload 403 permanent;
+rewrite /+custom/+blowfish 403 permanent;
+rewrite /+cache/+diagnostic 403 permanent;
+rewrite /+files\.md5$ 403 permanent;
+
 location / {
   index  index.html index.php;
 

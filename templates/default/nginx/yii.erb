@@ -1,6 +1,8 @@
 
 # deny access to protected directories
 location ~ ^/(protected|framework|themes/w+/views) {
+  access_log off;
+  log_not_found off;
   deny  all;
 }
 
