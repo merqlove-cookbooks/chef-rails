@@ -1,4 +1,19 @@
 location / {
   index  index.html index.php;
-  try_files $uri $uri/ /index.php?$args;
+
+  if (!-d $request_filename){
+    set $rule_0 true;
+  }
+  if (!-f $request_filename){
+    set $rule_0 true;
+  }
+  if ($rule_0){
+    rewrite ^/rest/(.*)$ /api/rest.php?__sugar_url=$1 last;
+    rewrite ^/cache/api/metadata/lang_(.._..)_(.*)_public.json$ /rest/v10/lang/public/$1?platform=$2 last;
+    rewrite ^/cache/api/metadata/lang_(.._..)_([^_]*).json$ /rest/v10/lang/$1?platform=$2 last;
+    rewrite ^/portal/(.*)$ /portal2/$1 last;
+    rewrite ^/portal$ /portal/? permanent;
+  }
+
+  try_files $uri $uri/ index.php;
 }
