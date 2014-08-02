@@ -57,7 +57,7 @@ def cleanup_php_fpm # rubocop:disable Style/MethodLength
 
   ::Dir.foreach(node['php-fpm']['pool_conf_dir']) do |pool|
     next if pool == '.' || pool == '..'
-    if pool.include? '.conf'
+    if pool.include?('.conf') && !pool.include?('www.conf')
       unless hash_in_array?(node['php-fpm']['pools'], pool.gsub(/\.conf/, '')) # rubocop:disable Style/BlockNesting
         ::File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")
         deleted = true
