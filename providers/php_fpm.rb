@@ -76,7 +76,7 @@ def stop_php_fpm
 
   ::Dir.foreach(node['php-fpm']['pool_conf_dir']) do |pool|
     next if pool == '.' || pool == '..'
-    if pool.include? '.conf'
+    if pool.include?('.conf') && !pool.include?('www.conf')
       ::File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")
     end
   end
