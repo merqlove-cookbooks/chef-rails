@@ -27,4 +27,6 @@ yum_repository 'openerp' do
   only_if { platform_family?('rhel') }
 end
 
-package 'openerp'
+package 'openerp' do
+  options '--force-yes' if platform_family?('debian')
+end
