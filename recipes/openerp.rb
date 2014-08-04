@@ -18,7 +18,7 @@
 #
 
 apt_repository 'openerp' do
-  uri          'http://nightly.openerp.com/7.0/nightly/deb'
+  uri          'http://nightly.openerp.com/7.0/nightly/deb/ ./'
   only_if { platform_family?('debian') }
 end
 
