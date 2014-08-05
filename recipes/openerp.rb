@@ -31,7 +31,7 @@ package 'openerp' do
   options '--force-yes' if platform_family?('debian')
 end
 
-#TODO: CHAT
+# TODO: CHAT
 pip_install 'gevent'
 pip_install 'greenlet'
 pip_install 'gevent-psycopg2'
