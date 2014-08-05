@@ -16,7 +16,7 @@ module Rails
     end
 
     def php_fpm?
-      node['php-fpm'] && node['php-fpm']['pools'].count > 0
+      node['php-fpm'] && node['php-fpm']['pools'].count > 1
     end
     #
     # Determine if the current node using old RHEL.

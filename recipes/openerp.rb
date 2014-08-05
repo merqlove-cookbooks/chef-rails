@@ -18,15 +18,20 @@
 #
 
 apt_repository 'openerp' do
-  uri          'http://nightly.openerp.com/7.0/nightly/deb/ ./'
+  uri 'http://nightly.openerp.com/7.0/nightly/deb/ ./'
   only_if { platform_family?('debian') }
 end
 
 yum_repository 'openerp' do
-  baseurl          'http://nightly.openerp.com/7.0/nightly/rpm'
+  baseurl 'http://nightly.openerp.com/7.0/nightly/rpm'
   only_if { platform_family?('rhel') }
 end
 
 package 'openerp' do
   options '--force-yes' if platform_family?('debian')
 end
+
+#TODO: CHAT
+pip_install 'gevent'
+pip_install 'greenlet'
+pip_install 'gevent-psycopg2'
