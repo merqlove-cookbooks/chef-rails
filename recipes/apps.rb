@@ -29,7 +29,7 @@ node.default['rails']['rbenv']['versions']  = {}
 
 node.default['rails']['php']['install']     = false
 node.default['rails']['php']['modules']     = []
-node.default['php-fpm']['pools']            = []
+node.default['php-fpm']['pools']            = [node['php-fpm']['default']['pool']]
 
 # Useful databases
 node.default['rails']['databases'] = {}
