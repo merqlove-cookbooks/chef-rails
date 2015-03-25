@@ -46,7 +46,7 @@ action :create do
 
   init_backup(a, type, app_path, project_path)
 
-  init_cron(a)
+  init_cron(a. app_path)
 
   init_db(a, type, app_path, backup_db_path) if db?(a)
 
@@ -321,23 +321,24 @@ def init_backup(a, type, app_path, project_path) # rubocop:disable Metrics/Metho
   end
 end
 
-def init_cron(a) # rubocop:disable Metrics/MethodLength
+def init_cron(a, app_path) # rubocop:disable Metrics/MethodLength
   return unless a['cron']
   a['cron'].each do |cron|
     rails_cron "#{a[:name]}-#{cron[:name] || 'default'}" do
-      interval cron[:interval]
-      minute   cron[:minute]
-      hour     cron[:hour]
-      day      cron[:day]
-      month    cron[:month]
-      weekday  cron[:weekday]
-      interval cron[:interval]
-      user     a[:user]
-      command  cron[:command]
-      mailto   cron[:mailto]
-      path     cron[:path]
-      home     cron[:home]
-      shell    cron[:shell]
+      interval    cron[:interval]
+      minute      cron[:minute]
+      hour        cron[:hour]
+      day         cron[:day]
+      month       cron[:month]
+      weekday     cron[:weekday]
+      interval    cron[:interval]
+      user        a[:user]
+      command     cron[:command]
+      mailto      cron[:mailto]
+      path        cron[:path]
+      home        cron[:home]
+      shell       cron[:shell]
+      environment cron[:environment].merge("APP_PATH" => app_path)
 
       action :create
     end

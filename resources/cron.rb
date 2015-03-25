@@ -34,3 +34,4 @@ attribute :mailto, kind_of: String, default: nil
 attribute :path, kind_of: String, default: nil
 attribute :home, kind_of: String, default: nil
 attribute :shell, kind_of: String, default: nil
+attribute :environment, kind_of: Hash, default: {}

@@ -21,17 +21,18 @@ action :init do
   node['rails']['crons'].each do |cron|
     cron_d "cron-#{cron.name}" do
       predefined_value cron[:interval]
-      minute  cron[:minute]
-      hour    cron[:hour]
-      day     cron[:day]
-      month   cron[:month]
-      weekday cron[:weekday]
-      command cron[:command]
-      user    cron[:user]
-      mailto  cron[:mailto]
-      path    cron[:path]
-      home    cron[:home]
-      shell   cron[:shell]
+      minute      cron[:minute]
+      hour        cron[:hour]
+      day         cron[:day]
+      month       cron[:month]
+      weekday     cron[:weekday]
+      command     cron[:command]
+      user        cron[:user]
+      mailto      cron[:mailto]
+      path        cron[:path]
+      home        cron[:home]
+      shell       cron[:shell]
+      environment cron[:environment]
 
       action :create
     end
@@ -64,7 +65,8 @@ action :create do
     mailto: new_resource.mailto,
     path: new_resource.path,
     home: new_resource.home,
-    shell: new_resource.shell
+    shell: new_resource.shell,
+    environment: new_resource.environment
   }
 
   new_resource.updated_by_last_action(true)
