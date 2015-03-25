@@ -274,11 +274,6 @@
           "method": "md5"
         }
       ]
-    },
-    "pure_ftpd": {
-      "source_url": "http://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.37.tar.gz",
-      "source_checksum": "a9c10b0b8b5772fbf2212bc46fece86f9d4bcc07e58dfd83b58e42a1b2acb76c",
-      "system_user": "ftp"
     }
   },
   "run_list": [
