@@ -31,7 +31,7 @@ action :modules do
   new_resource.updated_by_last_action(true)
 end
 
-def install_php # rubocop:disable Style/MethodLength
+def install_php # rubocop:disable Metrics/MethodLength
   case node['platform_family']
   when 'rhel'
     %w(openssl-devel zlib-devel readline-devel libxml2-devel libxslt-devel libyaml-devel libffi-devel).each do |p|
@@ -55,7 +55,7 @@ def install_php # rubocop:disable Style/MethodLength
   end
 end
 
-def install_modules # rubocop:disable Style/MethodLength
+def install_modules # rubocop:disable Metrics/MethodLength
   modules = []
 
   case node['platform_family']

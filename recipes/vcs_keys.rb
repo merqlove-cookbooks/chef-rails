@@ -28,7 +28,7 @@ if node.role? 'vagrant'
 
       vcs = data_bag('vcs_keys')
       default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
-      if vcs # rubocop:disable Style/BlockNesting
+      if vcs # rubocop:disable Metrics/BlockNesting
         vcs.each do |item|
           key = ::Chef::EncryptedDataBagItem.load('vcs_keys', item, default_secret)
 

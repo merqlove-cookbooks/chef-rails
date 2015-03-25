@@ -10,6 +10,9 @@ SingleSpaceBeforeFirstArg:
 TrailingComma:
   Enabled: false
 
+Metrics/AbcSize:
+  Enabled: false
+
 Style/LeadingCommentSpace:
   Exclude:
     - 'Berksfile'

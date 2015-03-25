@@ -48,7 +48,7 @@ end
 
 # Makers
 
-def create_mysql_dbs(secret, date) # rubocop:disable Style/MethodLength
+def create_mysql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   root = ::Chef::EncryptedDataBagItem.load('mysql', 'root', secret)
   if root
     node.normal['mysql']['server_debian_password'] = root['debian_password']
@@ -108,7 +108,7 @@ def create_mysql_dbs(secret, date) # rubocop:disable Style/MethodLength
   create_mysql_admin(secret, root)
 end
 
-def install_mysql # rubocop:disable Style/MethodLength
+def install_mysql # rubocop:disable Metrics/MethodLength
   name = node['rails']['mysqld']['service_name']
   mysql_service name do
     version node['mysql']['version']
@@ -144,7 +144,7 @@ def install_mysql # rubocop:disable Style/MethodLength
   end
 end
 
-def tune_mysql(name) # rubocop:disable Style/MethodLength
+def tune_mysql(name) # rubocop:disable Metrics/MethodLength
   ruby_block 'cleanup_innodb_logfiles' do
     block do
       ::Dir.glob("#{node['mysql']['data_dir']}/ib*").each do |f|
@@ -169,7 +169,7 @@ def tune_mysql(name) # rubocop:disable Style/MethodLength
   end
 end
 
-def create_mysql_admin(secret, root) # rubocop:disable Style/MethodLength
+def create_mysql_admin(secret, root) # rubocop:disable Metrics/MethodLength
   return unless secret && root
   mysql = data_bag('mysql')
   return unless mysql
@@ -191,7 +191,7 @@ def create_mysql_admin(secret, root) # rubocop:disable Style/MethodLength
   end
 end
 
-def backup_mysql_db(d, date, password) # rubocop:disable Style/MethodLength,Style/CyclomaticComplexity
+def backup_mysql_db(d, date, password) # rubocop:disable Metrics/MethodLength,Metrics/CyclomaticComplexity
   return unless d && date && password
 
   exec_before = [
@@ -209,7 +209,7 @@ def stop_mysql
   end
 end
 
-def create_postgresql_dbs(secret, date) # rubocop:disable Style/MethodLength
+def create_postgresql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   postgres = ::Chef::EncryptedDataBagItem.load('postgresql', 'postgres', secret)
   node.normal['postgresql']['password']['postgres'] = postgres['password']
 
@@ -218,7 +218,7 @@ def create_postgresql_dbs(secret, date) # rubocop:disable Style/MethodLength
   template '/root/.pgpass' do
     source 'pgpass.erb'
     variables(
-        password: postgres['password']
+      password: postgres['password']
     )
     group  'root'
     user   'root'
@@ -270,7 +270,7 @@ def create_postgresql_dbs(secret, date) # rubocop:disable Style/MethodLength
   create_postgresql_admin(secret, postgres)
 end
 
-def create_postgresql_admin(secret, postgres) # rubocop:disable Style/MethodLength
+def create_postgresql_admin(secret, postgres) # rubocop:disable Metrics/MethodLength
   return unless secret && postgres
   psql = data_bag('postgresql')
   return unless psql
@@ -306,7 +306,7 @@ def create_postgresql_admin(secret, postgres) # rubocop:disable Style/MethodLeng
   end
 end
 
-def install_postgresql # rubocop:disable Style/MethodLength
+def install_postgresql # rubocop:disable Metrics/MethodLength
   case node['platform_family']
   when 'debian'
     node.default['postgresql']['enable_pgdg_apt'] = true
@@ -331,7 +331,7 @@ def install_postgresql # rubocop:disable Style/MethodLength
   run_context.include_recipe 'postgresql::ruby'
 end
 
-def backup_postgresql_db(d, date) # rubocop:disable Style/MethodLength
+def backup_postgresql_db(d, date) # rubocop:disable Metrics/MethodLength
   return unless d && date
 
   exec_before = [
@@ -351,7 +351,7 @@ def stop_postgresql
   end
 end
 
-def create_mongodb_dbs(secret, date) # rubocop:disable Style/MethodLength
+def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   admin = ::Chef::EncryptedDataBagItem.load('mongodb', 'admin', secret)
   run_context.include_recipe 'mongodb::default'
   node.default['mongodb']['config']['auth'] = true if node['rails']['mongodb']['auth']
@@ -405,10 +405,10 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Style/MethodLength
   create_mongodb_admin(secret, admin)
 end
 
-def create_mongodb_admin(secret, admin) # rubocop:disable Style/MethodLength
+def create_mongodb_admin(secret, admin) # rubocop:disable Metrics/MethodLength
   return unless secret && admin
   mongo = data_bag('mongodb')
-  return unless mongo # rubocop:disable Style/BlockNesting
+  return unless mongo # rubocop:disable Metrics/BlockNesting
 
   (mongo - ['admin']).each do |m|
     u = ::Chef::EncryptedDataBagItem.load('mongodb', m, secret)
@@ -423,7 +423,7 @@ def create_mongodb_admin(secret, admin) # rubocop:disable Style/MethodLength
   end
 end
 
-def backup_mongodb_db(d, date) # rubocop:disable Style/MethodLength
+def backup_mongodb_db(d, date) # rubocop:disable Metrics/MethodLength
   return unless d && date
 
   exec_before = [
@@ -443,7 +443,7 @@ def stop_mongodb
   end
 end
 
-def backup_db(name, d, date, before = [], pre = [], after = []) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength,Style/ParameterLists
+def backup_db(name, d, date, before = [], pre = [], after = []) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/ParameterLists,Metrics/PerceivedComplexity
   return unless name && d && date
 
   if d['app_backup']
@@ -466,7 +466,7 @@ def backup_db(name, d, date, before = [], pre = [], after = []) # rubocop:disabl
       name "#{name}_db_#{d['app_name']}"
       action :delete
     end
-    ::FileUtils.remove_dir(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Style/BlockNesting
-    ::FileUtils.remove_dir(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Style/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Metrics/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Metrics/BlockNesting
   end
 end

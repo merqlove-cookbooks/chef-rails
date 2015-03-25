@@ -67,7 +67,7 @@ action :create do
   new_resource.updated_by_last_action(true)
 end
 
-def user_ssh_keys(u, data) # rubocop:disable Style/MethodLength
+def user_ssh_keys(u, data) # rubocop:disable Metrics/MethodLength
   return unless data['ssh-keys'] && u
 
   directory "/home/#{u}/.ssh" do
@@ -86,7 +86,7 @@ def user_ssh_keys(u, data) # rubocop:disable Style/MethodLength
   end
 end
 
-def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Style/MethodLength
+def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
   return unless data['vcs'] && u && secret
 
   data['vcs'].each do |v|
@@ -122,13 +122,13 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Style/MethodLength
     mode 00644
 
     variables(
-        name:  u,
-        email: "#{u}@#{node['fqdn']}"
+      name:  u,
+      email: "#{u}@#{node['fqdn']}"
     )
   end
 end
 
-def user_groups(u) # rubocop:disable Style/MethodLength
+def user_groups(u) # rubocop:disable Metrics/MethodLength
   return unless u
 
   if u == node['rails']['user']['deploy']
@@ -157,7 +157,7 @@ def user_groups(u) # rubocop:disable Style/MethodLength
   end
 end
 
-def user_ftps(u, data) # rubocop:disable Style/MethodLength
+def user_ftps(u, data) # rubocop:disable Metrics/MethodLength
   return %w() unless data['ftp'] && u
 
   users = []

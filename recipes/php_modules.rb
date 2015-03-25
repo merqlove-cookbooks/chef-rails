@@ -20,4 +20,3 @@
 rails_php 'install modules' do
   action :modules
 end
-

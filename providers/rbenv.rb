@@ -23,7 +23,7 @@ action :create do
   new_resource.updated_by_last_action(true)
 end
 
-def install_ruby # rubocop:disable Style/MethodLength
+def install_ruby # rubocop:disable Metrics/MethodLength
   node['rails']['rbenv']['versions'].each do |version, setup|
     rbenv_ruby version do
       ruby_version version

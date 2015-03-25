@@ -143,7 +143,7 @@ end
 
 # Installers
 
-def setup_rbenv(a) # rubocop:disable Style/MethodLength
+def setup_rbenv(a) # rubocop:disable Metrics/MethodLength
   return unless a
 
   version  = a['rbenv']['version']
@@ -160,7 +160,7 @@ def setup_rbenv(a) # rubocop:disable Style/MethodLength
   end
 end
 
-def setup_ruby_server_init(a, app_path) # rubocop:disable Style/MethodLength
+def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
   service_name = "#{a['ruby_server']['type']}_#{a['name']}"
   init_file = "/etc/init.d/#{service_name}"
 
@@ -192,7 +192,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Style/MethodLength
   end
 end
 
-def setup_ruby_server(a, app_path) # rubocop:disable Style/MethodLength
+def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
   if a['ruby_server']['enable']
     rails_nginx_vhost a['name'] do
       action :nothing
@@ -221,7 +221,7 @@ def setup_ruby_server(a, app_path) # rubocop:disable Style/MethodLength
   end
 end
 
-def setup_nginx(a, app_path) # rubocop:disable Style/MethodLength
+def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
   directory "#{app_path}/docs" do
     mode      00750
     owner     a['user']
@@ -266,7 +266,7 @@ def setup_nginx(a, app_path) # rubocop:disable Style/MethodLength
   end
 end
 
-def setup_php(a, app_path) # rubocop:disable Style/MethodLength
+def setup_php(a, app_path) # rubocop:disable Metrics/MethodLength
   return unless a
 
   node.default['rails']['php']['install']  = true
@@ -283,13 +283,13 @@ def setup_php(a, app_path) # rubocop:disable Style/MethodLength
   fill_php_config(a, app_path)
 end
 
-def init_smtp(a, app_path) # rubocop:disable Style/MethodLength
+def init_smtp(a, app_path) # rubocop:disable Metrics/MethodLength
   node.default['msmtp']['accounts'][a['user']][a['name']]          = a[:smtp]
   node.default['msmtp']['accounts'][a['user']][a['name']][:syslog] = 'on'
   node.default['msmtp']['accounts'][a['user']][a['name']][:log]    = "#{app_path}/log/msmtp.log"
 end
 
-def init_db(a, type, app_path, backup_db_path) # rubocop:disable Style/MethodLength
+def init_db(a, type, app_path, backup_db_path) # rubocop:disable Metrics/MethodLength
   a['db'].each do |d|
     node.default['rails']['databases'][d['type']][d['name']] = {
       name:               d['name'],
@@ -310,7 +310,7 @@ def init_db(a, type, app_path, backup_db_path) # rubocop:disable Style/MethodLen
   end
 end
 
-def init_backup(a, type, app_path, project_path) # rubocop:disable Style/MethodLength
+def init_backup(a, type, app_path, project_path) # rubocop:disable Metrics/MethodLength
   return unless a['backup']
   rails_backup a['name'] do
     path        "#{type}/#{project_path}"
@@ -321,10 +321,10 @@ def init_backup(a, type, app_path, project_path) # rubocop:disable Style/MethodL
   end
 end
 
-def init_cron(a)
+def init_cron(a) # rubocop:disable Metrics/MethodLength
   return unless a['cron']
   a['cron'].each do |cron|
-    rails_cron "#{a[:name]}-#{cron[:name]||'default'}" do
+    rails_cron "#{a[:name]}-#{cron[:name] || 'default'}" do
       interval cron[:interval]
       minute   cron[:minute]
       hour     cron[:hour]
@@ -346,7 +346,7 @@ end
 
 # Methods
 
-def fill_php_config(a, app_path) # rubocop:disable Style/MethodLength
+def fill_php_config(a, app_path) # rubocop:disable Metrics/MethodLength
   pool = node.default['php-fpm']['default']['pool'].dup
 
   pool_custom = {
@@ -368,7 +368,7 @@ def fill_php_config(a, app_path) # rubocop:disable Style/MethodLength
 
   if a[:php][:pool]
     a[:php][:pool].each do |key, value|
-      if key.include? 'php_options' # rubocop:disable Style/BlockNesting
+      if key.include? 'php_options' # rubocop:disable Metrics/BlockNesting
         pool_custom[:"#{key}"] = pool_custom[:"#{key}"].merge(value)
       else
         pool_custom[:"#{key}"] = value

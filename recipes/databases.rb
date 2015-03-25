@@ -32,7 +32,6 @@ end
 db_backup_root = '/var/tmp/db_backup'
 
 node['rails']['duplicity']['db'].each do |db|
-
   db_backup_dir = "#{db_backup_root}/#{db}"
 
   exec_pre = [

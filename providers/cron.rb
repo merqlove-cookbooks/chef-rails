@@ -41,11 +41,13 @@ action :init do
 end
 
 action :cleanup do
-  ::Dir[ ::File.join('/etc/cron.d/cron-*') ].each do |c|
+  ::Dir[::File.join('/etc/cron.d/cron-*')].each do |c|
     next if cron_active?(c)
 
     ::File.delete(c)
   end
+
+  new_resource.updated_by_last_action(true)
 end
 
 action :create do

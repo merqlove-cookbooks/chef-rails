@@ -18,7 +18,7 @@
 #
 
 action :create do
-  chef_gem 'chef-vault' do
+  chef_gem 'chef-vault' do # ~FC009
     compile_time true
     action :nothing
   end
@@ -27,18 +27,18 @@ action :create do
     block do
       require 'rubygems'
       require 'chef-vault'
-      if Class.const_defined? 'ChefVault'
-        Chef::DataBag.load('secrets').each do |item|
-          next unless item[0] == node['rails']['secrets']['key']
+      return unless Class.const_defined? 'ChefVault'
 
-          key = ChefVault::Item.load('secrets', item[0])
-          s = Chef::Resource::File.new(node['rails']['secrets']['default'], run_context)
-          s.owner      'root'
-          s.group      'root'
-          s.mode       00600
-          s.content    key['file-content']
-          s.run_action :create
-        end
+      Chef::DataBag.load('secrets').each do |item|
+        next unless item[0] == node['rails']['secrets']['key']
+
+        key = ChefVault::Item.load('secrets', item[0])
+        s = Chef::Resource::File.new(node['rails']['secrets']['default'], run_context)
+        s.owner      'root'
+        s.group      'root'
+        s.mode       00600
+        s.content    key['file-content']
+        s.run_action :create
       end
     end
     action :nothing

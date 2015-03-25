@@ -10,7 +10,6 @@ end
 source 'https://supermarket.chef.io'
 
 group :java do
-
 end
 
 group :php do

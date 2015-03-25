@@ -23,7 +23,7 @@ module Rails
         self.file ||= resource
       end
 
-      def save_all # rubocop:disable Style/CyclomaticComplexity
+      def save_all # rubocop:disable Metrics/CyclomaticComplexity
         Dir.glob('tmp/**/*').each do |d|
           next if d == '.' || d == '..' || File.file?(d)
           dir = resource_path(d.sub('tmp/', ''))

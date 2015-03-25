@@ -61,24 +61,29 @@ action :delete do
 end
 
 action :cleanup do
-  cron_root = "/etc/cron.#{new_resource.interval}"
-  if ::Dir.exist? cron_root
-    ::Dir.foreach(cron_root) do |cron|
-      next if cron == '.' || cron == '..' || !cron.include?('duplicity')
-      name = cron.sub('duplicity-', '')
-      next if backup_active?(name)
-
-      duplicity_ng_cronjob "cleanup backup #{name}" do
-        name name
-        action :delete
-      end
-    end
-  end
+  backup_cleanup
   backup_tmp_cleanup
+
   new_resource.updated_by_last_action(true)
 end
 
-def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
+def backup_cleanup
+  cron_root = "/etc/cron.#{new_resource.interval}"
+  return unless ::Dir.exist?(cron_root)
+
+  ::Dir.foreach(cron_root) do |cron|
+    next if cron == '.' || cron == '..' || !cron.include?('duplicity')
+    name = cron.sub('duplicity-', '')
+    next if backup_active?(name)
+
+    duplicity_ng_cronjob "cleanup backup #{name}" do
+      name name
+      action :delete
+    end
+  end
+end
+
+def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
   return unless storage_key_id || pass_key_id
 
   default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
@@ -108,7 +113,7 @@ def use_config(new_resource, pass_key_id, store, default_secret)
   cronjob_script new_resource, store, boto, duplicity if duplicity['passphrase']
 end
 
-def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
+def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
   aws_eu  = (new_resource.s3_eu) ? '--s3-use-new-style --s3-european-buckets ' : ''
   logfile = (new_resource.log) ? (new_resource.logfile) : '/dev/null'
   method  = node['rails']['duplicity']['method']
@@ -187,22 +192,22 @@ end
 def gs?
   node['rails']['duplicity']['method'].include?('gs')
 end
-alias is_gs? gs?
+alias_method :is_gs?, :gs?
 
 def aws?
   node['rails']['duplicity']['method'].include?('s3')
 end
-alias is_aws? aws?
+alias_method :is_aws?, :aws?
 
 def swift?
   node['rails']['duplicity']['method'].include?('swift')
 end
-alias is_swift? swift?
+alias_method :is_swift?, :swift?
 
 def azure?
   node['rails']['duplicity']['method'].include?('azure')
 end
-alias is_azure? azure?
+alias_method :is_azure?, :azure?
 
 def backup_active?(name)
   node['rails']['duplicity']['units'].each do |backup|
@@ -219,14 +224,14 @@ def backup_tmp_active?(name)
 end
 
 def backup_tmp_cleanup
-  ::Dir[ ::File.join('/tmp/d{a,t}-*-*') ].each do |d|
+  ::Dir[::File.join('/tmp/d{a,t}-*-*')].each do |d|
     next if backup_tmp_active?(d)
 
     ::FileUtils.remove_dir(d)
   end
 end
 
-def clean_path(path, replacement='_')
+def clean_path(path, replacement = '_')
   return unless path
   cleaned = path.gsub(/[_\-\?\+\/\\+]/, replacement)
   if cleaned.include? '_db'
@@ -237,5 +242,5 @@ def clean_path(path, replacement='_')
 end
 
 def collect_units(name)
-  node.default['rails']['duplicity']['units'] << { name: name}
+  node.default['rails']['duplicity']['units'] << { name: name }
 end
