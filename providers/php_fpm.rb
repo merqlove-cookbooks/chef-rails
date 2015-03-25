@@ -55,7 +55,6 @@ action :configure do
     php_fpm_pool pool[:name] do
       pool.each do |k, v|
         params[k.to_sym] = v
-        notifies :restart, 'service[php-fpm]', :delayed
       end
     end
   end
