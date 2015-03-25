@@ -338,7 +338,7 @@ def init_cron(a, app_path) # rubocop:disable Metrics/MethodLength
       path        cron[:path]
       home        cron[:home]
       shell       cron[:shell]
-      environment cron[:environment].merge("APP_PATH" => app_path)
+      environment cron[:environment].merge('APP_PATH' => app_path)
 
       action :create
     end
