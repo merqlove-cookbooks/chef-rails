@@ -22,6 +22,15 @@
 action :create do
   # PHP pools
   if php_fpm?
+    template node['php-fpm']['conf_file'] do
+      source 'php-fpm.conf.erb'
+      cookbook 'php-fpm'
+      mode 00644
+      owner 'root'
+      group 'root'
+      notifies :restart, 'service[php-fpm]'
+    end
+
     template "#{node['php']['ext_conf_dir']}/php_fix.ini" do
       owner 'root'
       group 'root'
