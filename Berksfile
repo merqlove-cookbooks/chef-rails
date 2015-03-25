@@ -7,7 +7,7 @@ def company_cookbook(name, version = '>= 0.0.0', options = {})
   }.merge(options))
 end
 
-source 'https://api.berkshelf.com'
+source 'https://supermarket.chef.io'
 
 group :java do
 
@@ -23,7 +23,7 @@ end
 
 group :ruby do
   cookbook 'rbenv', '~> 1.7.1', github: 'RiotGames/rbenv-cookbook'
-  cookbook 'nodejs', github: 'mdxp/nodejs-cookbook'
+  cookbook 'nodejs', '~> 2.2.1', github: 'redguide/nodejs'
 end
 
 group :mail do
@@ -37,13 +37,11 @@ group :postgres do
   company_cookbook 'postgresql'
 end
 
-group :mysql do
-  cookbook 'mysql', github: 'LessonPlanet/mysql', ref: '4635b8c'
-end
+company_cookbook 'duplicity_ng', '>= 0.0.0', branch: 'feature/fix_conditions_and_azure'
 
 # base
 group :production do
-  %w(duplicity_ng locale openssl-fips ssh_known_hosts timezone-ii vsftpd).each do |name|
+  %w(locale openssl-fips ssh_known_hosts timezone-ii vsftpd).each do |name|
     company_cookbook name
   end
 end

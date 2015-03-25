@@ -14,7 +14,7 @@ provisioner:
 platforms:
 - name: centos-6.5
   run_list:
-- name: centos-5.10
+- name: centos-6.6
   run_list:
 - name: centos-7.0
   run_list:

@@ -46,6 +46,8 @@ action :create do
 
   init_backup(a, type, app_path, project_path)
 
+  init_cron(a)
+
   init_db(a, type, app_path, backup_db_path) if db?(a)
 
   if a[:delete] && a[:name] && !a['name'].empty?
@@ -309,22 +311,36 @@ def init_db(a, type, app_path, backup_db_path) # rubocop:disable Style/MethodLen
 end
 
 def init_backup(a, type, app_path, project_path) # rubocop:disable Style/MethodLength
-  if a['backup']
-    rails_backup a['name'] do
-      path        "#{type}/#{project_path}"
-      include     [app_path]
-      exclude     ["#{app_path}/backup"]
-      archive_dir "/tmp/da-#{a['user']}-#{a['name']}"
-      temp_dir    "/tmp/dt-#{a['user']}-#{a['name']}"
+  return unless a['backup']
+  rails_backup a['name'] do
+    path        "#{type}/#{project_path}"
+    include     [app_path]
+    exclude     ["#{app_path}/backup"]
+    archive_dir "/tmp/da-#{a['user']}-#{a['name']}"
+    temp_dir    "/tmp/dt-#{a['user']}-#{a['name']}"
+  end
+end
+
+def init_cron(a)
+  return unless a['cron']
+  a['cron'].each do |cron|
+    rails_cron "#{a[:name]}-#{cron[:name]||'default'}" do
+      interval cron[:interval]
+      minute   cron[:minute]
+      hour     cron[:hour]
+      day      cron[:day]
+      month    cron[:month]
+      weekday  cron[:weekday]
+      interval cron[:interval]
+      user     a[:user]
+      command  cron[:command]
+      mailto   cron[:mailto]
+      path     cron[:path]
+      home     cron[:home]
+      shell    cron[:shell]
+
+      action :create
     end
-  else
-    archive_dir = "/tmp/da-#{a['user']}-#{a['name']}"
-    temp_dir    = "/tmp/dt-#{a['user']}-#{a['name']}"
-    rails_backup a['name'] do
-      action :delete
-    end
-    ::FileUtils.remove_dir(archive_dir) if ::Dir.exist? archive_dir
-    ::FileUtils.remove_dir(temp_dir) if ::Dir.exist? temp_dir
   end
 end
 
@@ -361,7 +377,7 @@ def fill_php_config(a, app_path) # rubocop:disable Style/MethodLength
   end
 
   if smtp?(a)
-    pool_custom[:php_options]['php_admin_value[sendmail_path]'] = "/usr/bin/msmtp -a #{a['user']}_#{a['name']} -t"
+    pool_custom[:php_options]['php_admin_value[sendmail_path]'] = "/usr/bin/msmtp -a #{a['name']} -t"
   end
 
   pool_custom.each do |key, value|
@@ -372,5 +388,5 @@ def fill_php_config(a, app_path) # rubocop:disable Style/MethodLength
     end
   end
 
-  node.default['php-fpm']['pools'].push(pool)
+  node.default['php-fpm']['pools'] << pool
 end

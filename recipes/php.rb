@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Resource:: php_fpm
+# Recipe:: php
 #
-# Copyright (C) 2014 Alexander Merkulov
+# Copyright (C) 2015 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,10 +17,4 @@
 # limitations under the License.
 #
 
-actions :create, :fix, :configure
-
-default_action :create
-
-attribute :name, name_attribute: true, kind_of: String
-attribute :cookbook, kind_of: String, default: 'rails' # Cookbook to find template
-attribute :template, kind_of: String, default: 'database.yml.erb' # Template to use.
+rails_php 'initialize'

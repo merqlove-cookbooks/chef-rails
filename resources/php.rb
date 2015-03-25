@@ -17,9 +17,9 @@
 # limitations under the License.
 #
 
-actions :create
+actions :install, :modules
 
-default_action :create
+default_action :install
 
 attribute :name, name_attribute: true, kind_of: String
 attribute :cookbook, kind_of: String, default: 'rails'

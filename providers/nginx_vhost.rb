@@ -134,10 +134,8 @@ end
 action :delete do
   name = new_resource.name
 
-  begin
-    nginx_site name do
-      enable false
-    end
+  nginx_site name do
+    enable false
   end
 
   file "#{node['nginx']['dir']}/sites-available/#{name}" do

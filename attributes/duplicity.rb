@@ -53,3 +53,4 @@ default['rails']['duplicity']['exec_before'] = [] # ['pg_dumpall -U postgres |bz
 default['rails']['duplicity']['exec_after'] = [] # ['touch /backup-sucessfull', 'echo yeeeh']
 
 default['rails']['duplicity']['db'] = []
+default['rails']['duplicity']['units'] = []

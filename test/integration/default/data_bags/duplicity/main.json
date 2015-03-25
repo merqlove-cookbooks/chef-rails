@@ -1,8 +1,8 @@
 {
   "id": "main",
   "passphrase": {
-    "encrypted_data": "aQnEX4H0MQloUhF2c21KBanstOwHVX+uncRDJ2ABpsg=\n",
-    "iv": "IY1zITsdHzZNGgLQOrraAg==\n",
+    "encrypted_data": "Wu8qM8LnXyPs+EXa4PD64GMYOw+FB8fERlp8rAJTyGg=\n",
+    "iv": "bAliAoDrAQoFUFgjGa22Kw==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   }

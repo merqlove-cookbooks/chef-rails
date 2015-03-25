@@ -19,11 +19,14 @@
 
 ::Chef::Provider.send(:include, Rails::Helpers)
 
-action :create do
-  if php_exist?
-    install_php
-    install_modules
-  end
+action :install do
+  install_php if php_exist?
+
+  new_resource.updated_by_last_action(true)
+end
+
+action :modules do
+  install_modules if php_exist?
 
   new_resource.updated_by_last_action(true)
 end
@@ -40,7 +43,6 @@ def install_php # rubocop:disable Style/MethodLength
     end
   end
 
-  node.default['php']['packages'] = %w(php php-devel php-cli php-pear) if rhel5x?
   node.default['php']['ext_conf_dir'] = '/etc/php5/mods-available' if ubuntu14x?
 
   apt_repository 'php' do
@@ -51,9 +53,6 @@ def install_php # rubocop:disable Style/MethodLength
     key          'E5267A6C'
     only_if { debian? }
   end
-
-  run_context.include_recipe 'php'
-  run_context.include_recipe 'composer'
 end
 
 def install_modules # rubocop:disable Style/MethodLength

@@ -61,7 +61,8 @@ def create_mysql_dbs(secret, date) # rubocop:disable Style/MethodLength
   mysql_connection_info = {
     host:     'localhost',
     username: 'root',
-    password: root['password']
+    password: root['password'],
+    socket:   "/var/run/mysql-#{node['rails']['mysqld']['service_name']}/mysqld.sock"
   }
 
   node['rails']['databases']['mysql'].each do |_k, d|
@@ -108,17 +109,30 @@ def create_mysql_dbs(secret, date) # rubocop:disable Style/MethodLength
 end
 
 def install_mysql # rubocop:disable Style/MethodLength
-  run_context.include_recipe 'mysql::server'
-  run_context.include_recipe 'mysql::client'
-
-  service node['rails']['mysqld']['service_name'] do
-    supports status: true, restart: true, reload: true, start: true, stop: true
-    action :nothing
+  name = node['rails']['mysqld']['service_name']
+  mysql_service name do
+    version node['mysql']['version']
+    data_dir node['mysql']['data_dir']
+    initial_root_password node['mysql']['server_root_password']
+    bind_address node['mysql']['bind_address']
+    socket
+    action [:create, :start]
   end
 
-  tune_mysql
+  mysql_client 'default' do
+    action :create
+  end
 
-  run_context.include_recipe 'database::mysql'
+  tune_mysql(name)
+
+  mysql2_chef_gem 'default' do
+    action :install
+  end
+
+  link "mysql config link #{name}" do
+    target_file '/etc/my.cnf'
+    to "/etc/mysql-#{name}/my.cnf"
+  end
 
   if php? # rubocop:disable Style/GuardClause
     case node['platform_family']
@@ -130,7 +144,7 @@ def install_mysql # rubocop:disable Style/MethodLength
   end
 end
 
-def tune_mysql # rubocop:disable Style/MethodLength
+def tune_mysql(name) # rubocop:disable Style/MethodLength
   ruby_block 'cleanup_innodb_logfiles' do
     block do
       ::Dir.glob("#{node['mysql']['data_dir']}/ib*").each do |f|
@@ -139,17 +153,18 @@ def tune_mysql # rubocop:disable Style/MethodLength
       end
     end
     action :nothing
-    notifies :start, "service[#{node['rails']['mysqld']['service_name']}]", :immediately
+    notifies :start, "mysql_service[#{name}]", :immediately
   end
 
-  template "#{node['rails']['mysqld']['include_dir']}/tune.cnf" do
-    owner    'mysql'
-    owner    'mysql'
-    source   'mysql_tune.cnf.erb'
+  mysql_config "tune_#{name}" do
+    source 'mysql_tune.cnf.erb'
+    instance name
+    version node['mysql']['version']
     variables(
-        config: node['rails']['mysql']
+      config: node['rails']['mysql']
     )
-    notifies :stop, "service[#{node['rails']['mysqld']['service_name']}]", :immediately
+    action :create
+    notifies :stop, "mysql_service[#{name}]", :immediately
     notifies :run, 'ruby_block[cleanup_innodb_logfiles]', :immediately
   end
 end
@@ -162,7 +177,8 @@ def create_mysql_admin(secret, root) # rubocop:disable Style/MethodLength
   mysql_connection_info = {
     host:     'localhost',
     username: root['id'],
-    password: root['password']
+    password: root['password'],
+    socket:   "/var/run/mysql-#{node['rails']['mysqld']['service_name']}/mysqld.sock"
   }
 
   (mysql - ['root']).each do |m|
@@ -186,9 +202,9 @@ def backup_mysql_db(d, date, password) # rubocop:disable Style/MethodLength,Styl
 end
 
 def stop_mysql
-  mysql_init = ::File.join('/etc/init.d', node['rails']['mysqld']['service_name'])
-  service node['rails']['mysqld']['service_name'] do
-    action [:stop, :disable]
+  mysql_init = ::File.join('/etc/init.d', "mysql-#{node['rails']['mysqld']['service_name']}")
+  mysql_service node['rails']['mysqld']['service_name'] do
+    action [:stop, :delete]
     only_if { ::FileTest.file? mysql_init }
   end
 end

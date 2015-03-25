@@ -14,8 +14,8 @@ module Rails
 
         raw_hash = ::Chef::JSONCompat.from_json(raw_json)
         bag_item = ::Chef::EncryptedDataBagItem.new raw_hash, secret
-        FileUtils.mkdir_p(tmp_resource_dir("databags/#{@resource}"))
-        IO.write tmp_resource_file('data_bags'), Chef::JSONCompat.to_json_pretty(bag_item.to_hash)
+        FileUtils.mkdir_p(tmp_resource_dir("data_bags/#{@resource}"))
+        IO.write tmp_resource_file, Chef::JSONCompat.to_json_pretty(bag_item.to_hash)
       end
 
       def decode
@@ -24,8 +24,8 @@ module Rails
 
           raw_hash = ::Chef::JSONCompat.from_json(raw_json)
           bag_item = ::Chef::EncryptedDataBagItem.new raw_hash, secret
-          FileUtils.mkdir_p(tmp_resource_dir("databags/#{@resource}"))
-          IO.write tmp_resource_file('data_bags'), ::Chef::JSONCompat.to_json_pretty(bag_item.to_hash)
+          FileUtils.mkdir_p(tmp_resource_dir("data_bags/#{@resource}"))
+          IO.write tmp_resource_file, ::Chef::JSONCompat.to_json_pretty(bag_item.to_hash)
         end
       end
 

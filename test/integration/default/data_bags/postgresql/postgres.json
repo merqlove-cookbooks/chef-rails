@@ -1,14 +1,14 @@
 {
   "id": "postgres",
   "password": {
-    "encrypted_data": "PwYXARZ6++3ne7bVPHeVyrl8tny5DmAdZWA4Dd31HNA=\n",
-    "iv": "KuSoweLG4hxnHKiNRWUhdA==\n",
+    "encrypted_data": "1GpVU/+aoLxhRPpVfZCFkkNuy0LuWf7zrmre/fE1aho=\n",
+    "iv": "30YzTQZHXP17ueecI5QTGg==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   },
   "admin": {
-    "encrypted_data": "k1Z707esgKtzyimZlHnrHZTjFDnixPx6aZ19VyJ6FuE=\n",
-    "iv": "bI2oCa05UTq/Ybn6BR+Q6Q==\n",
+    "encrypted_data": "3M1UFGTxLQ+FPfR8vT029AIEM6QtbzU/m76TMWTN534=\n",
+    "iv": "VOnB9PLqhq2xH8EFxLZLFQ==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   }

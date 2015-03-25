@@ -72,8 +72,12 @@ module Rails
       end
 
       # path on resource type
-      def tmp_resource_dir
-        @tmp_resource_dir ||= "#{PROJECT_ROOT}"
+      def tmp_resource_dir(path)
+        @tmp_resource_dir = "#{tmp_dir}/#{path}" unless path.blank?
+      end
+
+      def tmp_dir
+        @tmp_resource_dir ||= "#{PROJECT_ROOT}/tmp"
       end
 
       # path on resource type
@@ -95,7 +99,7 @@ module Rails
       end
 
       def tmp_resource_file
-        @tmp_resource_file ||= "#{tmp_resource_dir}/#{file}.json"
+        @tmp_resource_file ||= "#{tmp_dir}/#{file}.json"
       end
 
       def test_dir

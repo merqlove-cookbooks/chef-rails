@@ -58,6 +58,8 @@ node['rails']['duplicity']['db'].each do |db|
     exec_before.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
   end
 
+  exec_before.push "chmod -R o-rwx #{db_backup_dir}"
+
   rails_backup "#{db}_db_backup" do
     path        "db/#{db}"
     exec_pre    exec_pre
@@ -76,7 +78,6 @@ if ::Dir.exist? db_backup_root
       block do
         ::FileUtils.remove_dir("/tmp/da-#{db}") if ::Dir.exist?("/tmp/da-#{db}")
         ::FileUtils.remove_dir("/tmp/dt-#{db}") if ::Dir.exist?("/tmp/dt-#{db}")
-        ::FileUtils.remove_dir("#{db_backup_root}/#{db}") if ::Dir.exist?("#{db_backup_root}/#{db}")
       end
       action :nothing
     end

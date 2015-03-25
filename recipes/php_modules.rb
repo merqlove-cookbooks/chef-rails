@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Provider:: python
+# Recipe:: php_modules
 #
-# Copyright (C) 2014 Alexander Merkulov
+# Copyright (C) 2015 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,7 @@
 # limitations under the License.
 #
 
-action :create do
-  link "#{node['python']['prefix_dir']}/local/bin/python" do
-    to node['python']['binary']
-    only_if { ::File.exist?(node['python']['binary']) }
-  end
-
-  new_resource.updated_by_last_action(true)
+rails_php 'install modules' do
+  action :modules
 end
+

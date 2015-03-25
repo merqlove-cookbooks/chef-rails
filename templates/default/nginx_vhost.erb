@@ -50,7 +50,7 @@
       <% hidden_paths << Array(@hidden).join('|') %>
     <% end %>
 
-    location ~ (/(uploads/|ini.php)|/\.svn/|/\.git/|robots.txt|favicon.ico|/.hta.+<%=hidden_paths%>){
+    location ~ (^/(uploads/|ini.php)|/\.svn/|/\.git/|robots.txt|favicon.ico|/.hta.+<%=hidden_paths%>){
       access_log off;
       log_not_found off;
       deny all;

@@ -17,5 +17,5 @@
 # limitations under the License.
 #
 
-default['rails']['rbenv']['version']  = '2.1.2'
+default['rails']['rbenv']['version']  = '2.1.5'
 default['rails']['rbenv']['versions'] = {}

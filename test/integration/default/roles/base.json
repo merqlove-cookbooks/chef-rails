@@ -12,6 +12,12 @@
       }
     },
     "duplicity_ng": {
+      "use_pip": true,
+      "source": {
+        "version": "0.7.02",
+        "checksum": "609462ba43275340ae4fc008ee6620265cdc2c68988caae289971dd609ed033a",
+        "url": "https://launchpad.net/duplicity/0.7-series/0.7.02/+download/duplicity-0.7.02.tar.gz"
+      }
     },
     "nodejs": {
       "version": "0.10.29",
@@ -24,6 +30,14 @@
         "ssh": {
           "maxretry": 10
         }
+      }
+    },
+    "openssl_fips": {
+      "fips": {
+        "url": "https://www.openssl.org/source/openssl-fips-2.0.5.tar.gz"
+      },
+      "openssl": {
+        "url": "https://www.openssl.org/source/openssl-1.0.1g.tar.gz"
       }
     },
     "memcached": {
@@ -40,6 +54,7 @@
       "remove_test_database": true,
       "bind_address": "localhost",
       "remove_anonymous_users": true,
+      "data_dir": "/var/lib/mysql",
       "client": {
         "packages": [
           "mysql",
@@ -49,8 +64,7 @@
     },
     "yum": {
       "epel": {
-        "exclude": "postgresql* mongo* mysql*",
-        "managed": true
+        "exclude": "postgresql* mongo* mysql*"
       },
       "remi": {
         "exclude": "postgresql* mongo* mysql*"
@@ -129,7 +143,7 @@
         "auth": true
       },
       "duplicity": {
-        "target": "backup_merqlove",
+        "target": "backup_merqlove_test",
         "pass_key_id": "main",
         "method": "gs",
         "keep_full": 5,
@@ -148,7 +162,9 @@
       ]
     },
     "packages": [
-      "mc"
+      "mc",
+      "zip",
+      "unzip"
     ],
     "php": {
       "directives": {
@@ -156,6 +172,35 @@
         "upload_max_filesize": "32M",
         "post_max_size": "32M",
         "max_execution_time": 240
+      }
+    },
+    "php-fpm": {
+      "listen_mode": "0777",
+      "listen_owner": "nginx",
+      "listen_group": "nginx",
+      "emergency_restart_threshold": 10,
+      "emergency_restart_interval": "1m",
+      "process_control_timeout": "1s",
+      "log_level": "debug",
+      "upload_max_filesize": "16M",
+      "post_max_size": "16M",
+      "default": {
+        "pool": {
+          "name": "www",
+          "allowed_clients": "127.0.0.1",
+          "process_manager": "dynamic",
+          "max_children": 4,
+          "start_servers": 2,
+          "min_spare_servers": 1,
+          "max_spare_servers": 3,
+          "max_requests": 200,
+          "catch_workers_output": "yes",
+          "php_options": {
+            "listen.backlog": -1,
+            "rlimit_files": 131072,
+            "rlimit_core": "unlimited"
+          }
+        }
       }
     }
   },
@@ -195,26 +240,23 @@
   },
   "run_list": [
     "recipe[chef-client::config]",
-    "recipe[selinux::disabled]",
     "recipe[rails::secrets]",
     "recipe[rails::swap]",
     "recipe[rails::repos]",
-    "recipe[build-essential]",
-    "recipe[rails::openssl]",
-    "recipe[rails::packages]",
-    "recipe[vsftpd]",
-    "recipe[rails::users]",
-    "recipe[git]",
     "recipe[timezone-ii]",
     "recipe[locale]",
+    "recipe[build-essential]",
+    "recipe[rails::openssl]",
+    "recipe[packages]",
+    "recipe[sudo]",
+
+    "recipe[selinux::disabled]",
     "recipe[iptables]",
     "recipe[rails::iptables]",
-    "recipe[rails::openssh]",
-    "recipe[openssh]",
-    "recipe[openssh::iptables]",
-    "recipe[sudo]",
+    "recipe[rails::packages]",
+    "recipe[vsftpd]",
+    "recipe[git]",
     "recipe[python]",
-    "recipe[rails::python]",
     "recipe[fail2ban]",
     "recipe[vim]",
     "recipe[curl]",
@@ -222,11 +264,14 @@
     "recipe[msmtp]",
     "recipe[msmtp::no_postfix]",
     "recipe[msmtp::sasl]",
-    "recipe[packages]",
     "recipe[nginx::repo]",
     "recipe[nginx]",
     "recipe[duplicity_ng::source]",
     "recipe[duplicity_ng::install_boto]",
-    "recipe[memcached]"
+    "recipe[memcached]",
+    "recipe[rails::users]",
+    "recipe[openssh::iptables]",
+    "recipe[rails::openssh]",
+    "recipe[openssh]"
   ]
 }

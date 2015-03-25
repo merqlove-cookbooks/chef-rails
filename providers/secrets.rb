@@ -18,15 +18,9 @@
 #
 
 action :create do
-  if Gem.const_defined?('Version') && Gem::Version.new(Chef::VERSION) < Gem::Version.new('10.12.0')
-    gem_package 'chef-vault' do
-      action :nothing
-    end.run_action(:install)
-    Gem.clear_paths
-  else
-    chef_gem 'chef-vault' do
-      action :nothing
-    end.run_action(:install)
+  chef_gem 'chef-vault' do
+    compile_time true
+    action :nothing
   end
 
   ruby_block 'secrets' do

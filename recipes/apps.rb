@@ -22,10 +22,14 @@ file "#{node['nginx']['dir']}/conf.d/default.conf" do
   action :delete
 end
 
-node.default['rails']['rbenv']['versions'] = {}
-node.default['rails']['php']['install']    = false
-node.default['rails']['php']['modules']    = []
-node.default['php-fpm']['pools']           = [node['php-fpm']['default']['pool']]
+node.default['rails']['duplicity']['units'] = []
+node.default['rails']['crons']              = []
+
+node.default['rails']['rbenv']['versions']  = {}
+
+node.default['rails']['php']['install']     = false
+node.default['rails']['php']['modules']     = []
+node.default['php-fpm']['pools']            = []
 
 # Useful databases
 node.default['rails']['databases'] = {}
@@ -45,8 +49,6 @@ node['rails']['apps'].each do |k, a|
 end
 
 rails_rbenv 'initialize'
-rails_php 'initialize'
-rails_php_fpm 'initialize'
 
 # Sites cleanup
 if node['rails']['sites'].count > 0
@@ -72,6 +74,19 @@ rails_backup 'system' do
   main true
 end
 
+rails_cron 'init' do
+  action :init
+end
+
 msmtp_system   'initialize base msmtp account'
 msmtp_accounts 'initialize user msmtp accounts'
+
+rails_backup 'cleanup backups' do
+  action :cleanup
+end
+
+rails_cron 'cleanup cron' do
+  action :cleanup
+end
+
 include_recipe 'rails::cleanup'

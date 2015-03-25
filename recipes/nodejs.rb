@@ -23,6 +23,5 @@ if rhel7x?
     package pkg
   end
 else
-  node.default['nodejs']['install_method'] = 'source' if rhel5x?
   include_recipe 'nodejs'
 end

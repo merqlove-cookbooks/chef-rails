@@ -22,10 +22,6 @@
 action :create do
   # PHP pools
   if php_fpm?
-    node.default['php-fpm']['skip_repository_install'] = true if rhel?
-    run_context.include_recipe 'php-fpm::install'
-    run_context.include_recipe 'php-fpm::configure'
-
     template "#{node['php']['ext_conf_dir']}/php_fix.ini" do
       owner 'root'
       group 'root'
@@ -48,26 +44,40 @@ action :create do
   new_resource.updated_by_last_action(true)
 end
 
+action :fix do
+  node.default['php-fpm']['skip_repository_install'] = true if rhel?
+
+  new_resource.updated_by_last_action(true)
+end
+
+action :configure do
+  node['php-fpm']['pools'].each do |pool|
+    php_fpm_pool pool[:name] do
+      pool.each do |k, v|
+        params[k.to_sym] = v
+        notifies :restart, 'service[php-fpm]', :delayed
+      end
+    end
+  end
+
+  new_resource.updated_by_last_action(true)
+end
+
 # Makers
 
 def cleanup_php_fpm # rubocop:disable Style/MethodLength,Style/CyclomaticComplexity
   return unless ::Dir.exist? node['php-fpm']['pool_conf_dir']
 
-  deleted = false
-
   ::Dir.foreach(node['php-fpm']['pool_conf_dir']) do |pool|
     next if pool == '.' || pool == '..'
     if pool.include?('.conf') && !pool.include?('www.conf')
       unless hash_in_array?(node['php-fpm']['pools'], pool.gsub(/\.conf/, '')) # rubocop:disable Style/BlockNesting
-        ::File.delete("#{node['php-fpm']['pool_conf_dir']}/#{pool}")
-        deleted = true
+        file "#{node['php-fpm']['pool_conf_dir']}/#{pool}" do
+          action   :delete
+          notifies :restart, 'service[php-fpm]', :delayed
+        end
       end
     end
-  end
-
-  service 'php-fpm' do
-    action [:restart]
-    only_if { deleted }
   end
 end
 

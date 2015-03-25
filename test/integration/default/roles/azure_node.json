@@ -1,7 +1,7 @@
 {
   "chef_type": "role",
   "json_class": "Chef::Role",
-  "name": "app1_node",
+  "name": "azure_node",
   "description": "",
   "default_attributes": {
     "nginx": {
@@ -17,8 +17,7 @@
         "pass_key_id": "main",
         "method": "azure",
         "db": [
-          "postgresql",
-          "mongo"
+          "postgresql"
         ]
       },
       "apps": {

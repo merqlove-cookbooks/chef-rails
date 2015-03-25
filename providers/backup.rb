@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+require 'fileutils'
+
 action :create do
   store_keys = nil
 
@@ -26,6 +28,8 @@ action :create do
     store_keys = data_bag('gs')
   elsif swift?
     store_keys = data_bag('swift')
+  elsif azure?
+    store_keys = data_bag('azure')
   end
 
   if store_keys
@@ -36,6 +40,8 @@ action :create do
       config new_resource, storage_key_id, pass_key_id
     end
   end
+
+  collect_units new_resource.name
 
   new_resource.updated_by_last_action(true)
 end
@@ -54,6 +60,24 @@ action :delete do
   new_resource.updated_by_last_action(true)
 end
 
+action :cleanup do
+  cron_root = "/etc/cron.#{new_resource.interval}"
+  if ::Dir.exist? cron_root
+    ::Dir.foreach(cron_root) do |cron|
+      next if cron == '.' || cron == '..' || !cron.include?('duplicity')
+      name = cron.sub('duplicity-', '')
+      next if backup_active?(name)
+
+      duplicity_ng_cronjob "cleanup backup #{name}" do
+        name name
+        action :delete
+      end
+    end
+  end
+  backup_tmp_cleanup
+  new_resource.updated_by_last_action(true)
+end
+
 def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/CyclomaticComplexity,Style/MethodLength
   return unless storage_key_id || pass_key_id
 
@@ -65,6 +89,8 @@ def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Style/Cy
     store = ::Chef::EncryptedDataBagItem.load('gs', storage_key_id, default_secret)
   elsif swift?
     store = ::Chef::EncryptedDataBagItem.load('swift', storage_key_id, default_secret)
+  elsif azure?
+    store = ::Chef::EncryptedDataBagItem.load('azure', storage_key_id, default_secret)
   else
     return
   end
@@ -115,23 +141,29 @@ def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable 
 
     #
     # # In case you use Swift as you backend, specify the credentials here
-    swift_username       store['username'] if swift?
-    swift_password       store['password'] if swift?
-    swift_authurl        store['authurl'] if swift?
+    swift_username       store['username'] if is_swift?
+    swift_password       store['password'] if is_swift?
+    swift_authurl        store['authurl']  if is_swift?
 
     # In case you use Google Cloud Storage as your backend, your credentials go here
-    gs_access_key_id     store['access_key_id'] if gs? && !boto
-    gs_secret_access_key store['secret_access_key'] if gs? && !boto
+    gs_access_key_id     store['access_key_id']     if is_gs? && !boto
+    gs_secret_access_key store['secret_access_key'] if is_gs? && !boto
 
     # In case you use S3 as your backend, your credentials go here
-    aws_access_key_id     store['access_key_id'] if aws? && !boto
-    aws_secret_access_key store['secret_access_key'] if aws? && !boto
+    aws_access_key_id     store['access_key_id']     if is_aws? && !boto
+    aws_secret_access_key store['secret_access_key'] if is_aws? && !boto
+
+    # In case you use Microsoft Azure
+    azure_account_name store['account_name'] if is_azure?
+    azure_account_key  store['account_key']  if is_azure?
   end
 end
 
 def backend_uri(method, target, path = '', aws_eu = '')
   if swift?
     "#{method}://#{node['fqdn']}_#{clean_path(path)}"
+  elsif azure?
+    "#{method}://#{clean_path(node['fqdn'], '-').gsub('.', '-')}-#{clean_path(path, '-').gsub('.', '-')}".gsub('--', '-').downcase
   else
     "#{aws_eu}#{method}://#{target}/#{node['fqdn']}/#{path}"
   end
@@ -141,32 +173,69 @@ def boto_config(store)
   return unless store
   duplicity_ng_boto 'base boto config' do
     # In case you use Google Cloud Storage as your backend, your credentials go here
-    gs_access_key_id     store['access_key_id'] if gs?
-    gs_secret_access_key store['secret_access_key'] if gs?
+    gs_access_key_id     store['access_key_id'] if is_gs?
+    gs_secret_access_key store['secret_access_key'] if is_gs?
 
     # In case you use S3 as your backend, your credentials go here
-    aws_access_key_id     store['access_key_id'] if aws?
-    aws_secret_access_key store['secret_access_key'] if aws?
+    aws_access_key_id     store['access_key_id'] if is_aws?
+    aws_secret_access_key store['secret_access_key'] if is_aws?
   end
 end
+
+# Helpers
 
 def gs?
   node['rails']['duplicity']['method'].include?('gs')
 end
+alias is_gs? gs?
 
 def aws?
   node['rails']['duplicity']['method'].include?('s3')
 end
+alias is_aws? aws?
 
 def swift?
   node['rails']['duplicity']['method'].include?('swift')
 end
+alias is_swift? swift?
 
-def clean_path(path)
+def azure?
+  node['rails']['duplicity']['method'].include?('azure')
+end
+alias is_azure? azure?
+
+def backup_active?(name)
+  node['rails']['duplicity']['units'].each do |backup|
+    return true if backup[:name] == name
+  end
+  false
+end
+
+def backup_tmp_active?(name)
+  node['rails']['duplicity']['units'].each do |backup|
+    return true if name.include?(backup[:name])
+  end
+  false
+end
+
+def backup_tmp_cleanup
+  ::Dir[ ::File.join('/tmp/d{a,t}-*-*') ].each do |d|
+    next if backup_tmp_active?(d)
+
+    ::FileUtils.remove_dir(d)
+  end
+end
+
+def clean_path(path, replacement='_')
   return unless path
-  if path.include? '_db'
-    path[/[a-z_\-\.]+\/[a-z]+$/].sub('/', '_')
+  cleaned = path.gsub(/[_\-\?\+\/\\+]/, replacement)
+  if cleaned.include? '_db'
+    cleaned[/[a-z_\-\.]+\/[a-z]+$/].sub('/', replacement)
   else
-    path[/[a-z0-9_\-\.]+$/]
-  end.sub(/^_/, '')
+    cleaned[/[a-z0-9_\-\.]+$/]
+  end.sub(/^#{replacement}/, '')
+end
+
+def collect_units(name)
+  node.default['rails']['duplicity']['units'] << { name: name}
 end

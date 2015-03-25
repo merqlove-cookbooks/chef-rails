@@ -17,12 +17,26 @@
 # limitations under the License.
 #
 
-default['rails']['swap']['size'] = '512' # MBs
-default['rails']['swap']['enable'] = false
-default['rails']['apps_base_path']      = '/srv/apps'
-default['rails']['sites_base_path']      = '/srv/sites'
+default['rails']['swap']['size']    = '512' # MBs
+default['rails']['swap']['enable']  = false
+default['rails']['apps_base_path']  = '/srv/apps'
+default['rails']['sites_base_path'] = '/srv/sites'
 default['rails']['ruby'] = false
-default['rails']['apps']      = {
+default['rails']['cron'] = {
+  minute: '*',
+  hour: '*',
+  day: '*',
+  month: '*',
+  weekday: '*',
+  interval: nil,
+  user: 'root',
+  command: '',
+  mailto: nil,
+  path: nil,
+  home: nil,
+  shell: nil
+}
+default['rails']['apps'] = {
   # 'default2': {
   #   'db': [
   #     {

@@ -1,14 +1,14 @@
 {
   "id": "admin",
   "password": {
-    "encrypted_data": "Lh+6QvwJ93MgRLRAUUzXMK2sBIn1/F30MvPpv9KJLSg=\n",
-    "iv": "/quNKLRwLnmdRh60BgSOmA==\n",
+    "encrypted_data": "1CJjjfUffbRIIuwkoixGXhtaqsZysr5JUPzkOlQm5Wc=\n",
+    "iv": "JUXxTIJBrPVVf6kTCp1s5w==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   },
   "admin": {
-    "encrypted_data": "6r8l1HvKpk0onrhXLkJnORh0MMqNmaLuCaofC6hbyt8=\n",
-    "iv": "F10JwclQiv6YjZUpXSN5wQ==\n",
+    "encrypted_data": "2catAfFdGq+neHZI/9E9Ufd5dWC5CvHOcAR164i5pxc=\n",
+    "iv": "EbSSxFYbLo2RFYMM+sIe/Q==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   }

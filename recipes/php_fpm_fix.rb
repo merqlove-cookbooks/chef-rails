@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Recipe:: python
+# Recipe:: php_fpm_fix
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2015 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,6 @@
 # limitations under the License.
 #
 
-::Chef::Recipe.send(:include, Rails::Helpers)
-
-rails_python 'set alter as main python' if rhel5x?
+rails_php_fpm 'fix install method' do
+  action :fix
+end

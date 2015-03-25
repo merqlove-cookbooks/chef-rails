@@ -39,17 +39,6 @@
         "use_localtime": "YES"
       }
     },
-    "php-fpm": {
-      "listen_mode": "0777",
-      "listen_owner": "nginx",
-      "listen_group": "nginx",
-      "emergency_restart_threshold": 10,
-      "emergency_restart_interval": "1m",
-      "process_control_timeout": "1s",
-      "log_level": "debug",
-      "upload_max_filesize": "16M",
-      "post_max_size": "16M"
-    },
     "msmtp": {
       "host": "smtp.gmail.com",
       "port": "587",
@@ -148,6 +137,12 @@
               "delete": false,
               "name": "test_mrcr_ru",
               "user": "merkulov",
+              "cron": [
+                {
+                  "minute": 5,
+                  "hour": 23,
+                  "command": "ls -all"
+                }],
               "php": {
                   "modules": [
                       "php-mysqlnd",
@@ -275,6 +270,67 @@
                       "password": "123456789"
                   }
               ]
+          },
+          "bitrix_ru": {
+              "enable": true,
+              "backup": true,
+              "delete": false,
+              "name": "bitrix_ru",
+              "user": "merkulov",
+              "php": {
+                  "modules": [
+                      "php-mysqlnd",
+                      "php-memcached"
+                  ],
+                  "pool": {
+                      "allowed_clients": "127.0.0.1",
+                      "process_manager": "dynamic",
+                      "max_children": 4,
+                      "start_servers": 2,
+                      "min_spare_servers": 1,
+                      "max_spare_servers": 3,
+                      "max_requests": 200,
+                      "catch_workers_output": "yes",
+                      "php_options": {
+                          "request_slowlog_timeout": "5s",
+                          "listen.backlog": "-1",
+                          "rlimit_files": "131072",
+                          "rlimit_core": "unlimited",
+                          "php_admin_value[error_reporting]": 1
+                      }
+                  }
+              },
+              "smtp": {
+                  "host": "smtp.gmail.com",
+                  "port": "587",
+                  "domain": "mrcr.ru",
+                  "username": "noreply@mrcr.ru",
+                  "from": "noreply@mrcr.ru",
+                  "password": "12345678"
+              },
+              "nginx": {
+                  "vagrant_server_name": "bitrix",
+                  "access_log": false,
+                  "error_log": true,
+                  "default": false,
+                  "deferred": false,
+                  "disable_www": true,
+                  "engine": "bitrix",
+                  "server_name": [
+                      "bitrix.mrcr.ru"
+                  ],
+                  "rewrites": [
+
+                  ]
+              },
+              "db": [
+                  {
+                      "type": "mysql",
+                      "name": "bitrix_db",
+                      "user": "bitrix",
+                      "password": "123456789"
+                  }
+              ]
           }
       }
     }
@@ -284,6 +340,15 @@
     "role[base]",
     "recipe[vsftpd::_pam_virtual]",
     "recipe[rails]",
+    "recipe[rails::apps]",
+    "recipe[rails::php]",
+    "recipe[php]",
+    "recipe[composer]",
+    "recipe[rails::php_modules]",
+    "recipe[rails::php_fpm_fix]",
+    "recipe[php-fpm::install]",
+    "recipe[php-fpm::configure]",
+    "recipe[rails::php_fpm]",
     "role[newrelic]"
   ]
 }

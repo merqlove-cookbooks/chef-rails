@@ -36,5 +36,3 @@ directory node['rails']['sites_base_path'] do
   action    :create
   recursive true
 end
-
-include_recipe 'rails::apps'
