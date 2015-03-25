@@ -21,7 +21,7 @@ action :create do
   chef_gem 'chef-vault' do # ~FC009
     compile_time true
     action :nothing
-  end
+  end.run_action(:install)
 
   ruby_block 'secrets' do
     block do
