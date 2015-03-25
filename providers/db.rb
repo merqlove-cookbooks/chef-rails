@@ -119,14 +119,11 @@ def install_mysql # rubocop:disable Metrics/MethodLength
     action [:create, :start]
   end
 
-  mysql_client 'default' do
-    action :create
-  end
-
   tune_mysql(name)
 
   mysql2_chef_gem 'default' do
     action :install
+    client_version node['mysql']['version']
   end
 
   link "mysql config link #{name}" do
