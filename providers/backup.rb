@@ -67,7 +67,7 @@ action :cleanup do
   new_resource.updated_by_last_action(true)
 end
 
-def backup_cleanup
+def backup_cleanup # rubocop:disable Metrics/MethodLength
   cron_root = "/etc/cron.#{new_resource.interval}"
   return unless ::Dir.exist?(cron_root)
 
