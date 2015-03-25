@@ -10,44 +10,6 @@
       "fastcgi_read_timeout": 240,
       "client_max_body_size": "32m"
     },
-    "vsftpd": {
-      "enabled": true,
-      "allowed": [
-
-      ],
-      "config": {
-        "listen": "YES",
-        "session_support": "NO",
-        "local_umask": "027",
-        "chown_uploads": "YES",
-        "chmod_enable": "YES",
-        "dirmessage_enable": "YES",
-        "anonymous_enable": "NO",
-        "guest_enable": "YES",
-        "local_enable": "YES",
-        "chroot_local_user": "YES",
-        "write_enable": "YES",
-        "pam_service_name": "vsftpd_virtual",
-        "local_root": "/srv/sites/$USER",
-        "user_sub_token": "$USER",
-        "virtual_use_local_privs": "YES",
-        "hide_ids": "YES",
-        "user_config_dir": "/etc/vsftpd/users.d",
-        "ascii_upload_enable": "YES",
-        "ascii_download_enable": "YES",
-        "ftpd_banner": "Welcome to MRCR",
-        "use_localtime": "YES"
-      }
-    },
-    "msmtp": {
-      "host": "smtp.gmail.com",
-      "port": "587",
-      "domain": "mrcr.ru",
-      "username": "noreply@mrcr.ru",
-      "from": "noreply@mrcr.ru",
-      "password": "12345678",
-      "default": true
-    },
     "rails": {
       "swap": {
         "enable": true,
@@ -347,7 +309,6 @@
     "recipe[rails::php_modules]",
     "recipe[rails::php_fpm_fix]",
     "recipe[php-fpm::install]",
-    "recipe[php-fpm::configure]",
     "recipe[rails::php_fpm]",
     "role[newrelic]"
   ]

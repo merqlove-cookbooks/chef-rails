@@ -45,6 +45,8 @@ depends 'python', '~> 1.4.6'
 depends 'yum-mysql-community', '~> 0.1.14'
 depends 'composer', '~> 2.0.0'
 depends 'php', '~> 1.5.0'
+depends 'mysql', '~> 6.0.17'
+depends 'mysql2_chef_gem', '~> 1.0.1'
 # depends 'apache2'
 # depends 'java'
 # depends 'tomcat'
@@ -68,7 +70,5 @@ depends 'vagrant-ohai'
 
 # Official dev & 3rd side repos
 
-depends 'mysql', '~> 6.0.17'
-depends 'mysql2_chef_gem', '~> 1.0.1'
 depends 'nodejs'
 depends 'rbenv'

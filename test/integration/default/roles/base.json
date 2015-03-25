@@ -19,6 +19,44 @@
         "url": "https://launchpad.net/duplicity/0.7-series/0.7.02/+download/duplicity-0.7.02.tar.gz"
       }
     },
+    "vsftpd": {
+      "enabled": true,
+      "allowed": [
+
+      ],
+      "config": {
+        "listen": "YES",
+        "session_support": "NO",
+        "local_umask": "027",
+        "chown_uploads": "YES",
+        "chmod_enable": "YES",
+        "dirmessage_enable": "YES",
+        "anonymous_enable": "NO",
+        "guest_enable": "YES",
+        "local_enable": "YES",
+        "chroot_local_user": "YES",
+        "write_enable": "YES",
+        "pam_service_name": "vsftpd_virtual",
+        "local_root": "/srv/sites/$USER",
+        "user_sub_token": "$USER",
+        "virtual_use_local_privs": "YES",
+        "hide_ids": "YES",
+        "user_config_dir": "/etc/vsftpd/users.d",
+        "ascii_upload_enable": "YES",
+        "ascii_download_enable": "YES",
+        "ftpd_banner": "Welcome to MRCR",
+        "use_localtime": "YES"
+      }
+    },
+    "msmtp": {
+      "host": "smtp.gmail.com",
+      "port": "587",
+      "domain": "mrcr.ru",
+      "username": "noreply@mrcr.ru",
+      "from": "noreply@mrcr.ru",
+      "password": "12345678",
+      "default": true
+    },
     "nodejs": {
       "version": "0.10.29",
       "checksum": "47379d01f765f87c1a1498b4e65de30e45201de50334954860d7375a8258b15d",
@@ -236,6 +274,11 @@
           "method": "md5"
         }
       ]
+    },
+    "pure_ftpd": {
+      "source_url": "http://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.37.tar.gz",
+      "source_checksum": "a9c10b0b8b5772fbf2212bc46fece86f9d4bcc07e58dfd83b58e42a1b2acb76c",
+      "system_user": "ftp"
     }
   },
   "run_list": [
