@@ -324,7 +324,7 @@ end
 def init_cron(a, app_path) # rubocop:disable Metrics/MethodLength
   return unless a['cron']
   a['cron'].each do |cron|
-    environment = cron[:environment]
+    environment = cron[:environment] || {}
     environment.merge!('PHP' => node['php']['bin']) if php?(a)
     environment.merge!('RBENV_ROOT' => node['rbenv']['root_path'],
                        'RBENV_SHIMS' => '$RBENV_ROOT/shims',
