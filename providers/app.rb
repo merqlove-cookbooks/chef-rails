@@ -325,11 +325,11 @@ def init_cron(a, app_path) # rubocop:disable Metrics/MethodLength
   return unless a['cron']
   a['cron'].each do |cron|
     environment = cron[:environment]
-    environment.merge!('PHP' => node['php']['bin']) if php(a)
+    environment.merge!('PHP' => node['php']['bin']) if php?(a)
     environment.merge!('RBENV_ROOT' => node['rbenv']['root_path'],
                        'RBENV_SHIMS' => '$RBENV_ROOT/shims',
                        'RBENV_BIN' => '$RBENV_ROOT/bin',
-                       'PATH' => '/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$PATH') if rbenv(a)
+                       'PATH' => '/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$PATH') if rbenv?(a)
 
     rails_cron "#{a[:name]}-#{cron[:name] || 'default'}" do
       interval    cron[:interval]
