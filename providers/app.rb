@@ -46,7 +46,7 @@ action :create do
 
   init_backup(a, type, app_path, project_path)
 
-  init_cron(a. app_path)
+  init_cron(a, app_path)
 
   init_db(a, type, app_path, backup_db_path) if db?(a)
 
@@ -324,6 +324,13 @@ end
 def init_cron(a, app_path) # rubocop:disable Metrics/MethodLength
   return unless a['cron']
   a['cron'].each do |cron|
+    environment = cron[:environment]
+    environment.merge!('PHP' => node['php']['bin']) if php(a)
+    environment.merge!('RBENV_ROOT' => node['rbenv']['root_path'],
+                      'RBENV_SHIMS' => '$RBENV_ROOT/shims',
+                      'RBENV_BIN' => '$RBENV_ROOT/bin',
+                      'PATH' => '/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$PATH') if rbenv(a)
+
     rails_cron "#{a[:name]}-#{cron[:name] || 'default'}" do
       interval    cron[:interval]
       minute      cron[:minute]
@@ -331,14 +338,16 @@ def init_cron(a, app_path) # rubocop:disable Metrics/MethodLength
       day         cron[:day]
       month       cron[:month]
       weekday     cron[:weekday]
-      interval    cron[:interval]
       user        a[:user]
       command     cron[:command]
       mailto      cron[:mailto]
       path        cron[:path]
       home        cron[:home]
       shell       cron[:shell]
-      environment cron[:environment].merge('APP_PATH' => app_path)
+      environment environment.merge({
+                                      'APP_PATH' => app_path,
+                                      'POSTGRESQL_BIN' => "/usr/pgsql-#{node['postgresql']['version']}/bin"
+                                    })
 
       action :create
     end
