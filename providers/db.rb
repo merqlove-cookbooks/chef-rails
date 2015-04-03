@@ -49,7 +49,7 @@ end
 # Makers
 
 def create_mysql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
-  root = ::Chef::EncryptedDataBagItem.load('mysql', 'root', secret)
+  root = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['mysql'], 'root', secret)
   if root
     node.normal['mysql']['server_debian_password'] = root['debian_password']
     node.normal['mysql']['server_root_password']   = root['password']
@@ -179,7 +179,7 @@ def create_mysql_admin(secret, root) # rubocop:disable Metrics/MethodLength
   }
 
   (mysql - ['root']).each do |m|
-    u = ::Chef::EncryptedDataBagItem.load('mysql', m, secret)
+    u = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['mysql'], m, secret)
     mysql_database_user u['id'] do
       connection mysql_connection_info
       password   u['password']
@@ -207,7 +207,7 @@ def stop_mysql
 end
 
 def create_postgresql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
-  postgres = ::Chef::EncryptedDataBagItem.load('postgresql', 'postgres', secret)
+  postgres = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['postgresql'], 'postgres', secret)
   node.normal['postgresql']['password']['postgres'] = postgres['password']
 
   install_postgresql
@@ -279,7 +279,7 @@ def create_postgresql_admin(secret, postgres) # rubocop:disable Metrics/MethodLe
     password: postgres['password']
   }
   (psql - ['postgres']).each do |p|
-    u = ::Chef::EncryptedDataBagItem.load('postgresql', p, secret)
+    u = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['postgresql'], p, secret)
     postgresql_database 'template1' do
       connection postgresql_connection_info
       sql <<-EOH
@@ -349,7 +349,7 @@ def stop_postgresql
 end
 
 def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
-  admin = ::Chef::EncryptedDataBagItem.load('mongodb', 'admin', secret)
+  admin = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['mongodb'], 'admin', secret)
   run_context.include_recipe 'mongodb::default'
   node.default['mongodb']['config']['auth'] = true if node['rails']['mongodb']['auth']
 
@@ -408,7 +408,7 @@ def create_mongodb_admin(secret, admin) # rubocop:disable Metrics/MethodLength
   return unless mongo # rubocop:disable Metrics/BlockNesting
 
   (mongo - ['admin']).each do |m|
-    u = ::Chef::EncryptedDataBagItem.load('mongodb', m, secret)
+    u = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['mongodb'], m, secret)
 
     mongodb_user u['id'] do
       password   u['password']

@@ -19,7 +19,7 @@
 
 action :create do
   chef_gem 'chef-vault' do # ~FC009
-    compile_time true
+    compile_time true if respond_to?(:compile_time)
     action :nothing
   end.run_action(:install)
 

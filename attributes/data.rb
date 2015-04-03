@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: rails
-# Attributes:: secrets
+# Attributes:: data
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2015 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -17,4 +17,13 @@
 # limitations under the License.
 #
 
-default['rails']['secrets']['default'] = '/etc/chef/encrypted_data_bag_secret'
+default['rails']['d']['aws'] = 'aws'
+default['rails']['d']['azure'] = 'azure'
+default['rails']['d']['gs'] = 'gs'
+default['rails']['d']['swift'] = 'swift'
+default['rails']['d']['vcs_keys'] = 'vcs_keys'
+default['rails']['d']['users'] = 'users'
+default['rails']['d']['postgresql'] = 'postgresql'
+default['rails']['d']['mysql'] = 'mysql'
+default['rails']['d']['mongodb'] = 'mongodb'
+default['rails']['d']['duplicity'] = 'duplicity'

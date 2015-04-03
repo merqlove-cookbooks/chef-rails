@@ -29,7 +29,7 @@ if node['rails']['apps'] || node['rails']['sites']
 
   if File.exist?(node['rails']['secrets']['default'])
     default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
-    vcs            = data_bag('vcs_keys')
+    vcs            = data_bag(node['rails']['d']['vcs_keys'])
 
     rails_users 'references_for_users' do
       users  users

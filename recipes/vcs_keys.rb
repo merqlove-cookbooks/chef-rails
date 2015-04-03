@@ -30,7 +30,7 @@ if node.role? 'vagrant'
       default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
       if vcs # rubocop:disable Metrics/BlockNesting
         vcs.each do |item|
-          key = ::Chef::EncryptedDataBagItem.load('vcs_keys', item, default_secret)
+          key = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['vcs_keys'], item, default_secret)
 
           file "/home/vagrant/.ssh/#{key['file-name']}" do
             content key['file-content']

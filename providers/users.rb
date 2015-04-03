@@ -28,7 +28,7 @@ action :create do
     # user_nginx
 
     users.each do |u| # rubocop:disable Style/Next
-      data = ::Chef::EncryptedDataBagItem.load('users', u, secret)
+      data = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['users'], u, secret)
       next unless data
 
       ftp_list = user_ftps(u, data)
@@ -92,7 +92,7 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
   data['vcs'].each do |v|
     next unless vcs.include?(v)
 
-    key = ::Chef::EncryptedDataBagItem.load('vcs_keys', v, secret)
+    key = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['vcs_keys'], v, secret)
 
     file "/home/#{u}/.ssh/#{key['file-name']}" do
       content key['file-content']
