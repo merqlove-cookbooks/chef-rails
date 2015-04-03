@@ -4,7 +4,7 @@ maintainer_email 'sasha@merqlove.ru'
 license          'Apache 2.0'
 description      'Installs/Configures ruby/rails, php, databases and so on'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           '1.1.6'
+version           '1.1.7'
 
 supports 'centos'
 supports 'ubuntu'
