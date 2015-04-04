@@ -7,7 +7,7 @@ group :development do
   gem 'berkshelf'
   gem 'chef-zero'
   # gem 'serverspec'
-  # gem 'chef'
+  gem 'chef'
   gem 'ridley'
   gem 'json'
 end

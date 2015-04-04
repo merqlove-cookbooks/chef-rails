@@ -1,26 +1,26 @@
 {
   "id": "root",
   "password": {
-    "encrypted_data": "a8Fan0IpSESxoJ43D7MS3xPJ7G5jXvzsm8dUmpdONL8=\n",
-    "iv": "6LaY4WeJu0MGXvn98uPnkg==\n",
+    "encrypted_data": "KHCm0bhIEq1uI+x4iEgG2xMWiLUa4/n0IPhEVmMaSIc=\n",
+    "iv": "U6Z2Iou1cIby6C1x7RUIIg==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   },
   "replication_password": {
-    "encrypted_data": "OF1f357kH/lc4lN30YWfaMJqVVrpKl0KTD2HKQPH3mM=\n",
-    "iv": "QoweEkCPSEtHMb/bIATGcA==\n",
+    "encrypted_data": "AS4A95sf7maGyJ3AV0/HG45hcJ+A7CKwOTlNYjQvpX4=\n",
+    "iv": "Md9zDn2xj44HbpNWUR4tAw==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   },
   "debian_password": {
-    "encrypted_data": "6UMBpy7JdloqpqnAYceI0nA+5K8gO/ru8W1Vh6ai7pc=\n",
-    "iv": "FJ8DXGNa62py6AaJU0GbaA==\n",
+    "encrypted_data": "2Y5egsVCyt3Kme8Q8Bb/xtTO9L/RPUc0Y7NQ91SJZV4=\n",
+    "iv": "9KFrMNKpVwWBGo1TYxI6Ig==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   },
   "admin": {
-    "encrypted_data": "PsA+C4Yer/+fOv8vkTMKRbPDtF8ieRhrM56wwu1tPbc=\n",
-    "iv": "pB+3xWiI+yg/86aFXPNRMw==\n",
+    "encrypted_data": "LR3ct55TwlfE7VpI8HQ+fvKHK/jDvik1eLy3vvpvRJs=\n",
+    "iv": "Pl8gdvetnqO/v0dy7nQpNw==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   }

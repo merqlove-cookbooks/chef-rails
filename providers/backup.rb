@@ -236,8 +236,9 @@ end
 def clean_path(path, replacement = '_')
   return unless path
   cleaned = path.gsub(/[_\-\?\+\/\\+]/, replacement)
+  p cleaned
   if cleaned.include? '_db'
-    cleaned[/[a-z_\-\.]+\/[a-z]+$/].sub('/', replacement)
+    cleaned[/[a-z_\-\.]+#{replacement}[a-z]+$/].sub('/', replacement)
   else
     cleaned[/[a-z0-9_\-\.]+$/]
   end.sub(/^#{replacement}/, '')

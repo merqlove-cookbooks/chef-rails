@@ -16,6 +16,7 @@
         "size": 512
       },
       "duplicity": {
+        "method": "swift",
         "db": [
           "mysql"
         ]

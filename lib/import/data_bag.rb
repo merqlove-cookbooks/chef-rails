@@ -38,7 +38,10 @@ module Rails
 
       def auth
         auth = {
-          server_url: "https://api.opscode.com/organizations/#{ENV['ORGNAME']}",
+          ssl: {
+            verify: false
+          },
+          server_url: "https://#{ENV['CHEF_SERVER_HOST']}/organizations/#{ENV['ORGNAME']}",
           client_name: "#{ENV['ORGNAME']}-validator",
           client_key: "#{ENV['HOME']}/.chef/#{ENV['ORGNAME']}-validator.pem"
         }

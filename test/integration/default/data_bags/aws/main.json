@@ -1,14 +1,14 @@
 {
   "id": "main",
   "access_key_id": {
-    "encrypted_data": "YVnrFEy/FWDwLZ4CU3YCnZOUsQ6S/m8Ih1ntSe6x8QQ=\n",
-    "iv": "jVLymV+UYe0prc9BpHrMzw==\n",
+    "encrypted_data": "XoVFjapfjx8Pel9OLN6LEaZRJrrY5cL0SReRd6rltkE=\n",
+    "iv": "gHpvBipJpeUszc5zt72HQg==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   },
   "secret_access_key": {
-    "encrypted_data": "mYbTk+WgErxkvjoDElFTwVXGDmqkSKCPzQYp7jH1Pd6GEhytCYkiq8FcAoXD\n+P2/\n",
-    "iv": "0cokAVcW72DdX2xiJvjiRQ==\n",
+    "encrypted_data": "FD1Y2koIp1aBtZx++6MjGsWBvmjanT155Nb+M3msL8xL4gEa82pqx8RwqF0m\nK1nD\n",
+    "iv": "0wVFv1KaocTyq1yWW4csog==\n",
     "version": 1,
     "cipher": "aes-256-cbc"
   }
