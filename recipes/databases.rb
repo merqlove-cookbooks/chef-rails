@@ -19,6 +19,8 @@
 
 require 'fileutils'
 
+db_backup_root = '/var/tmp/db_backup'
+
 if ::File.exist? node['rails']['secrets']['default']
   default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
   date = 'NOW=$(date +"%Y%m%d")'
@@ -29,8 +31,6 @@ if ::File.exist? node['rails']['secrets']['default']
   end
 
   # Backup All Databases
-
-  db_backup_root = '/var/tmp/db_backup'
 
   node['rails']['duplicity']['db'].each do |db|
     db_backup_dir = "#{db_backup_root}/#{db}"
