@@ -35,6 +35,6 @@ if node['rails']['apps'] || node['rails']['sites']
 
   rails_users 'references_for_users' do
     users  users
-    notifies :reload, "ohai[reload_passwd]", :immediately
+    notifies :reload, 'ohai[reload_passwd]', :immediately
   end
 end

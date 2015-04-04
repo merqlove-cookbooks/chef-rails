@@ -21,7 +21,7 @@
 
 action :create do
   users  = new_resource.users
-  secret = get_secret
+  secret = load_secret
   vcs    = data_bag(node['rails']['d']['vcs_keys'])
 
   if users && secret && vcs

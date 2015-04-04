@@ -22,7 +22,7 @@ require 'fileutils'
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
-  secret = get_secret
+  secret = load_secret
   date   = new_resource.date
 
   if database_type_exist? 'mysql'

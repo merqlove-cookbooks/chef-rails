@@ -2,7 +2,7 @@ module Rails
   # include Chef::
   # Helpers for cookbook
   module Helpers
-    def get_secret
+    def load_secret
       ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default']) if File.exist?(node['rails']['secrets']['default'])
     end
 
