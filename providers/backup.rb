@@ -19,6 +19,8 @@
 
 require 'fileutils'
 
+::Chef::Provider.send(:include, Rails::Helpers)
+
 action :create do
   store_keys = nil
 
@@ -86,7 +88,7 @@ end
 def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
   return unless storage_key_id || pass_key_id
 
-  default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
+  default_secret = get_secret
 
   if aws?
     store = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['aws'], storage_key_id, default_secret)

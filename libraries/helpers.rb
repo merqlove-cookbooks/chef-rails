@@ -2,6 +2,10 @@ module Rails
   # include Chef::
   # Helpers for cookbook
   module Helpers
+    def get_secret
+      ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default']) if File.exist?(node['rails']['secrets']['default'])
+    end
+
     def hash_in_array?(other_array, value)
       other_array.each { |h| return true if h.is_a?(Hash) && h.value?(value) }
       false

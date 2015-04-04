@@ -20,15 +20,14 @@
 require 'fileutils'
 
 db_backup_root = '/var/tmp/db_backup'
+date = 'NOW=$(date +"%Y%m%d")'
+
+rails_db 'initialize' do
+  date   date
+end
 
 if ::File.exist? node['rails']['secrets']['default']
   default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
-  date = 'NOW=$(date +"%Y%m%d")'
-
-  rails_db 'initialize' do
-    secret default_secret
-    date   date
-  end
 
   # Backup All Databases
 

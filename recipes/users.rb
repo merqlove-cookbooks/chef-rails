@@ -27,20 +27,14 @@ if node['rails']['apps'] || node['rails']['sites']
   end
   users = users.unshift(node['rails']['user']['deploy']).uniq.compact
 
-  if File.exist?(node['rails']['secrets']['default'])
-    default_secret = ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default'])
-    vcs            = data_bag(node['rails']['d']['vcs_keys'])
+  # Reload OHAI 7
+  ohai 'reload_passwd' do
+    action :nothing
+    plugin 'etc'
+  end
 
-    rails_users 'references_for_users' do
-      users  users
-      secret default_secret
-      vcs    vcs
-    end
-
-    # Reload OHAI 7
-    ohai 'reload_passwd' do
-      action :nothing
-      plugin 'etc'
-    end
+  rails_users 'references_for_users' do
+    users  users
+    notifies :reload, "ohai[reload_passwd]", :immediately
   end
 end

@@ -17,10 +17,12 @@
 # limitations under the License.
 #
 
+::Chef::Provider.send(:include, Rails::Helpers)
+
 action :create do
   users  = new_resource.users
-  secret = new_resource.secret
-  vcs    = new_resource.vcs
+  secret = get_secret
+  vcs    = data_bag(node['rails']['d']['vcs_keys'])
 
   if users && secret && vcs
     users_data = []
