@@ -24,9 +24,6 @@ action :create do
   secret = get_secret
   vcs    = data_bag(node['rails']['d']['vcs_keys'])
 
-  p node['rails']['d']['users']
-  p node['rails']['d']['vcs_keys']
-  p node['rails']
   if users && secret && vcs
     users_data = []
 
