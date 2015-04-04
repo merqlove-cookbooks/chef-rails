@@ -36,7 +36,7 @@ module Rails
 
       attr_writer :encrypt
 
-      def auth
+      def auth # rubocop:disable  Metrics/MethodLength
         auth = {
           ssl: {
             verify: false
