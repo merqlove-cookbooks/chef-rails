@@ -27,47 +27,47 @@ if ::File.exist? node['rails']['secrets']['default']
     secret default_secret
     date   date
   end
-end
 
-# Backup All Databases
+  # Backup All Databases
 
-db_backup_root = '/var/tmp/db_backup'
+  db_backup_root = '/var/tmp/db_backup'
 
-node['rails']['duplicity']['db'].each do |db|
-  db_backup_dir = "#{db_backup_root}/#{db}"
+  node['rails']['duplicity']['db'].each do |db|
+    db_backup_dir = "#{db_backup_root}/#{db}"
 
-  exec_pre = [
-    "mkdir -p #{db_backup_dir} >> /dev/null 2>&1",
-  ]
+    exec_pre = [
+      "mkdir -p #{db_backup_dir} >> /dev/null 2>&1",
+    ]
 
-  exec_before = [
-    date,
-    "rm -rf #{db_backup_dir}/*",
-  ]
+    exec_before = [
+      date,
+      "rm -rf #{db_backup_dir}/*",
+    ]
 
-  case db
-  when 'postgresql'
-    exec_before.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.\"$0\".sql.gz' -- \"$NOW\""
-    exec_before.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
-    exec_before.push "chown -R root:root #{db_backup_dir}/*"
-  when 'mysql'
-    root ||= ::Chef::EncryptedDataBagItem.load(node['rails']['d'][db], 'root', default_secret)
-    exec_before.push "mysqldump --all-databases -u root -p#{root['password']} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
-  when 'mongodb'
-    exec_before.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
-    exec_before.push "tar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
-    exec_before.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
-  end
+    case db
+    when 'postgresql'
+      exec_before.push "su postgres -c 'pg_dumpall -U postgres | gzip > /tmp/#{db}.\"$0\".sql.gz' -- \"$NOW\""
+      exec_before.push "mv /tmp/#{db}.$NOW.sql.gz #{db_backup_dir}/"
+      exec_before.push "chown -R root:root #{db_backup_dir}/*"
+    when 'mysql'
+      root ||= ::Chef::EncryptedDataBagItem.load(node['rails']['d'][db], 'root', default_secret)
+      exec_before.push "mysqldump --all-databases -u root -p#{root['password']} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
+    when 'mongodb'
+      exec_before.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
+      exec_before.push "tar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
+      exec_before.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
+    end
 
-  exec_before.push "chmod -R o-rwx #{db_backup_dir}"
+    exec_before.push "chmod -R o-rwx #{db_backup_dir}"
 
-  rails_backup "#{db}_db_backup" do
-    path        "db/#{db}"
-    exec_pre    exec_pre
-    exec_before exec_before
-    include     [db_backup_dir]
-    archive_dir "/tmp/da-#{db}"
-    temp_dir    "/tmp/dt-#{db}"
+    rails_backup "#{db}_db_backup" do
+      path        "db/#{db}"
+      exec_pre    exec_pre
+      exec_before exec_before
+      include     [db_backup_dir]
+      archive_dir "/tmp/da-#{db}"
+      temp_dir    "/tmp/dt-#{db}"
+    end
   end
 end
 

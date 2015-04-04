@@ -11,8 +11,8 @@ group :development do
   gem 'ridley'
   gem 'json'
 end
-#
-# group :integration do
+
+group :integration do
   gem 'test-kitchen'
   gem 'kitchen-vagrant'
-# end
+end
