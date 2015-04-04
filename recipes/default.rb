@@ -21,8 +21,6 @@ service 'memcached' do
   only_if { node['recipes'].include?('memcached::default') }
 end
 
-include_recipe 'rails::users'
-
 directory node['rails']['apps_base_path'] do
   mode      00755
   owner     node['rails']['user']['deploy']
