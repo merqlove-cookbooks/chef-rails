@@ -37,6 +37,7 @@ action :create do
         s.owner      'root'
         s.group      'root'
         s.mode       00600
+        s.sensitive  true
         s.content    key['file-content']
         s.run_action :create
       end
