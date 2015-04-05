@@ -133,10 +133,10 @@ def install_mysql # rubocop:disable Metrics/MethodLength
 
   if php_exist? # rubocop:disable Style/GuardClause
     case node['platform_family']
-      when 'rhel'
-        node.default['rails']['php']['modules'] << 'php-mysqlnd'
-      when 'ubuntu'
-        node.default['rails']['php']['modules'] << 'php5-mysqlnd'
+    when 'rhel'
+      node.default['rails']['php']['modules'] << 'php-mysqlnd'
+    when 'ubuntu'
+      node.default['rails']['php']['modules'] << 'php5-mysqlnd'
     end
   end
 end
@@ -315,10 +315,10 @@ def install_postgresql # rubocop:disable Metrics/MethodLength
 
   if php_exist? # rubocop:disable Style/GuardClause
     case node['platform_family']
-      when 'rhel'
-        node.default['rails']['php']['modules'] << 'php-pgsql'
-      when 'ubuntu'
-        node.default['rails']['php']['modules'] << 'php5-pgsql'
+    when 'rhel'
+      node.default['rails']['php']['modules'] << 'php-pgsql'
+    when 'ubuntu'
+      node.default['rails']['php']['modules'] << 'php5-pgsql'
     end
   end
 
@@ -365,10 +365,10 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
 
   if php_exist? # rubocop:disable Style/GuardClause
     case node['platform_family']
-      when 'rhel'
-        node.default['rails']['php']['modules'] << 'php-pecl-mongo'
-      when 'ubuntu'
-        node.default['rails']['php']['modules'] << 'php5-mongo'
+    when 'rhel'
+      node.default['rails']['php']['modules'] << 'php-pecl-mongo'
+    when 'ubuntu'
+      node.default['rails']['php']['modules'] << 'php5-mongo'
     end
   end
 
