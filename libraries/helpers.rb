@@ -83,6 +83,10 @@ module Rails
     def ubuntu14x?
       platform_family?('debian') && node['platform_version'][/^14/]
     end
+
+    def php_exist?
+      node['rails']['php']['install']
+    end
   end
 end
 

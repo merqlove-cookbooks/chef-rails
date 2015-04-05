@@ -88,7 +88,3 @@ end
 def php_rhel_modules
   %w(php-gd php-memcached php-pecl-apcu php-mbstring)
 end
-
-def php_exist?
-  node['rails']['php']['install']
-end
