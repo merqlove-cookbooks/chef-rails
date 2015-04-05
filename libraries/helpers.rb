@@ -11,6 +11,10 @@ module Rails
       false
     end
 
+    def rails_fqdn
+      node['rails']['fqdn'] ? node['fqdn'] : node.name
+    end
+
     def vagrant?
       node.role?('vagrant') || node.role?('kitchen')
     end

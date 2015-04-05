@@ -11,13 +11,13 @@
       "client_max_body_size": "32m"
     },
     "rails": {
+      "fqdn": true,
       "swap": {
         "enable": true,
         "size": 512
       },
       "duplicity": {
         "method": "swift",
-        "fqdn": true,
         "db": [
           "mysql"
         ]

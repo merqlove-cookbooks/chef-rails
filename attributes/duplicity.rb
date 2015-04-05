@@ -22,7 +22,6 @@ default['rails']['duplicity']['pass_key_id'] = 'main'
 default['rails']['duplicity']['storage_key_id'] = node.default['rails']['duplicity']['pass_key_id']
 default['rails']['duplicity']['boto_cfg'] = true
 default['rails']['duplicity']['method'] = 's3+http' # possible 's3', "s3+http", 'gs', 'swift', 'ftp', 'ssh', ...
-default['rails']['duplicity']['fqdn']   = true
 
 # path & log
 default['rails']['duplicity']['path'] = '_system' # must be not empty!

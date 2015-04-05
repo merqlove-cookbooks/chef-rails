@@ -125,7 +125,7 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
 
     variables(
       name:  u,
-      email: "#{u}@#{node['fqdn']}"
+      email: "#{u}@#{rails_fqdn}"
     )
   end
 end

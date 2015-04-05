@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+default['rails']['fqdn']            = true
 default['rails']['swap']['size']    = '512' # MBs
 default['rails']['swap']['enable']  = false
 default['rails']['apps_base_path']  = '/srv/apps'

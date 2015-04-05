@@ -168,16 +168,12 @@ end
 
 def backend_uri(method, target, path = '', aws_eu = '')
   if swift?
-    "#{method}://#{fqdn}_#{clean_path(path)}"
+    "#{method}://#{rails_fqdn}_#{clean_path(path)}"
   elsif azure?
-    "#{method}://#{clean_path(fqdn, '-').gsub('.', '-')}-#{clean_path(path, '-').gsub('.', '-')}".gsub('--', '-').downcase
+    "#{method}://#{clean_path(rails_fqdn, '-').gsub('.', '-')}-#{clean_path(path, '-').gsub('.', '-')}".gsub('--', '-').downcase
   else
-    "#{aws_eu}#{method}://#{target}/#{fqdn}/#{path}"
+    "#{aws_eu}#{method}://#{target}/#{rails_fqdn}/#{path}"
   end
-end
-
-def fqdn
-  node['rails']['duplicity']['fqdn'] ? node['fqdn'] : node.name
 end
 
 def boto_config(store)
