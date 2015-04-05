@@ -17,6 +17,7 @@
       },
       "duplicity": {
         "method": "swift",
+        "fqdn": true,
         "db": [
           "mysql"
         ]

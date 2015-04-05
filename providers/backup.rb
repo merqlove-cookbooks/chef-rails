@@ -168,12 +168,16 @@ end
 
 def backend_uri(method, target, path = '', aws_eu = '')
   if swift?
-    "#{method}://#{node['fqdn']}_#{clean_path(path)}"
+    "#{method}://#{fqdn}_#{clean_path(path)}"
   elsif azure?
-    "#{method}://#{clean_path(node['fqdn'], '-').gsub('.', '-')}-#{clean_path(path, '-').gsub('.', '-')}".gsub('--', '-').downcase
+    "#{method}://#{clean_path(fqdn, '-').gsub('.', '-')}-#{clean_path(path, '-').gsub('.', '-')}".gsub('--', '-').downcase
   else
-    "#{aws_eu}#{method}://#{target}/#{node['fqdn']}/#{path}"
+    "#{aws_eu}#{method}://#{target}/#{fqdn}/#{path}"
   end
+end
+
+def fqdn
+  node['rails']['duplicity']['fqdn'] ? node['fqdn'] : node.name
 end
 
 def boto_config(store)
@@ -236,7 +240,6 @@ end
 def clean_path(path, replacement = '_')
   return unless path
   cleaned = path.gsub(/[_\-\?\+\/\\+]/, replacement)
-  p cleaned
   if cleaned.include? '_db'
     cleaned[/[a-z_\-\.]+#{replacement}[a-z]+$/].sub('/', replacement)
   else
