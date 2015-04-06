@@ -36,6 +36,7 @@ action :create do
       group 'root'
       mode 00755
       source 'php_fix.erb'
+      variables(options: node['rails']['php']['options'])
       notifies :restart, 'service[php-fpm]', :delayed
     end
 

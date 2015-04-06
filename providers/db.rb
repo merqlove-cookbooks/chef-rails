@@ -133,7 +133,9 @@ def install_mysql # rubocop:disable Metrics/MethodLength
   end
 
   if php_exist? # rubocop:disable Style/GuardClause
-    node.default['php']['directives']['mysql.default_socket'] = mysql_socket
+    node.default['rails']['php']['options']['mysql.default_socket'] = mysql_socket
+    node.default['rails']['php']['options']['pdo_mysql.default_socket'] = mysql_socket
+    node.default['rails']['php']['options']['mysqli.default_socket '] = mysql_socket
     case node['platform_family']
     when 'rhel'
       node.default['rails']['php']['modules'] << 'php-mysqlnd'

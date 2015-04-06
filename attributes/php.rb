@@ -19,3 +19,4 @@
 
 default['rails']['php']['install'] = false
 default['rails']['php']['modules'] = []
+default['rails']['php']['options'] = {}

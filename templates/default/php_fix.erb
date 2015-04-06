@@ -9,3 +9,6 @@ date.timezone = 'Europe/Moscow'
 sendmail_path = /usr/bin/msmtp -a system -t
 ;session_save.path = /tmp
 ;mail.force_extra_parameters =
+<% @options.sort_by { |key, val| key }.each do |directive, value| -%>
+<%= "#{directive} = \"#{value}\"" %>
+<% end -%>
