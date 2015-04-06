@@ -2,6 +2,9 @@
 adapter: <%= @type %>
 host: <%= @host %>
 port: <%= @port %>
+<% if @socket %>
+pool: <%= @socket %>
+<% end -%>
 database: <%= @database %>
 username: <%= @user %>
 password: <%= @password %>
