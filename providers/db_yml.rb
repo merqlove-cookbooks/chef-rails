@@ -32,6 +32,7 @@ action :create do
       port: new_resource.port,
       pool: new_resource.pool,
       type: new_resource.type,
+      socket: new_resource.socket,
       database: database_name,
       user: new_resource.database_user,
       password: new_resource.database_password,

@@ -62,7 +62,7 @@ def create_mysql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
     host:     'localhost',
     username: 'root',
     password: root['password'],
-    socket:   "/var/run/mysql-#{node['rails']['mysqld']['service_name']}/mysqld.sock"
+    socket:   mysql_socket
   }
 
   node['rails']['databases']['mysql'].each do |_k, d|
@@ -76,6 +76,7 @@ def create_mysql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
       database_password d['password']
       type              'mysql'
       port              node['mysql']['port']
+      socket            mysql_socket
       host              node['mysql']['bind_address']
       path              d['app_path']
       owner             d['app_user']
@@ -115,7 +116,7 @@ def install_mysql # rubocop:disable Metrics/MethodLength
     data_dir node['mysql']['data_dir']
     initial_root_password node['mysql']['server_root_password']
     bind_address node['mysql']['bind_address']
-    socket
+    socket mysql_socket
     action [:create, :start]
   end
 
@@ -132,6 +133,7 @@ def install_mysql # rubocop:disable Metrics/MethodLength
   end
 
   if php_exist? # rubocop:disable Style/GuardClause
+    node.default['php']['directives']['mysql.default_socket'] = mysql_socket
     case node['platform_family']
     when 'rhel'
       node.default['rails']['php']['modules'] << 'php-mysqlnd'
@@ -139,6 +141,10 @@ def install_mysql # rubocop:disable Metrics/MethodLength
       node.default['rails']['php']['modules'] << 'php5-mysqlnd'
     end
   end
+end
+
+def mysql_socket
+  "/var/run/mysql-#{node['rails']['mysqld']['service_name']}/mysqld.sock"
 end
 
 def tune_mysql(name) # rubocop:disable Metrics/MethodLength
@@ -175,7 +181,7 @@ def create_mysql_admin(secret, root) # rubocop:disable Metrics/MethodLength
     host:     'localhost',
     username: root['id'],
     password: root['password'],
-    socket:   "/var/run/mysql-#{node['rails']['mysqld']['service_name']}/mysqld.sock"
+    socket:   mysql_socket
   }
 
   (mysql - ['root']).each do |m|
