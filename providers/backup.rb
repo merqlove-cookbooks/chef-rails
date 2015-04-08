@@ -18,6 +18,7 @@
 #
 
 require 'fileutils'
+require 'digest'
 
 ::Chef::Provider.send(:include, Rails::Helpers)
 
@@ -130,7 +131,7 @@ def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable 
 
     # duplicity parameters
     # Backend to use (default: nil, required!)
-    backend    backend_uri(method, target, path, aws_eu)
+    backend    backend_uri(new_resource.name, method, target, path, aws_eu)
     passphrase duplicity_main['passphrase']  # duplicity passphrase (default: nil, required!)
 
     include                   new_resource.include # Default directories to backup
@@ -166,14 +167,19 @@ def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable 
   end
 end
 
-def backend_uri(method, target, path = '', aws_eu = '')
+def backend_uri(name, method, target, path = '', aws_eu = '')
   if swift?
-    "#{method}://#{rails_fqdn}_#{clean_path(path)}"
+    "#{method}://#{rails_fqdn}_#{clean_path(name)}_#{path_digest(path)}"
   elsif azure?
-    "#{method}://#{clean_path(rails_fqdn, '-').gsub('.', '-')}-#{clean_path(path, '-').gsub('.', '-')}".gsub('--', '-').downcase
+    "#{method}://#{clean_path(rails_fqdn, '-').gsub('.', '-')}-#{clean_path(name, '-').gsub('.', '-')}".gsub('--', '-').downcase + "-#{path_digest(path)}"
   else
     "#{aws_eu}#{method}://#{target}/#{rails_fqdn}/#{path}"
   end
+end
+
+def path_digest(path)
+  return unless path
+  Digest::SHA2.new.hexdigest(path)[0..6]
 end
 
 def boto_config(store)
