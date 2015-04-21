@@ -1,5 +1,9 @@
 index index.php index.html index.htm;
 
+if ($request_uri ~* "^(.*/)index\.php$") {
+  return 301 $1;
+}
+
 rewrite ^sitemap.xml$ /index.php?route=feed/google_sitemap last;
 rewrite ^googlebase.xml$ /index.php?route=feed/google_base last;
 rewrite ^download/(.*) /index.php?route=error/not_found last;
