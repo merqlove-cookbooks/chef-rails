@@ -22,5 +22,6 @@ AllCops:
     - 'Berksfile'
     - 'Vagrantfile'
     - '.kitchen/**/*'
+    - 'lib/**/*'
 
 
