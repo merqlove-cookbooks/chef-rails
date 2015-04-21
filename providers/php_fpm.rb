@@ -31,15 +31,6 @@ action :create do
       notifies :restart, 'service[php-fpm]'
     end
 
-    template "#{node['php']['ext_conf_dir']}/php_fix.ini" do
-      owner 'root'
-      group 'root'
-      mode 00755
-      source 'php_fix.erb'
-      variables(options: node['rails']['php']['options'])
-      notifies :restart, 'service[php-fpm]', :delayed
-    end
-
     cleanup_php_fpm
 
     directory '/var/lib/php/session' do
@@ -56,6 +47,15 @@ end
 
 action :fix do
   node.default['php-fpm']['skip_repository_install'] = true if rhel?
+
+  template "#{node['php']['ext_conf_dir']}/php_fix.ini" do
+    owner 'root'
+    group 'root'
+    mode 00755
+    source 'php_fix.erb'
+    variables(options: node['rails']['php']['options'])
+    notifies :restart, 'service[php-fpm]', :delayed
+  end
 
   new_resource.updated_by_last_action(true)
 end
