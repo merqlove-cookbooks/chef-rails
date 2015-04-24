@@ -98,7 +98,7 @@ def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Metrics/
   elsif swift?
     store = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['swift'], storage_key_id, default_secret)
   elsif azure?
-    store = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['swift'], storage_key_id, default_secret)
+    store = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['azure'], storage_key_id, default_secret)
   else
     return
   end
@@ -122,6 +122,7 @@ def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable 
   method  = node['rails']['duplicity']['method']
   target  = new_resource.target
   path    = new_resource.path
+
   duplicity_ng_cronjob "backup #{new_resource.name}" do
     name new_resource.name # Cronjob filename (name_attribute)
 

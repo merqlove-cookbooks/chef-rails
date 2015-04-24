@@ -22,7 +22,7 @@ end
 
 group :ruby do
   cookbook 'rbenv', '~> 1.7.1', github: 'RiotGames/rbenv-cookbook'
-  cookbook 'nodejs', '~> 2.2.1', github: 'redguide/nodejs'
+  cookbook 'nodejs', '~> 2.4.0', github: 'redguide/nodejs', ref: 'v2.4.0'
 end
 
 group :mail do
@@ -36,7 +36,7 @@ group :postgres do
   company_cookbook 'postgresql'
 end
 
-company_cookbook 'duplicity_ng', '>= 0.0.0', branch: 'feature/fix_conditions_and_azure'
+# company_cookbook 'duplicity_ng', '>= 0.0.0', branch: 'feature/fix_conditions_and_azure'
 
 # base
 group :production do

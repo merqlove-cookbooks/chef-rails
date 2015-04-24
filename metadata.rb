@@ -59,7 +59,7 @@ depends 'apt'
 
 depends 'openssl-fips'
 depends 'vsftpd'
-depends 'duplicity_ng'
+depends 'duplicity_ng', '~> 1.2.2'
 depends 'ssh_known_hosts'
 depends 'nginx'
 depends 'mongodb'
