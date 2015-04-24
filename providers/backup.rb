@@ -172,7 +172,7 @@ def backend_uri(name, method, target, path = '', aws_eu = '')
   if swift?
     "#{method}://#{rails_fqdn}_#{clean_path(name)}_#{path_digest(path)}"
   elsif azure?
-    "#{method}://#{clean_path(rails_fqdn, '-').gsub('.', '-')}-#{clean_path(name, '-').gsub('.', '-')}".gsub('--', '-').downcase + "-#{path_digest(path)}"
+    "#{method}://#{clean_path(rails_fqdn, '-').gsub('.', '-')}".gsub('--', '-').downcase + "-#{path_digest(path)}"
   else
     "#{aws_eu}#{method}://#{target}/#{rails_fqdn}/#{path}"
   end
