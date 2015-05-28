@@ -313,7 +313,7 @@ end
 
 def install_postgresql # rubocop:disable Metrics/MethodLength
   case node['platform_family']
-  when 'debian'
+  when 'debian', 'ubuntu'
     node.default['postgresql']['enable_pgdg_apt'] = true
   when 'rhel', 'fedora', 'suse'
     node.default['postgresql']['enable_pgdg_yum'] = true
@@ -325,7 +325,7 @@ def install_postgresql # rubocop:disable Metrics/MethodLength
     case node['platform_family']
     when 'rhel'
       node.default['rails']['php']['modules'] << 'php-pgsql'
-    when 'ubuntu'
+    when 'ubuntu', 'debian'
       node.default['rails']['php']['modules'] << 'php5-pgsql'
     end
   end
@@ -361,7 +361,9 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   run_context.include_recipe 'mongodb::default'
   node.default['mongodb']['config']['auth'] = true if node['rails']['mongodb']['auth']
 
-  chef_gem 'mongo'
+  chef_gem 'mongo' do
+    version '1.12.2'
+  end
 
   mongodb_user admin['id'] do
     password   admin['password']

@@ -12,11 +12,11 @@ provisioner:
     ssl_verify_mode: verify_peer
 
 platforms:
-- name: centos-6.5
+- name: chef/centos-6.5
   run_list:
 - name: centos-6.6
   run_list:
-- name: centos-7.0
+- name: centos-7.1
   run_list:
 - name: ubuntu-12.04
   run_list:

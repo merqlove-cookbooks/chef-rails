@@ -1,0 +1,11 @@
+APP_ROOT=<%= @path %>
+APP_PATH=$APP_ROOT/current
+APP_SHARED=$APP_ROOT/shared
+
+POSTGRESQL_BIN=/usr/pgsql-<%= node['postgresql']['version'] %>/bin
+
+SERVER_VARS="<%= @vars %>"
+
+USER=<%= @user %>
+PATH=/usr/local/bin:/usr/local/lib:<%= node['rbenv']['root_path'] %>/shims:<%= node['rbenv']['root_path'] %>/bin:$PATH:$POSTGRESQL_BIN
+RACK_ENV=<%= @environment || "production" %>

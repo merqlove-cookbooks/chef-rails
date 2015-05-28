@@ -26,9 +26,15 @@
           "backup": true,
           "ruby_server": {
             "enable": true,
-            "type": "unicorn",
+            "type": "puma",
             "environment": "production",
             "www": true,
+            "vars": {
+              "MAX_THREADS": 8,
+              "MAX_WORKERS": 0,
+              "SECRET_TOKEN": "SOMETOKEN",
+              "POOL": 8
+            },
             "server_name": [
                 "christ-leather.ru"
             ]

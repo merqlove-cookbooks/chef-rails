@@ -171,6 +171,8 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
   end
 
   if a['ruby_server']['enable']
+    vars = nil
+    vars = a['vars'].map { |k,v| "#{k.upcase}=#{v} && export #{k.upcase}" }.join(' && ') if a['vars']
     template init_file do
       cookbook 'rails'
       source "server/#{a['ruby_server']['type']}.erb"
@@ -180,8 +182,10 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       variables app: a['name'],
                 user: a['user'],
                 path: app_path,
-                environment: a['ruby_server']['environment']
+                environment: a['ruby_server']['environment'],
+                vars: vars
       notifies :enable, "service[#{service_name}]", :immediately
+      notifies :restart, "service[#{service_name}]", :delayed
     end
   else
     file init_file do

@@ -1,0 +1,17 @@
+[Unit]
+Description=Redmine + improvised bundle support + non-root user + chroot
+After=<%= node['postgresql']['server']['service_name'] %>.service
+Wants=<%= node['postgresql']['server']['service_name'] %>.service
+
+[Service]
+PIDFile=$APP_SHARED/pids/puma.pid
+RootDirectory=$APP_ROOT
+WorkingDirectory=$APP_PATH
+User=<%= @user %>
+Group=<%= @user %>
+EnvironmentFile=/etc/systemd/system/puma_<%= @app %>.vars
+
+ExecStart=$RUBY_PATH_PATCH && $RBENV_ROOT_PATCH && $SERVER_VARS && bundle exec puma $OPTS exec puma -C $APP_SHARED/config/puma.rb
+
+[Install]
+WantedBy=multi-user.target

@@ -46,13 +46,14 @@ RBENV_BIN="$RBENV_ROOT/bin"
 
 RBENV_ROOT_PATCH="export RBENV_ROOT"
 RUBY_PATH_PATCH="PATH=/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$PATH:$POSTGRESQL_BIN && export PATH"
+SERVER_VARS="<%= @vars %>"
 
 start() {
 cd $APP_PATH
 
 # Start puma
 echo -n $"Starting puma: "
-daemon --pidfile=$UPID --user=$USER "$RUBY_PATH_PATCH && $RBENV_ROOT_PATCH && bundle exec puma $OPTS"
+daemon --pidfile=$UPID --user=$USER "$RUBY_PATH_PATCH && $RBENV_ROOT_PATCH && $SERVER_VARS && bundle exec puma $OPTS"
 puma=$?
 [ $puma -eq 0 ] && touch $ULOCK
 echo
