@@ -1,6 +1,6 @@
 # Maintained by Chef.  Local changes will be overwritten
 
-upstream <%= @name %>_<%= @name %> {
+upstream <%= @type %>_<%= @name %> {
   server unix:///tmp/<%= @type %>.<%= @name %>.sock fail_timeout=0;
 }
 
