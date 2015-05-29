@@ -47,13 +47,12 @@ RBENV_BIN="$RBENV_ROOT/bin"
 
 RBENV_ROOT_PATCH="export RBENV_ROOT"
 RUBY_PATH_PATCH="PATH=/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$PATH:$POSTGRESQL_BIN && export PATH"
-SERVER_VARS="<%= @vars %>"
 
 start() {
 # Start unicorn
 echo -n $"Starting $NAME: "
 cd $APP_PATH
-daemon --pidfile=$UPID --user=$USER "$RUBY_PATH_PATCH && $RBENV_ROOT_PATCH && $SERVER_VARS && bundle exec unicorn_rails $OPTS"
+daemon --pidfile=$UPID --user=$USER "$RUBY_PATH_PATCH && $RBENV_ROOT_PATCH && bundle exec unicorn_rails $OPTS"
 RETVAL=$?
 echo
 [ $RETVAL = 0 ] && touch ${ULOCK}
