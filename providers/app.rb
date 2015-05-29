@@ -211,11 +211,12 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
 end
 
 def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
+  template_file = "#{node['nginx']['dir']}/sites-available/#{a['name']}"
   if a['ruby_server']['enable']
     rails_nginx_vhost a['name'] do
       action :nothing
     end
-    template "#{node['nginx']['dir']}/sites-available/#{a['name']}" do
+    template template_file do
       cookbook 'rails'
       source 'nginx_ruby_crap.erb'
       owner 'root'
@@ -232,8 +233,14 @@ def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
     end
     setup_ruby_server_init(a, app_path)
   else
+    file "drop_#{a['name']}" do
+      path template_file
+      action :nothing
+    end
+
     rails_nginx_vhost a['name'] do
       action :disable
+      notifies :delete, "file[nginx_drop_#{a['name']}]", :delayed
     end
     setup_ruby_server_init(a, app_path)
   end
