@@ -175,8 +175,8 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
     template rbenv_vars_file do
       action :create
       mode 00700
-      owner a['user']
-      group a['user']
+      owner           a['user']
+      group           a['user']
       variables vars: a['vars']
       source 'rbenv_vars.erb'
       sensitive true
@@ -215,11 +215,12 @@ def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
     rails_nginx_vhost a['name'] do
       template 'nginx_ruby_crap.erb'
 
-      type a['ruby_server']['type']
+      user        a['user']
+      type        a['ruby_server']['type']
       server_name a['ruby_server']['server_name']
-      listen a['ruby_server']['listen']
-      path app_path
-      ssl a['ruby_server']['ssl']
+      listen      a['ruby_server']['listen']
+      path        app_path
+      ssl         a['ruby_server']['ssl']
       disable_www !!a['ruby_server']['www']
     end
     setup_ruby_server_init(a, app_path)
