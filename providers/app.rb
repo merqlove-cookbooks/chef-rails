@@ -65,7 +65,7 @@ action :create do
 
   if sites?(type) && nginx?(a) && !a[:enable]
     rails_nginx_vhost a['name'] do
-      action :disable
+      action :delete
     end
     next
   end
@@ -233,14 +233,8 @@ def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
     end
     setup_ruby_server_init(a, app_path)
   else
-    file "drop_#{a['name']}" do
-      path template_file
-      action :nothing
-    end
-
     rails_nginx_vhost a['name'] do
-      action :disable
-      notifies :delete, "file[nginx_drop_#{a['name']}]", :delayed
+      action :delete
     end
     setup_ruby_server_init(a, app_path)
   end
