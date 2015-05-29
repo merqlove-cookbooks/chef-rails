@@ -171,13 +171,12 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
     ignore_failure true
   end
 
-  # vars = nil
-  # vars = a['vars'].map { |k,v| "#{k.upcase}=#{v} && export #{k.upcase}" }.join(' && ') if a['vars']
-
   if a['ruby_server']['enable']
     template rbenv_vars_file do
       action :create
       mode 00700
+      owner a['user']
+      group a['user']
       variables vars: a['vars']
       source 'rbenv_vars.erb'
       sensitive true
