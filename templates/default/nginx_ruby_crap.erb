@@ -1,10 +1,10 @@
 # Maintained by Chef.  Local changes will be overwritten
 
-upstream <%= @type %>_<%= @app %> {
-  server unix:///tmp/<%= @type %>.<%= @app %>.sock fail_timeout=0;
+upstream <%= @name %>_<%= @name %> {
+  server unix:///tmp/<%= @type %>.<%= @name %>.sock fail_timeout=0;
 }
 
-<% if @www %>
+<% unless @disable_www %>
 server {
   listen 80;
   server_name  www.<%= Array(@server_name)[0] %>;
@@ -32,12 +32,12 @@ server {
     add_header Cache-Control public;
   }
 
-  try_files $uri/index.html $uri @<%= @type %>_<%= @app %>;
-  location @<%= @type %>_<%= @app %> {
+  try_files $uri/index.html $uri @<%= @type %>_<%= @name %>;
+  location @<%= @type %>_<%= @name %> {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
     proxy_redirect off;
-    proxy_pass http://<%= @type %>_<%= @app %>;
+    proxy_pass http://<%= @type %>_<%= @name %>;
   }
 
   error_page 500 502 503 /500.html;

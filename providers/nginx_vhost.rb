@@ -107,6 +107,7 @@ action :create do
               server_name:   server_name,
               php:           new_resource.php,
               engine:        new_resource.engine,
+              type:          new_resource.type,
               rewrites:      new_resource.rewrites,
               file_rewrites: new_resource.file_rewrites,
               php_rewrites:  new_resource.php_rewrites,

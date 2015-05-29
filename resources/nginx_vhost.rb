@@ -25,6 +25,7 @@ attribute :block,            kind_of: Array, default: [] # Include additional co
 attribute :name,             kind_of: String, name_attribute: true, required: true
 attribute :user,             kind_of: String, default: nil, required: true
 attribute :listen,           kind_of: String, default: '80'  # Listening port, ip, etc.
+attribute :type,             kind_of: String, default: nil # Server type: puma, unicorn, ...
 attribute :server_name,      kind_of: Array, default: [] # Server name if different then the name attribute.
 attribute :path,             kind_of: String, default: nil, required: true # Server root
 attribute :path_suffix,      kind_of: String, default: '',  required: false # Server root

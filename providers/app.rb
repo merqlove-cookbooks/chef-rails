@@ -214,22 +214,19 @@ def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
   template_file = "#{node['nginx']['dir']}/sites-available/#{a['name']}"
   if a['ruby_server']['enable']
     rails_nginx_vhost a['name'] do
-      action :nothing
-    end
-    template template_file do
+      template template_file
       cookbook 'rails'
       source 'nginx_ruby_crap.erb'
       owner 'root'
       group 'root'
       mode 00644
-      variables app: a['name'],
-                type: a['ruby_server']['type'],
-                server_name: a['ruby_server']['server_name'],
-                listen: a['ruby_server']['listen'],
-                path: app_path,
-                ssl: a['ruby_server']['ssl'],
-                www: a['ruby_server']['www']
-      notifies :enable, "rails_nginx_vhost[#{a['name']}]", :delayed
+
+      type a['ruby_server']['type']
+      server_name a['ruby_server']['server_name']
+      listen a['ruby_server']['listen']
+      path app_path
+      ssl a['ruby_server']['ssl']
+      disable_www !!a['ruby_server']['www']
     end
     setup_ruby_server_init(a, app_path)
   else
