@@ -163,6 +163,7 @@ end
 def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
   service_name = "#{a['ruby_server']['type']}_#{a['name']}"
   init_file = "/etc/init.d/#{service_name}"
+  rbenv_vars_file  = "#{app_path}/.rbenv-vars"
 
   service service_name do
     supports status: true, restart: true, stop: true, reload: true
@@ -170,9 +171,20 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
     ignore_failure true
   end
 
+  # vars = nil
+  # vars = a['vars'].map { |k,v| "#{k.upcase}=#{v} && export #{k.upcase}" }.join(' && ') if a['vars']
+
   if a['ruby_server']['enable']
-    vars = nil
-    vars = a['vars'].map { |k,v| "#{k.upcase}=#{v} && export #{k.upcase}" }.join(' && ') if a['vars']
+    template rbenv_vars_file do
+      action :create
+      mode 00700
+      variables vars: a['vars']
+      source 'rbenv_vars.erb'
+      sensitive true
+      backup false
+      notifies :restart, "service[#{service_name}]", :delayed
+    end
+
     template init_file do
       cookbook 'rails'
       source "server/#{a['ruby_server']['type']}.erb"
@@ -182,12 +194,15 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       variables app: a['name'],
                 user: a['user'],
                 path: app_path,
-                environment: a['ruby_server']['environment'],
-                vars: vars
+                environment: a['ruby_server']['environment']
       notifies :enable, "service[#{service_name}]", :immediately
       notifies :restart, "service[#{service_name}]", :delayed
     end
   else
+    file rbenv_vars_file do
+      action :delete
+    end
+
     file init_file do
       action :delete
       notifies :stop,    "service[#{service_name}]", :immediately
