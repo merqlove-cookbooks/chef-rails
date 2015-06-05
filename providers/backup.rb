@@ -242,11 +242,11 @@ end
 
 def clean_path(path, replacement = '_')
   return unless path
-  cleaned = path.gsub(%r{/[_\-\?\+\/\\+]/}, replacement)
+  cleaned = path.gsub(/[_\-\?\+\/\\+]/, replacement) # rubocop:disable Style::RegexpLiteral
   if cleaned.include? '_db'
-    cleaned[%r{/[a-z_\-\.]+#{replacement}[a-z]+$/}].sub('/', replacement)
+    cleaned[/[a-z_\-\.]+#{replacement}[a-z]+$/].sub('/', replacement)
   else
-    cleaned[%r{/[a-z0-9_\-\.]+$/}]
+    cleaned[/[a-z0-9_\-\.]+$/]
   end.sub(/^#{replacement}/, '')
 end
 
