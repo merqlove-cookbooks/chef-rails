@@ -28,7 +28,7 @@ depends 'fail2ban', '~> 2.2.1'
 depends 'cron', '~> 1.6.1'
 
 depends 'logrotate', '~> 1.9.1'
-depends 'newrelic', '~> 2.8.0'
+depends 'newrelic', '~> 2.12.2'
 
 depends 'selinux', '~> 0.9.0'
 depends 'vim', '~> 1.1.2'
