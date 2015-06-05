@@ -26,3 +26,6 @@ location / {
 
   try_files $uri $uri/ index.php;
 }
+
+location @engine_file_rewrite {
+}

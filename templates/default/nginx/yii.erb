@@ -11,3 +11,5 @@ location / {
   try_files $uri $uri/ /index.php?$args;
 }
 
+location @engine_file_rewrite {
+}
