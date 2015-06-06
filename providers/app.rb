@@ -162,7 +162,9 @@ end
 
 def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
   service_name = "#{a['ruby_server']['type']}_#{a['name']}"
+  service_name_worker = "#{a['name']}_#{a['ruby_server']['worker_type']}"
   init_file = "/etc/init.d/#{service_name}"
+  init_file_worker = "/etc/init.d/#{service_name_worker}"
   rbenv_vars_file  = "#{app_path}/.rbenv-vars"
 
   service service_name do
@@ -171,7 +173,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
     ignore_failure true
   end
 
-  service "#{service_name}_sidekiq" do
+  service service_name_worker do
     supports status: true, restart: true, stop: true, reload: true
     action :nothing
     ignore_failure true
@@ -204,8 +206,8 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       notifies :restart, "service[#{service_name}]", :delayed
     end
 
-    if a['ruby_server']['sidekiq']
-      template "#{init_file}_sidekiq" do
+    if a['ruby_server']['worker']
+      template init_file_worker do
         cookbook 'rails'
         source 'server/sidekiq.erb'
         owner 'root'
@@ -215,8 +217,8 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
                   user: a['user'],
                   path: app_path,
                   environment: a['ruby_server']['environment']
-        notifies :enable, "service[#{service_name}_sidekiq]", :immediately
-        notifies :restart, "service[#{service_name}_sidekiq]", :delayed
+        notifies :enable, "service[#{service_name_worker}]", :immediately
+        notifies :restart, "service[#{service_name_worker}]", :delayed
       end
     end
   else
@@ -231,11 +233,11 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       only_if { ::FileTest.file? init }
     end
 
-    file "#{init_file}_sidekiq" do
+    file init_file_worker do
       action :delete
-      notifies :stop,    "service[#{service_name}_sidekiq]", :immediately
-      notifies :disable, "service[#{service_name}_sidekiq]", :delayed
-      only_if { ::FileTest.file? "#{init}_sidekiq" }
+      notifies :stop,    "service[#{service_name_worker}]", :immediately
+      notifies :disable, "service[#{service_name_worker}]", :delayed
+      only_if { ::FileTest.file? init_file_worker }
     end
   end
 end
