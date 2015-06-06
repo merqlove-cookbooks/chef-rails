@@ -27,13 +27,12 @@ APP_PATH="$APP_ROOT/current"
 APP_SHARED="$APP_ROOT/shared"
 
 CONFIG="$APP_SHARED/config"
-LOG="$APP_SHARED/log/sidekiq.log"
 
 # The PID and LOCK files used by sidekiq
 UPID="$APP_SHARED/pids/sidekiq.pid"
 ULOCK="/var/lock/subsys/$NAME"
 
-OPTS="-e <%= @environment || 'production' %> -P $PID_FILE -d -L $LOG"
+OPTS="-C $APP_SHARED/config/sidekiq.yml -e <%= @environment || 'production' %> -d"
 
 POSTGRESQL_BIN="/usr/pgsql-<%= node['postgresql']['version'] %>/bin"
 
