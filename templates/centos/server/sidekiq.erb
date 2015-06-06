@@ -5,7 +5,7 @@
 # App Version   : 6.x
 
 # chkconfig: 2345 82 55
-# processname: <%= @app %>_sidekiq
+# processname: sidekiq_<%= @app %>
 # description: Runs sidekiq for <%= @app %>.
 
 # Related:
@@ -19,9 +19,8 @@
 . /etc/rc.d/init.d/functions
 
 # The name of the service
-NAME="<%= @app %>_sidekiq"
+NAME="sidekiq_<%= @app %>"
 
-# The username and path to the gitlab source
 USER=<%= @user %>
 APP_ROOT=<%= @path %>
 APP_PATH="$APP_ROOT/current"
@@ -30,11 +29,11 @@ APP_SHARED="$APP_ROOT/shared"
 CONFIG="$APP_SHARED/config"
 LOG="$APP_SHARED/log/sidekiq.log"
 
-# The PID and LOCK files used by puma
+# The PID and LOCK files used by sidekiq
 UPID="$APP_SHARED/pids/sidekiq.pid"
 ULOCK="/var/lock/subsys/$NAME"
 
-OPTS="-e <%= @environment || 'production' %> -P $PID_FILE"
+OPTS="-e <%= @environment || 'production' %> -P $PID_FILE -d -L $LOG_FILE"
 
 POSTGRESQL_BIN="/usr/pgsql-<%= node['postgresql']['version'] %>/bin"
 
@@ -51,7 +50,7 @@ cd $APP_PATH
 
 # Start sidekiq
 echo -n $"Starting sidekiq: "
-daemon --pidfile=$UPID --user=$USER "$RUBY_PATH_PATCH && $RBENV_ROOT_PATCH && bundle exec sidekiq $OPTS >> $LOG_FILE 2>&1 &"
+daemon --pidfile=$UPID --user=$USER "$RUBY_PATH_PATCH && $RBENV_ROOT_PATCH && bundle exec sidekiq $OPTS"
 sidekiq=$?
 [ $sidekiq -eq 0 ] && touch $ULOCK
 echo

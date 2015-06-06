@@ -162,7 +162,7 @@ end
 
 def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
   service_name = "#{a['ruby_server']['type']}_#{a['name']}"
-  service_name_worker = "#{a['name']}_#{a['ruby_server']['worker_type']}"
+  service_name_worker = "#{a['ruby_server']['worker_type']}_#{a['name']}"
   init_file = "/etc/init.d/#{service_name}"
   init_file_worker = "/etc/init.d/#{service_name_worker}"
   rbenv_vars_file  = "#{app_path}/.rbenv-vars"
