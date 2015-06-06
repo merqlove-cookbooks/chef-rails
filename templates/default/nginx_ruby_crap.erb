@@ -26,7 +26,7 @@ server {
   autoindex off;
   charset utf-8;
 
-  location ^~ /(assets|static|spree|system)/ {
+  location ^~ /(sidekiq/assets|assets|static|spree|system)/ {
     gzip_static on;
     expires max;
     add_header Cache-Control public;
