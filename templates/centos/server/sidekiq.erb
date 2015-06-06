@@ -33,7 +33,7 @@ LOG="$APP_SHARED/log/sidekiq.log"
 UPID="$APP_SHARED/pids/sidekiq.pid"
 ULOCK="/var/lock/subsys/$NAME"
 
-OPTS="-e <%= @environment || 'production' %> -P $PID_FILE -d -L $LOG_FILE"
+OPTS="-e <%= @environment || 'production' %> -P $PID_FILE -d -L $LOG"
 
 POSTGRESQL_BIN="/usr/pgsql-<%= node['postgresql']['version'] %>/bin"
 
