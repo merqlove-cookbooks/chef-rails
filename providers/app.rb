@@ -171,6 +171,12 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
     ignore_failure true
   end
 
+  service "#{service_name}_sidekiq" do
+    supports status: true, restart: true, stop: true, reload: true
+    action :nothing
+    ignore_failure true
+  end
+
   if a['ruby_server']['enable']
     template rbenv_vars_file do
       action :create
@@ -199,7 +205,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
     end
 
     if a['ruby_server']['sidekiq']
-      template "#{init}_sidekiq" do
+      template "#{init_file}_sidekiq" do
         cookbook 'rails'
         source 'server/sidekiq.erb'
         owner 'root'
@@ -209,8 +215,8 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
                   user: a['user'],
                   path: app_path,
                   environment: a['ruby_server']['environment']
-        notifies :enable, "service[#{service_name}]", :immediately
-        notifies :restart, "service[#{service_name}]", :delayed
+        notifies :enable, "service[#{service_name}_sidekiq]", :immediately
+        notifies :restart, "service[#{service_name}_sidekiq]", :delayed
       end
     end
   else
@@ -225,10 +231,10 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       only_if { ::FileTest.file? init }
     end
 
-    file init_file do
+    file "#{init_file}_sidekiq" do
       action :delete
-      notifies :stop,    "service[#{service_name}]", :immediately
-      notifies :disable, "service[#{service_name}]", :delayed
+      notifies :stop,    "service[#{service_name}_sidekiq]", :immediately
+      notifies :disable, "service[#{service_name}_sidekiq]", :delayed
       only_if { ::FileTest.file? "#{init}_sidekiq" }
     end
   end
