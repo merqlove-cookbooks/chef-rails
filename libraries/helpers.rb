@@ -36,6 +36,15 @@ module Rails
       platform_family?('rhel') && major_version < 6
     end
     #
+    # Determine if the current node using 6.x RHEL.
+    #
+    # @return [Boolean]
+    #
+    def rhel6x?
+      major_version = node['platform_version'].split('.').first.to_i
+      platform_family?('rhel') && major_version >= 6 && major_version < 7
+    end
+    #
     # Determine if the current node using new RHEL.
     #
     # @return [Boolean]
