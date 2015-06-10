@@ -230,7 +230,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       action :delete
       notifies :stop,    "service[#{service_name}]", :immediately
       notifies :disable, "service[#{service_name}]", :delayed
-      only_if { ::FileTest.file? init }
+      only_if { ::FileTest.file? init_file }
     end
 
     file init_file_worker do
