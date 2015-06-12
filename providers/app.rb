@@ -206,7 +206,6 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       notifies :restart, "service[#{service_name}]", :delayed
     end
 
-
     template init_file_worker do
       cookbook 'rails'
       source 'server/sidekiq.erb'
