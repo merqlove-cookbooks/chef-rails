@@ -22,5 +22,5 @@ include_recipe 'stunnel'
 stunnel_connection 'redis_azure' do
   connect "#{node['rails']['redis']['host']}:#{node['rails']['redis']['port']}"
   accept "127.0.0.1:#{node['rails']['redis']['local_accept_port']}"
-  notifies :restart, 'service[stunnel]'
+  notifies :restart, 'service[stunnel]', :immediately
 end
