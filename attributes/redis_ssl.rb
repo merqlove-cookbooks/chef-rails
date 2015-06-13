@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Attributes:: redis
+# Attributes:: redis_ssl
 #
 # Copyright (C) 2015 Alexander Merkulov
 #
