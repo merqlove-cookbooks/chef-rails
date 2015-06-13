@@ -17,6 +17,4 @@
 # limitations under the License.
 #
 
-default['stunnel']['ext_options'] = {
-  fips: false
-}
+default['stunnel']['default']['fips'] = 'no'
