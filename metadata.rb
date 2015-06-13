@@ -4,7 +4,7 @@ maintainer_email 'sasha@merqlove.ru'
 license          'Apache 2.0'
 description      'Installs/Configures ruby/rails, php, databases and so on'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           '1.2.23'
+version           '1.2.24'
 
 supports 'centos'
 supports 'ubuntu'
@@ -59,7 +59,7 @@ depends 'apt'
 
 depends 'openssl-fips'
 depends 'vsftpd'
-depends 'stunnel', '~> 2.1.0'
+depends 'stunnel-wrapper'
 depends 'duplicity_ng', '~> 1.2.2'
 depends 'ssh_known_hosts'
 depends 'nginx'

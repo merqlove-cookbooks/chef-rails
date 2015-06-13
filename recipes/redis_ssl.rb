@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-include_recipe 'stunnel'
+include_recipe 'stunnel-wrapper'
 
 stunnel_connection 'redis_azure' do
   connect "#{node['rails']['redis']['host']}:#{node['rails']['redis']['port']}"
