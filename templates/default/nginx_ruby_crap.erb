@@ -47,7 +47,7 @@ server {
   keepalive_timeout 10;
   server_tokens off;
   <% exclude = %w(jpg jpeg gif png ico svg css mp3 ogg mpe?g avi pdf doc docx xls xlsx ppt pptx dmg tgz tar.gz zip gz bz2? rar ttf woff txt syx) %>
-  <% exclude << 'js' unless @nginx['js'] == false %>
+  <% exclude << 'js' unless @tunes['js'] == false %>
   location ~* ^.+\.(<%= exclude.join('|') %>)$ {
     access_log        off;
     log_not_found     off;
