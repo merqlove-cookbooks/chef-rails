@@ -254,7 +254,7 @@ def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
       path        app_path
       ssl         a['ruby_server']['ssl']
       disable_www a['ruby_server']['www']
-      nginx       a['nginx']
+      tunes       a['nginx']['tunes']
     end
     setup_ruby_server_init(a, app_path)
   else

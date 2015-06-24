@@ -37,6 +37,7 @@ attribute :error_log,        kind_of: [TrueClass, FalseClass], default: true  # 
 attribute :php,              kind_of: [TrueClass, FalseClass], default: false # PHP code
 attribute :engine,           kind_of: String, default: nil # Engine (Wordpress, Opencart, Santafox by default)
 attribute :locations,        kind_of: Hash, default: {} # Locations to include.
+attribute :tunes,            kind_of: Hash, default: {} # Some tunes.
 attribute :rewrites,         kind_of: Array, default: [] # Server rewrites
 attribute :file_rewrites,    kind_of: Array, default: [] # Server files rewrites
 attribute :php_rewrites,     kind_of: Array, default: [] # Server php rewrites

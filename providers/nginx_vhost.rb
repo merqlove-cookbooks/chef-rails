@@ -105,6 +105,7 @@ action :create do
               path:          new_resource.path,
               path_suffix:   new_resource.path_suffix,
               server_name:   server_name,
+              options:       new_resource.tunes,
               php:           new_resource.php,
               engine:        new_resource.engine,
               type:          new_resource.type,
