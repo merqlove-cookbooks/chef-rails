@@ -1,20 +1,14 @@
 chef-rails cookbook
 ===================
 
-e.g.
 This cookbook makes your favorite breakfast sandwich.
 
 Requirements
 ------------
-TODO: List your cookbook requirements. Be sure to include any requirements this cookbook has on platforms, libraries, other cookbooks, packages, operating systems, etc.
 
-e.g.
-#### packages
-- `toaster` - rails needs toaster to brown your bagel.
+Platforms: CentOS, Debian
 
-Attributes
-----------
-TODO: List you cookbook attributes here.
+Lots of packages in metadata.rb
 
 e.g.
 #### rails::default
