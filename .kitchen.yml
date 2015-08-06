@@ -18,7 +18,7 @@ platforms:
   run_list:
 - name: centos-7.1
   run_list:
-- name: ubuntu-12.04
+- name: ubuntu-14.04
   run_list:
 
 suites:

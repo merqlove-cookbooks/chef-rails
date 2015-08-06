@@ -19,11 +19,6 @@
         "url": "https://launchpad.net/duplicity/0.7-series/0.7.02/+download/duplicity-0.7.02.tar.gz",
         "gnupg": {
           "url": "http://downloads.sourceforge.net/project/py-gnupg/GnuPGInterface/0.3.2/GnuPGInterface-0.3.2.tar.gz"
-        },
-        "dev": {
-          "packages": [
-            "python-devel", "librsync-devel", "libffi-devel"
-          ]
         }
       }
     },

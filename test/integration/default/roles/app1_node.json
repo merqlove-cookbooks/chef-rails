@@ -24,17 +24,17 @@
       "apps": {
         "www_christ_leather_ru": {
           "backup": true,
+          "vars": {
+            "MAX_THREADS": 8,
+            "MAX_WORKERS": 0,
+            "SECRET_TOKEN": "SOMETOKEN",
+            "POOL": 8
+          },
           "ruby_server": {
             "enable": true,
             "type": "puma",
             "environment": "production",
             "www": true,
-            "vars": {
-              "MAX_THREADS": 8,
-              "MAX_WORKERS": 0,
-              "SECRET_TOKEN": "SOMETOKEN",
-              "POOL": 8
-            },
             "server_name": [
                 "christ-leather.ru"
             ]
@@ -66,10 +66,21 @@
                 "name": "bundler"
               }
             ]
+          },
+          "nginx": {
+            "tunes": {
+              "js": false
+            }
           }
         },
           "stage_christ_leather_ru": {
               "backup": true,
+              "vars": {
+                "MAX_THREADS": 8,
+                "MAX_WORKERS": 0,
+                "SECRET_TOKEN": "SOMETOKEN",
+                "POOL": 8
+              },
               "ruby_server": {
                   "enable": true,
                   "type": "unicorn",
@@ -100,6 +111,11 @@
                           "name": "bundler"
                       }
                   ]
+              },
+              "nginx": {
+                "tunes": {
+                  "js": false
+                }
               }
           }
       }

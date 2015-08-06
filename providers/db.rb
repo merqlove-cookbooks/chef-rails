@@ -312,14 +312,7 @@ def create_postgresql_admin(secret, postgres) # rubocop:disable Metrics/MethodLe
 end
 
 def install_postgresql # rubocop:disable Metrics/MethodLength
-  case node['platform_family']
-  when 'debian', 'ubuntu'
-    node.default['postgresql']['enable_pgdg_apt'] = true
-  when 'rhel', 'fedora', 'suse'
-    node.default['postgresql']['enable_pgdg_yum'] = true
-  end
-
-  run_context.include_recipe 'postgresql::contrib'
+  run_context.include_recipe 'postgresql-wrapper::default'
 
   if php_exist? # rubocop:disable Style/GuardClause
     case node['platform_family']
@@ -330,10 +323,7 @@ def install_postgresql # rubocop:disable Metrics/MethodLength
     end
   end
 
-  run_context.include_recipe 'postgresql::config_initdb'
-  run_context.include_recipe 'postgresql::config_pgtune'
-
-  run_context.include_recipe 'postgresql::ruby'
+  run_context.include_recipe 'postgresql-wrapper::init'
 end
 
 def backup_postgresql_db(d, date) # rubocop:disable Metrics/MethodLength

@@ -33,7 +33,7 @@ group :mongo do
   company_cookbook 'mongodb'
 end
 group :postgres do
-  company_cookbook 'postgresql', '>= 0.0.0', branch: 'develop' #path: '../postgresql'
+  company_cookbook 'postgresql-wrapper'
 end
 
 # company_cookbook 'duplicity_ng', '>= 0.0.0', branch: 'feature/fix_conditions_and_azure'
