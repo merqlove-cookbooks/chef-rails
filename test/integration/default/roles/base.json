@@ -292,7 +292,7 @@
     "recipe[sudo]",
 
     "recipe[selinux::disabled]",
-    "recipe[iptables]",
+    "recipe[iptables-wrapper]",
     "recipe[rails::iptables]",
     "recipe[rails::packages]",
     "recipe[vsftpd]",

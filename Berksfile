@@ -40,7 +40,7 @@ end
 
 # base
 group :production do
-  %w(locale openssl-fips ssh_known_hosts timezone-ii vsftpd stunnel-wrapper nginx-wrapper).each do |name|
+  %w(locale openssl-fips ssh_known_hosts timezone-ii vsftpd stunnel-wrapper nginx-wrapper iptables-wrapper).each do |name|
     company_cookbook name
   end
 end
