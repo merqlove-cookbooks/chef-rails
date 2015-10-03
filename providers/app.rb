@@ -429,7 +429,7 @@ def fill_php_config(a, app_path) # rubocop:disable Metrics/MethodLength
   end
 
   if smtp?(a)
-    pool_custom[:php_options]['php_admin_value[sendmail_path]'] = "/usr/bin/msmtp -a #{a['name']} -t"
+    pool_custom[:php_options]['php_admin_value[sendmail_path]'] = "#{node['msmtp']['binary']} -a #{a['name']} -t"
   end
 
   pool_custom.each do |key, value|
