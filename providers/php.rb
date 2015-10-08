@@ -76,7 +76,7 @@ def install_modules # rubocop:disable Metrics/MethodLength
   modules.flatten.compact.uniq.each do |m|
     package m do
       action :install
-      notifies :restart, 'service[php-fpm]', :delayed
+      notifies :reload, 'service[php-fpm]', :delayed
     end
   end
 end

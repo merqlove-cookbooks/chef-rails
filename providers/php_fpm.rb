@@ -28,7 +28,7 @@ action :create do
       mode 00644
       owner 'root'
       group 'root'
-      notifies :restart, 'service[php-fpm]'
+      notifies :reload, 'service[php-fpm]'
     end
 
     cleanup_php_fpm
@@ -54,7 +54,7 @@ action :fix do
     mode 00755
     source 'php_fix.erb'
     variables(options: node['rails']['php']['options'])
-    notifies :restart, 'service[php-fpm]', :delayed
+    notifies :reload, 'service[php-fpm]', :delayed
   end
 
   new_resource.updated_by_last_action(true)
@@ -84,7 +84,7 @@ def cleanup_php_fpm # rubocop:disable Metrics/MethodLength,Metrics/CyclomaticCom
 
     file "#{node['php-fpm']['pool_conf_dir']}/#{pool}" do
       action   :delete
-      notifies :restart, 'service[php-fpm]', :delayed
+      notifies :reload, 'service[php-fpm]', :delayed
     end
   end
 end
