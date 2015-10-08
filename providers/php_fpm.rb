@@ -110,7 +110,7 @@ def logrotate(enable = true)
   logrotate_app 'php-fpm' do
     cookbook  'logrotate'
     path      '/var/log/php-fpm/*log'
-    frequency 'hourly'
+    frequency 'daily'
     enable    enable
     rotate    30
     size      10_485_760
