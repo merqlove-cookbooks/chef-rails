@@ -1,16 +1,1 @@
-<% case @engine %>
-<% when 'wordpress' %>
-  <%= render 'nginx/wordpress.erb' %>
-<% when 'yii' %>
-  <%= render 'nginx/yii.erb' %>
-<% when 'bitrix' %>
-  <%= render 'nginx/bitrix.erb' %>
-<% when 'sugar' %>
-  <%= render 'nginx/sugar.erb' %>
-<% when 'opencart' %>
-  <%= render 'nginx/opencart.erb' %>
-<% when 'santafox' %>
-  <%= render 'nginx/santafox.erb' %>
-<% else %>
-  <%= render 'nginx/default.erb' %>
-<% end -%>
+<%= render "nginx/#{@engine || 'default'}.erb" %>
