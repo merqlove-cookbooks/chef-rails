@@ -116,6 +116,6 @@ def logrotate(enable=true)
     size      10485760
     sharedscripts true
     postrotate "/bin/kill -SIGUSR1 `cat #{node['php-fpm']['pid']} 2>/dev/null` 2>/dev/null || true"
-    options    %w(missingok compress delaycompress notifempty)
+    options    %w(missingok delaycompress notifempty)
   end
 end
