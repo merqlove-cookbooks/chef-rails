@@ -38,8 +38,11 @@ action :create do
       group 'root'
       mode 00777
     end
+
+    logrotate
   else
     stop_php_fpm
+    logrotate(false)
   end
 
   new_resource.updated_by_last_action(true)
@@ -100,5 +103,19 @@ def stop_php_fpm
   end
   service 'php-fpm' do
     action [:disable, :stop]
+  end
+end
+
+def logrotate(enable=true)
+  logrotate_app 'php-fpm' do
+    cookbook  'logrotate'
+    path      '/var/log/php-fpm/*log'
+    frequency 'hourly'
+    enable    enable
+    rotate    30
+    size      10485760
+    sharedscripts true
+    postrotate "/bin/kill -SIGUSR1 `cat #{node['php-fpm']['pid']} 2>/dev/null` 2>/dev/null || true"
+    options    %w(missingok compress delaycompress notifempty)
   end
 end
