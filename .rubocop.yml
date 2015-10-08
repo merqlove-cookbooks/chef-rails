@@ -13,6 +13,9 @@ TrailingComma:
 Metrics/AbcSize:
   Enabled: false
 
+Metrics/MethodLength:
+  Max: 20
+
 Style/LeadingCommentSpace:
   Exclude:
     - 'Berksfile'

@@ -106,14 +106,14 @@ def stop_php_fpm
   end
 end
 
-def logrotate(enable=true)
+def logrotate(enable = true)
   logrotate_app 'php-fpm' do
     cookbook  'logrotate'
     path      '/var/log/php-fpm/*log'
     frequency 'hourly'
     enable    enable
     rotate    30
-    size      10485760
+    size      10_485_760
     sharedscripts true
     postrotate "/bin/kill -SIGUSR1 `cat #{node['php-fpm']['pid']} 2>/dev/null` 2>/dev/null || true"
     options    %w(missingok delaycompress notifempty)
