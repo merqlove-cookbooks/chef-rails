@@ -34,6 +34,13 @@ node.default['php-fpm']['pools']            = [node['php-fpm']['default']['pool'
 # Useful databases
 node.default['rails']['databases'] = {}
 
+template '/var/www/html/locked.html' do
+  owner 'nginx'
+  group 'nginx'
+  mode 00644
+  source 'locked.html.erb'
+end
+
 node['rails']['sites'].each do |k, a|
   rails_app k do
     application a

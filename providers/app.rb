@@ -306,6 +306,7 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
     file_rewrites    a['nginx']['file_rewrites']
     php_rewrites     a['nginx']['php_rewrites']
     error_pages      a['nginx']['error_pages']
+    template         'nginx_vhost_locked.erb' if a['locked']
     action           :create
   end
 end

@@ -1,0 +1,44 @@
+  # Maintained by Chef.  Local changes will be overwritten
+
+  <% unless node.role? 'vagrant' && !@disable_www %>
+  server {
+    listen <%= @listen %>;
+    server_name www.<%= Array(@server_name)[0] %>;
+    return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
+  }
+  <% end %>
+
+  server {
+    listen <%= @listen %> <%= 'default' if @default %> <%= 'deferred' if @deferred %>;
+    server_name <%= Array(@server_name).join(' ') %>;
+
+    root /var/www/html;
+    autoindex off;
+    charset utf-8;
+
+    <% if @access_log %>
+    access_log <%= @path %>/log/access.log combined;
+    <% else %>
+    access_log off;
+    <% end %>
+
+    <% if @error_log %>
+    error_log <%= @path %>/log/error.log error;
+    <% end %>
+
+    location ~ (^/(uploads/|ini.php)|/\.svn/|/\.git/|/.hta.+){
+      access_log off;
+      log_not_found off;
+      deny all;
+    }
+
+    location / {
+      index locked.html;
+      try_files $uri $uri/ =404;
+    }
+
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+      root   /var/www/html;
+    }
+  }
