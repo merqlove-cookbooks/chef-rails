@@ -2,7 +2,7 @@
 # Cookbook Name:: rails
 # Recipe:: default
 #
-# Copyright (C) 2013 Alexander Merkulov
+# Copyright (C) 2015 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -36,3 +36,23 @@ directory node['rails']['sites_base_path'] do
   action    :create
   recursive true
 end
+
+node.default[:ohai][:disabled_plugins] = %w(
+  c
+  dmi
+  dmi_common
+  erlang
+  groovy
+  java
+  languages
+  lua
+  mono
+  rackspace
+  solaris2::filesystem
+  solaris2::kernel
+  solaris2::uptime
+  solaris2::zpools
+  windows::cpu
+  windows::network
+  windows::filesystem
+)
