@@ -37,7 +37,7 @@ directory node['rails']['sites_base_path'] do
   recursive true
 end
 
-node.default[:ohai][:disabled_plugins] = %w(
+node.default['ohai']['disabled_plugin'] = %w(
   c
   dmi
   dmi_common
