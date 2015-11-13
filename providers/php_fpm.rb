@@ -77,13 +77,13 @@ end
 
 # Makers
 
-def cleanup_php_fpm # rubocop:disable Metrics/MethodLength,Metrics/CyclomaticComplexity
+def cleanup_php_fpm # rubocop:disable Metrics/CyclomaticComplexity
   return unless ::Dir.exist? node['php-fpm']['pool_conf_dir']
 
   ::Dir.foreach(node['php-fpm']['pool_conf_dir']) do |pool|
     next if pool == '.' || pool == '..'
     next unless pool.include?('.conf') && !pool.include?('www.conf')
-    next if hash_in_array?(node['php-fpm']['pools'], pool.gsub(/\.conf/, '')) # rubocop:disable Metrics/BlockNesting
+    next if hash_in_array?(node['php-fpm']['pools'], pool.gsub(/\.conf/, ''))
 
     file "#{node['php-fpm']['pool_conf_dir']}/#{pool}" do
       action   :delete

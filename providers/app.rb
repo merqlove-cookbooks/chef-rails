@@ -143,7 +143,7 @@ end
 
 # Installers
 
-def setup_rbenv(a) # rubocop:disable Metrics/MethodLength
+def setup_rbenv(a)
   return unless a
 
   version  = a['rbenv']['version']
@@ -242,7 +242,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
+def setup_ruby_server(a, app_path)
   if a['ruby_server']['enable']
     rails_nginx_vhost a['name'] do
       template 'nginx_ruby_crap.erb'
@@ -254,7 +254,7 @@ def setup_ruby_server(a, app_path) # rubocop:disable Metrics/MethodLength
       path        app_path
       ssl         a['ruby_server']['ssl']
       disable_www a['ruby_server']['www']
-      tunes       a['nginx']['tunes'] || {'js' => false}
+      tunes       a['nginx']['tunes'] || { 'js' => false }
     end
     setup_ruby_server_init(a, app_path)
   else
@@ -311,7 +311,7 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def setup_php(a, app_path) # rubocop:disable Metrics/MethodLength
+def setup_php(a, app_path)
   return unless a
 
   node.default['rails']['php']['install']  = true
@@ -328,13 +328,13 @@ def setup_php(a, app_path) # rubocop:disable Metrics/MethodLength
   fill_php_config(a, app_path)
 end
 
-def init_smtp(a, app_path) # rubocop:disable Metrics/MethodLength
+def init_smtp(a, app_path)
   node.default['msmtp']['accounts'][a['user']][a['name']]          = a[:smtp]
   node.default['msmtp']['accounts'][a['user']][a['name']][:syslog] = 'on'
   node.default['msmtp']['accounts'][a['user']][a['name']][:log]    = "#{app_path}/log/msmtp.log"
 end
 
-def init_db(a, type, app_path, backup_db_path) # rubocop:disable Metrics/MethodLength
+def init_db(a, type, app_path, backup_db_path)
   a['db'].each do |d|
     node.default['rails']['databases'][d['type']][d['name']] = {
       name:               d['name'],
@@ -355,7 +355,7 @@ def init_db(a, type, app_path, backup_db_path) # rubocop:disable Metrics/MethodL
   end
 end
 
-def init_backup(a, type, app_path, project_path) # rubocop:disable Metrics/MethodLength
+def init_backup(a, type, app_path, project_path)
   return unless a['backup']
   rails_backup a['name'] do
     path        "#{type}/#{project_path}"
@@ -421,7 +421,7 @@ def fill_php_config(a, app_path) # rubocop:disable Metrics/MethodLength
 
   if a[:php][:pool]
     a[:php][:pool].each do |key, value|
-      if key.include? 'php_options' # rubocop:disable Metrics/BlockNesting
+      if key.include? 'php_options'
         pool_custom[:"#{key}"] = pool_custom[:"#{key}"].merge(value)
       else
         pool_custom[:"#{key}"] = value

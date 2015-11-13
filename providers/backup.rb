@@ -70,7 +70,7 @@ action :cleanup do
   new_resource.updated_by_last_action(true)
 end
 
-def backup_cleanup # rubocop:disable Metrics/MethodLength
+def backup_cleanup
   cron_root = "/etc/cron.#{new_resource.interval}"
   return unless ::Dir.exist?(cron_root)
 
@@ -86,7 +86,7 @@ def backup_cleanup # rubocop:disable Metrics/MethodLength
   end
 end
 
-def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
+def config(new_resource, storage_key_id, pass_key_id) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
   return unless storage_key_id || pass_key_id
 
   default_secret = load_secret
@@ -242,7 +242,7 @@ end
 
 def clean_path(path, replacement = '_')
   return unless path
-  cleaned = path.gsub(/[_\-\?\+\/\\+]/, replacement) # rubocop:disable Style::RegexpLiteral
+  cleaned = path.gsub(/[_\-\?\+\/\\+]/, replacement) # rubocop:disable Style/RegexpLiteral
   if cleaned.include? '_db'
     cleaned[/[a-z_\-\.]+#{replacement}[a-z]+$/].sub('/', replacement)
   else

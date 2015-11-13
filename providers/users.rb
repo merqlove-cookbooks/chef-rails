@@ -29,7 +29,7 @@ action :create do
 
     # user_nginx
 
-    users.each do |u| # rubocop:disable Style/Next
+    users.each do |u|
       data = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['users'], u, secret)
       next unless data
 
@@ -69,7 +69,7 @@ action :create do
   new_resource.updated_by_last_action(true)
 end
 
-def user_ssh_keys(u, data) # rubocop:disable Metrics/MethodLength
+def user_ssh_keys(u, data)
   return unless data['ssh-keys'] && u
 
   directory "/home/#{u}/.ssh" do
@@ -159,7 +159,7 @@ def user_groups(u) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def user_ftps(u, data) # rubocop:disable Metrics/MethodLength
+def user_ftps(u, data)
   return %w() unless data['ftp'] && u
 
   users = []

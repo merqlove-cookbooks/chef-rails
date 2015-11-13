@@ -174,7 +174,7 @@ def tune_mysql(name) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def create_mysql_admin(secret, root) # rubocop:disable Metrics/MethodLength
+def create_mysql_admin(secret, root)
   return unless secret && root
   mysql = data_bag('mysql')
   return unless mysql
@@ -196,7 +196,7 @@ def create_mysql_admin(secret, root) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def backup_mysql_db(d, date, password) # rubocop:disable Metrics/MethodLength,Metrics/CyclomaticComplexity
+def backup_mysql_db(d, date, password)
   return unless d && date && password
 
   exec_before = [
@@ -311,10 +311,10 @@ def create_postgresql_admin(secret, postgres) # rubocop:disable Metrics/MethodLe
   end
 end
 
-def install_postgresql # rubocop:disable Metrics/MethodLength
+def install_postgresql
   run_context.include_recipe 'postgresql-wrapper::default'
 
-  if php_exist? # rubocop:disable Style/GuardClause
+  if php_exist?
     case node['platform_family']
     when 'rhel'
       node.default['rails']['php']['modules'] << 'php-pgsql'
@@ -326,7 +326,7 @@ def install_postgresql # rubocop:disable Metrics/MethodLength
   run_context.include_recipe 'postgresql-wrapper::init'
 end
 
-def backup_postgresql_db(d, date) # rubocop:disable Metrics/MethodLength
+def backup_postgresql_db(d, date)
   return unless d && date
 
   exec_before = [
@@ -363,7 +363,7 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
     action     :add
   end
 
-  if php_exist? # rubocop:disable Style/GuardClause
+  if php_exist?
     case node['platform_family']
     when 'rhel'
       node.default['rails']['php']['modules'] << 'php-pecl-mongo'
@@ -402,10 +402,10 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   create_mongodb_admin(secret, admin)
 end
 
-def create_mongodb_admin(secret, admin) # rubocop:disable Metrics/MethodLength
+def create_mongodb_admin(secret, admin)
   return unless secret && admin
   mongo = data_bag('mongodb')
-  return unless mongo # rubocop:disable Metrics/BlockNesting
+  return unless mongo
 
   (mongo - ['admin']).each do |m|
     u = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['mongodb'], m, secret)
@@ -420,7 +420,7 @@ def create_mongodb_admin(secret, admin) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def backup_mongodb_db(d, date) # rubocop:disable Metrics/MethodLength
+def backup_mongodb_db(d, date)
   return unless d && date
 
   exec_before = [
@@ -463,7 +463,7 @@ def backup_db(name, d, date, before = [], pre = [], after = []) # rubocop:disabl
       name "#{name}_db_#{d['app_name']}"
       action :delete
     end
-    ::FileUtils.remove_dir(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive'] # rubocop:disable Metrics/BlockNesting
-    ::FileUtils.remove_dir(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp'] # rubocop:disable Metrics/BlockNesting
+    ::FileUtils.remove_dir(d['app_backup_archive']) if ::Dir.exist? d['app_backup_archive']
+    ::FileUtils.remove_dir(d['app_backup_temp']) if ::Dir.exist? d['app_backup_temp']
   end
 end
