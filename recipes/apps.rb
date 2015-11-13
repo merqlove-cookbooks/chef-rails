@@ -34,12 +34,18 @@ node.default['php-fpm']['pools']            = [node['php-fpm']['default']['pool'
 # Useful databases
 node.default['rails']['databases'] = {}
 
+directory '/var/www/html/' do
+  owner 'nginx'
+  group 'nginx'
+  mode  00644
+end
+
 template '/var/www/html/locked.html' do
   owner 'nginx'
   group 'nginx'
   mode 00644
   source 'locked.html.erb'
-end if node['rails']['apps'].size > 0
+end if node['rails']['sites'].size > 0
 
 node['rails']['sites'].each do |k, a|
   rails_app k do
