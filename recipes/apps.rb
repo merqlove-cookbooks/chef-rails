@@ -38,6 +38,7 @@ directory '/var/www/html/' do
   owner 'nginx'
   group 'nginx'
   mode  00644
+  recursive true
 end
 
 template '/var/www/html/locked.html' do
