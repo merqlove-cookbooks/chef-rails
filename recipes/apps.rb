@@ -39,7 +39,7 @@ template '/var/www/html/locked.html' do
   group 'nginx'
   mode 00644
   source 'locked.html.erb'
-end
+end if node['rails']['apps'].size > 0
 
 node['rails']['sites'].each do |k, a|
   rails_app k do
