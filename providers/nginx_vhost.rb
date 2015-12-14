@@ -201,10 +201,10 @@ action :disable do
 end
 
 def auth_basic_user_file(auth_basic_user_file, path, user)
-  if File.exist?(auth_basic_user_file)
+  if ::File.exist?(auth_basic_user_file)
     auth_basic_user_file
-  elsif File.exist?(File.join(path, auth_basic_user_file))
-    File.join(path, auth_basic_user_file)
+  elsif ::File.exist?(::File.join(path, auth_basic_user_file))
+    ::File.join(path, auth_basic_user_file)
   else
     directory "#{path}/conf" do
       mode      00770
@@ -212,6 +212,6 @@ def auth_basic_user_file(auth_basic_user_file, path, user)
       group     user
       action    :create
     end
-    File.join(path, 'conf', 'htpasswd')
+    ::File.join(path, 'conf', 'htpasswd')
   end
 end
