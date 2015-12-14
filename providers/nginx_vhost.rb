@@ -78,12 +78,11 @@ action :create do
   # end
 
   auth_basic = (new_resource.auth_basic && !new_resource.auth_basic.blank?)
-  auth_file = auth_basic_user_file(
-      auth_basic,
+  auth_file = auth_basic ? auth_basic_user_file(
       new_resource.auth_basic_user_file,
       new_resource.path,
       new_resource.user
-  )
+  ) : new_resource.auth_basic_user_file
 
   test_nginx = execute "test-nginx-conf-#{name}-create" do
     action   :nothing
@@ -118,6 +117,7 @@ action :create do
               engine:        new_resource.engine,
               type:          new_resource.type,
               rewrites:      new_resource.rewrites,
+              auth_basic_name: new_resource.auth_basic,
               auth_basic:    auth_basic,
               auth_basic_user_file: auth_file,
               file_rewrites: new_resource.file_rewrites,
@@ -196,9 +196,7 @@ action :disable do
   new_resource.updated_by_last_action(true)
 end
 
-def auth_basic_user_file(auth_basic, auth_basic_user_file, path, user)
-  return nil unless auth_basic
-
+def auth_basic_user_file(auth_basic_user_file, path, user)
   if File.exist?(auth_basic_user_file)
     auth_basic_user_file
   elsif File.exist?(File.join(path, auth_basic_user_file))
