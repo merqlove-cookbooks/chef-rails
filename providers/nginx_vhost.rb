@@ -77,6 +77,14 @@ action :create do
   #   }
   # end
 
+  auth_basic = (new_resource.auth_basic && !new_resource.auth_basic.blank?)
+  auth_file = auth_basic_user_file(
+      auth_basic,
+      new_resource.auth_basic_user_file,
+      new_resource.path,
+      new_resource.user
+  )
+
   test_nginx = execute "test-nginx-conf-#{name}-create" do
     action   :nothing
     command  "#{node['nginx']['binary']} -t"
@@ -110,6 +118,8 @@ action :create do
               engine:        new_resource.engine,
               type:          new_resource.type,
               rewrites:      new_resource.rewrites,
+              auth_basic:    auth_basic,
+              auth_basic_user_file: auth_file,
               file_rewrites: new_resource.file_rewrites,
               php_rewrites:  new_resource.php_rewrites,
               error_pages:   new_resource.error_pages,
@@ -184,4 +194,22 @@ action :disable do
   end
 
   new_resource.updated_by_last_action(true)
+end
+
+def auth_basic_user_file(auth_basic, auth_basic_user_file, path, user)
+  return nil unless auth_basic
+
+  if File.exist?(auth_basic_user_file)
+    auth_basic_user_file
+  elsif File.exist?(File.join(path, auth_basic_user_file))
+    File.join(path, auth_basic_user_file)
+  else
+    directory "#{path}/conf" do
+      mode      00770
+      owner     user
+      group     user
+      action    :create
+    end
+    File.join(path, 'conf', 'htpasswd')
+  end
 end

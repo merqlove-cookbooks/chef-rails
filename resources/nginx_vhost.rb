@@ -36,6 +36,8 @@ attribute :access_log,       kind_of: [TrueClass, FalseClass], default: false  #
 attribute :error_log,        kind_of: [TrueClass, FalseClass], default: true  # Error log
 attribute :php,              kind_of: [TrueClass, FalseClass], default: false # PHP code
 attribute :engine,           kind_of: String, default: nil # Engine (Wordpress, Opencart, Santafox by default)
+attribute :auth_basic,       kind_of: String, default: nil # file_name or true
+attribute :auth_basic_user_file, kind_of: String, default: nil # file_name or true
 attribute :locations,        kind_of: Hash, default: {} # Locations to include.
 attribute :tunes,            kind_of: Hash, default: {} # Some tunes.
 attribute :rewrites,         kind_of: Array, default: [] # Server rewrites

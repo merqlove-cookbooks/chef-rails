@@ -1,4 +1,8 @@
 location = / {
+  <% if @auth_basic %>
+    auth_basic 'Авторизация <%= @server_name %>';
+    auth_basic_user_file <%= @auth_basic_user_file %>;
+  <% end %>
   try_files @website @website;
 }
 

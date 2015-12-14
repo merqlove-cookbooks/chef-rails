@@ -302,6 +302,8 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
     server_name      server_name
     path             app_path
     path_suffix      a['nginx']['path_suffix']
+    auth_basic       a['nginx']['auth_basic']
+    auth_basic_user_file a['nginx']['auth_basic_user_file']
     rewrites         a['nginx']['rewrites']
     file_rewrites    a['nginx']['file_rewrites']
     php_rewrites     a['nginx']['php_rewrites']
