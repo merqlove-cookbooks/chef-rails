@@ -79,14 +79,14 @@ action :create do
 
   auth_basic = (new_resource.auth_basic && !new_resource.auth_basic.empty?)
   auth_file = if auth_basic
-    auth_basic_user_file(
-      new_resource.auth_basic_user_file,
-      new_resource.path,
-      new_resource.user
-    )
-  else
-      new_resource.auth_basic_user_file
-  end
+                auth_basic_user_file(
+                  new_resource.auth_basic_user_file,
+                  new_resource.path,
+                  new_resource.user
+                )
+              else
+                new_resource.auth_basic_user_file
+              end
 
   test_nginx = execute "test-nginx-conf-#{name}-create" do
     action   :nothing
