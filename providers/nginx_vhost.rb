@@ -201,9 +201,9 @@ action :disable do
 end
 
 def auth_basic_user_file(auth_basic_user_file, path, user)
-  if ::File.exist?(auth_basic_user_file)
+  if auth_basic_user_file && ::File.exist?(auth_basic_user_file)
     auth_basic_user_file
-  elsif ::File.exist?(::File.join(path, auth_basic_user_file))
+  elsif auth_basic_user_file && ::File.exist?(::File.join(path, auth_basic_user_file))
     ::File.join(path, auth_basic_user_file)
   else
     directory "#{path}/conf" do
