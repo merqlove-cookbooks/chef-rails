@@ -62,10 +62,18 @@
         <% @php_rewrites.each do |r| %>
           <% if r[:ext] %>
     location ~ \.<%= r[:ext] %>$ {
+        <% if @auth_basic %>
+          auth_basic '<%= @auth_basic_name %>';
+          auth_basic_user_file <%= @auth_basic_user_file %>;
+        <% end %>
         try_files $uri @website;
     }
           <% elsif r[:location] %>
     location <%= r[:location] %> {
+      <% if @auth_basic %>
+        auth_basic '<%= @auth_basic_name %>';
+        auth_basic_user_file <%= @auth_basic_user_file %>;
+      <% end %>
       index index.html index.php;
       try_files $uri $uri/ <%= r.include?('fallback') ? r[:fallback] : '=404' %>;
     }
@@ -90,6 +98,10 @@
     # }
     <% else %>
     location / {
+      <% if @auth_basic %>
+        auth_basic '<%= @auth_basic_name %>';
+        auth_basic_user_file <%= @auth_basic_user_file %>;
+      <% end %>
       index index.html;
       try_files $uri $uri/ =404;
     }
