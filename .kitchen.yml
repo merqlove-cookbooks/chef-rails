@@ -14,9 +14,9 @@ provisioner:
 platforms:
 - name: chef/centos-6.5
   run_list:
-- name: centos-6.6
+- name: centos-6.7
   run_list:
-- name: centos-7.1
+- name: centos-7.2
   run_list:
 - name: ubuntu-14.04
   run_list:

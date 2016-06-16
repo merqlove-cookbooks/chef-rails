@@ -22,7 +22,7 @@ end
 
 group :ruby do
   cookbook 'rbenv', '~> 1.7.1', github: 'RiotGames/rbenv-cookbook'
-  cookbook 'nodejs', '~> 2.4.0', github: 'redguide/nodejs', ref: 'v2.4.0'
+  cookbook 'nodejs', '~> 2.4.0', github: 'redguide/nodejs', ref: 'v2.4.4'
 end
 
 group :mail do
@@ -36,7 +36,7 @@ group :postgres do
   company_cookbook 'postgresql-wrapper'
 end
 
-# company_cookbook 'duplicity_ng', '>= 0.0.0', branch: 'feature/fix_conditions_and_azure'
+company_cookbook 'duplicity_ng', '>= 0.0.0', branch: 'master'
 
 # base
 group :production do
@@ -48,6 +48,6 @@ end
 metadata
 
 group :integration do
-  cookbook 'minitest-handler', '~> 1.3.0'
+  cookbook 'minitest-handler', '>= 1.3.0'
   company_cookbook 'vagrant-ohai'
 end
