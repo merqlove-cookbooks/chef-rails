@@ -1,8 +1,26 @@
+rewrite /admin$ $scheme://$host$uri/ permanent;
 
 location ~ (/(modules/|include/)){
   access_log off;
   log_not_found off;
   deny all;
 }
+
+location /admin/ {
+  index index.html index.php;
+  try_files $uri $uri/ =404;
+}
+
+<% if @seo_url %>
+  <%= render 'nginx/santafox_seo_url.erb' %>
+<% else %>
+  location ~ \.html$ {
+    <% if @auth_basic %>
+      auth_basic '<%= @auth_basic_name %>';
+      auth_basic_user_file <%= @auth_basic_user_file %>;
+    <% end %>
+    try_files $uri @website;
+  }
+<% end %>
 
 <%= render 'nginx/default.erb' %>

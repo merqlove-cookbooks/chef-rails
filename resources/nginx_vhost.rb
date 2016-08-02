@@ -35,6 +35,7 @@ attribute :disable_www,      kind_of: [TrueClass, FalseClass], default: true # R
 attribute :access_log,       kind_of: [TrueClass, FalseClass], default: false  # Access log
 attribute :error_log,        kind_of: [TrueClass, FalseClass], default: true  # Error log
 attribute :php,              kind_of: [TrueClass, FalseClass], default: false # PHP code
+attribute :seo_url,          kind_of: [TrueClass, FalseClass], default: false # SEF Urls
 attribute :engine,           kind_of: String, default: nil # Engine (Wordpress, Opencart, Santafox by default)
 attribute :auth_basic,       kind_of: String, default: nil # file_name or true
 attribute :auth_basic_user_file, kind_of: String, default: nil # file_name or true

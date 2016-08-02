@@ -1,0 +1,44 @@
+rewrite ^sitemap.xml$ /modules/mapsite/sitemapxml_cron.php last;
+
+# Add trailing slash, convert from .html
+location ~ \.html {
+  try_files $uri @html_files;
+}
+
+location @html_files {
+  rewrite ^(.*)\.html $1/ permanent;
+}
+
+rewrite ^index/(.*)$ /$1 permanent;
+
+if ($request_uri !~ .*.(html|php).*) {
+  rewrite [^/]$ $scheme://$http_host$uri/ permanent;
+}
+
+if (!-f $request_filename) {
+  # ЧПУ, базовые правила
+
+  rewrite ^/([a-z0-9_-]+)/page-([\d]+)/ /index.php?sitepage=$1&page=$2 last;
+  rewrite ^/([a-z0-9_-]+)/$ /index.php?sitepage=$1 last;
+
+  # ЧПУ для модуля Галерея
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-gcat([\d]+)/page-([\d]+)/$ /index.php?sitepage=$1&gcat=$3&page=$4 last;
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-gcat([\d]+)/$ /index.php?sitepage=$1&gcat=$3 last;
+
+  # ЧПУ для модуля "Новости"
+  rewrite ^/([a-z0-9_-]+)/start-([0-9-]+)/stop-([0-9-]+)/$ /index.php?sitepage=$1&start=$2&stop=$3 last;
+  rewrite ^/([a-z0-9_-]+)/start-([0-9-]+)/stop-([0-9-]+)/page-([\d]+)/$ /index.php?sitepage=$1&start=$2&stop=$3&page=$4 last;
+  rewrite ^/([a-z0-9_-]+)/date-([0-9-]+)/page-([\d]+)/$ /index.php?sitepage=$1&date=$2&page=$3 last;
+  rewrite ^/([a-z0-9_-]+)/date-([0-9-]+)/$ /index.php?sitepage=$1&date=$2 last;
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-p([\d]+).html$ /index.php?sitepage=$1&id=$3 last;
+  rewrite ^/([a-z0-9_-]+)/tag-([\w\-\_\%\d]+)/page-([\d]+)/ /index.php?sitepage=$1&tag=$2&page=$3 last;
+  rewrite ^/([a-z0-9_-]+)/tag-([\w\-\_\%\d]+)/ /index.php?sitepage=$1&tag=$2 last;
+
+  # ЧПУ для модуля Вопросы и ответы
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-a([\d]+)/ /index.php?sitepage=$1&a=2&b=$3 last;
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-q([\d]+)/ /index.php?sitepage=$1&a=3&b=$3 last;
+
+  # ЧПУ для модуля "Поиск по сайту"
+  rewrite ^/([a-z0-9_-]+)/(.+)/page-([d]+)/ /index.php?sitepage=$1&search=$2&page=$3 last;
+  rewrite ^/([a-z0-9_-]+)/(.+)/ /index.php?sitepage=$1&search=$2 last;
+}

@@ -295,7 +295,8 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
     deferred         a['nginx']['deferred'] unless node.role? 'vagrant'
     hidden           a['nginx']['hidden']
     disable_www      a['nginx']['disable_www']
-    php a.include?   'php'
+    php              a.include?('php')
+    seo_url          a['nginx']['seo_url']
     block            a['nginx']['block']
     listen           a['nginx']['listen']
     engine           a['nginx']['engine']

@@ -118,6 +118,7 @@ action :create do
               server_name:   server_name,
               tunes:         new_resource.tunes,
               php:           new_resource.php,
+              seo_url:       new_resource.seo_url,
               engine:        new_resource.engine,
               type:          new_resource.type,
               rewrites:      new_resource.rewrites,
