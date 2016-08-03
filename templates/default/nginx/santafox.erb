@@ -1,3 +1,4 @@
+rewrite ^sitemap.xml$ /modules/mapsite/sitemapxml_cron.php permanent;
 rewrite /admin$ $scheme://$host$uri/ permanent;
 
 location ~ (/(modules/|include/)){
@@ -21,6 +22,5 @@ location /admin/ {
     <% end %>
     try_files $uri @website;
   }
+  <%= render 'nginx/default.erb' %>
 <% end %>
-
-<%= render 'nginx/default.erb' %>

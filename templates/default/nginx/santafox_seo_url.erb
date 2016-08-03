@@ -1,4 +1,5 @@
-rewrite ^sitemap.xml$ /modules/mapsite/sitemapxml_cron.php last;
+rewrite ^/index/(.*)$ /$1 permanent;
+rewrite ^/index.php(.*)$ /$1 permanent;
 
 # Add trailing slash, convert from .html
 location ~ \.html {
@@ -9,15 +10,10 @@ location @html_files {
   rewrite ^(.*)\.html $1/ permanent;
 }
 
-rewrite ^index/(.*)$ /$1 permanent;
+if (!-e $request_filename) {
+  rewrite ^([^.]*[^/])$ $1/ permanent;
 
-if ($request_uri !~ .*.(html|php).*) {
-  rewrite [^/]$ $scheme://$http_host$uri/ permanent;
-}
-
-if (!-f $request_filename) {
   # ЧПУ, базовые правила
-
   rewrite ^/([a-z0-9_-]+)/page-([\d]+)/ /index.php?sitepage=$1&page=$2 last;
   rewrite ^/([a-z0-9_-]+)/$ /index.php?sitepage=$1 last;
 
@@ -26,19 +22,42 @@ if (!-f $request_filename) {
   rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-gcat([\d]+)/$ /index.php?sitepage=$1&gcat=$3 last;
 
   # ЧПУ для модуля "Новости"
-  rewrite ^/([a-z0-9_-]+)/start-([0-9-]+)/stop-([0-9-]+)/$ /index.php?sitepage=$1&start=$2&stop=$3 last;
   rewrite ^/([a-z0-9_-]+)/start-([0-9-]+)/stop-([0-9-]+)/page-([\d]+)/$ /index.php?sitepage=$1&start=$2&stop=$3&page=$4 last;
+  rewrite ^/([a-z0-9_-]+)/start-([0-9-]+)/stop-([0-9-]+)/$ /index.php?sitepage=$1&start=$2&stop=$3 last;
   rewrite ^/([a-z0-9_-]+)/date-([0-9-]+)/page-([\d]+)/$ /index.php?sitepage=$1&date=$2&page=$3 last;
   rewrite ^/([a-z0-9_-]+)/date-([0-9-]+)/$ /index.php?sitepage=$1&date=$2 last;
-  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-p([\d]+).html$ /index.php?sitepage=$1&id=$3 last;
   rewrite ^/([a-z0-9_-]+)/tag-([\w\-\_\%\d]+)/page-([\d]+)/ /index.php?sitepage=$1&tag=$2&page=$3 last;
   rewrite ^/([a-z0-9_-]+)/tag-([\w\-\_\%\d]+)/ /index.php?sitepage=$1&tag=$2 last;
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-p([\d]+).html$ /index.php?sitepage=$1&id=$3 last;
+
+  # ЧПУ для модуля Каталог
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-c([\d]+)/([a-z0-9_-]+)-i([\d]+).html$ /index.php?sitepage=$1&cid=$3&itemid=$5 last;
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-i([\d]+).html$ /index.php?sitepage=$1&itemid=$3 last;
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-c([\d]+)/page-([\d]+)/$ /index.php?sitepage=$1&cid=$3&page=$4 last;
+  rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-c([\d]+)/ /index.php?sitepage=$1&cid=$3 last;
 
   # ЧПУ для модуля Вопросы и ответы
   rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-a([\d]+)/ /index.php?sitepage=$1&a=2&b=$3 last;
   rewrite ^/([a-z0-9_-]+)/([a-z0-9_-]+)-q([\d]+)/ /index.php?sitepage=$1&a=3&b=$3 last;
 
   # ЧПУ для модуля "Поиск по сайту"
-  rewrite ^/([a-z0-9_-]+)/(.+)/page-([d]+)/ /index.php?sitepage=$1&search=$2&page=$3 last;
-  rewrite ^/([a-z0-9_-]+)/(.+)/ /index.php?sitepage=$1&search=$2 last;
+  rewrite ^/([a-z0-9_-]+)/(.+)/page-([\d]+)/ /index.php?sitepage=$1&search=$2&page=$3 last;
+  rewrite ^/([a-z0-9_-].+)/(.+)/$ /index.php?sitepage=$1&search=$2 last;
+}
+
+location / {
+  <% if @auth_basic %>
+    auth_basic '<%= @auth_basic_name %>';
+    auth_basic_user_file <%= @auth_basic_user_file %>;
+  <% end %>
+  try_files $uri @website;
+}
+
+location @website {
+  include fastcgi_params;
+  fastcgi_pass  php_<%= @user %>_<%= @name %>;
+  fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;
+}
+
+location @engine_file_rewrite {
 }
