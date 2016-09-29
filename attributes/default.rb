@@ -24,6 +24,35 @@ default['rails']['apps_base_path']  = '/srv/apps'
 default['rails']['sites_base_path'] = '/srv/sites'
 default['rails']['ports']           = %w( 22 )
 default['rails']['ruby'] = false
+
+default['rails']['openssl']['dhparam_dir'] = '/etc/ssl/certs'
+default['rails']['openssl']['dhparam_file'] = "dhparam.pem"
+default['rails']['openssl']['dhparam_path'] = "#{node['rails']['openssl']['dhparam_dir']}/#{node['rails']['openssl']['dhparam_file']}"
+default['rails']['nginx']['ssl_extra_configs'] = {
+  ssl_session_cache: 'builtin:1000 shared:SSL:10m',
+  ssl_session_timeout: '10m',
+}
+default['rails']['nginx']['hsts'] = false
+default['rails']['nginx']['hsts_configs'] = {
+  add_header: 'Strict-Transport-Security "max-age=31536000; includeSubDomains" always'
+}
+default['rails']['nginx']['stapling'] = false
+default['rails']['nginx']['stapling_configs'] = {
+  ssl_stapling: 'on',
+  ssl_stapling_verify: 'on',
+  resolver: '8.8.8.8 8.8.4.4 valid=300s',
+  resolver_timeout: '5s'
+}
+default['rails']['nginx']['dhparam'] = false
+default['rails']['nginx']['dhparam_configs'] = {
+  'ssl_dhparam' => '/etc/ssl/certs/dhparam.pem'
+}
+default['rails']['nginx']['extra_configs'] = {
+  ssl_ciphers: 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH',
+  ssl_protocols: 'TLSv1 TLSv1.1 TLSv1.2',
+  ssl_prefer_server_ciphers: 'on'
+}
+
 default['rails']['cron'] = {
   minute: '*',
   hour: '*',

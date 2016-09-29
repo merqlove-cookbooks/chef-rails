@@ -287,6 +287,11 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
     server_name.push "#{a['nginx']['vagrant_server_name']}.#{node['vagrant']['fqdn']}"
   end
 
+  ssl = if a['nginx']['ssl']
+    data_bag = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['users'], a['user'], load_secret) || {}
+    (a['nginx']['ssl']).merge((data_bag['ssl'] || {})[a['name']] || {}) if data_bag
+  end
+
   rails_nginx_vhost a['name'] do
     user             a['user']
     access_log       a['nginx']['access_log']
@@ -299,6 +304,7 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
     seo_url          a['nginx']['seo_url']
     block            a['nginx']['block']
     listen           a['nginx']['listen']
+    ssl              ssl
     engine           a['nginx']['engine']
     server_name      server_name
     path             app_path

@@ -38,44 +38,53 @@ action :create do
   #   end
   # end
 
-  # if new_resource.ssl
-  #   ssl_name = if new_resource.ssl['name']
-  #     new_resource.ssl['name']
-  #   else
-  #     conf_name
-  #   end
-  #
-  #   directory "#{node[:nginx][:dir]}/ssl" do
-  #     owner node[:nginx][:user]
-  #     group node[:nginx][:group]
-  #     mode '0755'
-  #   end
-  #
-  #   file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt" do
-  #     owner node[:nginx][:user]
-  #     group node[:nginx][:group]
-  #     mode '0640'
-  #     content  <<-EOH
-  # # Managed by Chef.  Local changes will be overwritten.
-  # #{new_resource.ssl['public']}
-  # EOH
-  #   end
-  #
-  #   file "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key" do
-  #     owner node[:nginx][:user]
-  #     group node[:nginx][:group]
-  #     mode '0640'
-  #     content <<-EOH
-  # # Maintained by Chef.  Local changes will be overwritten.
-  # #{new_resource.ssl['private']}
-  # EOH
-  #   end
-  #
-  #   ssl = {
-  #     certificate: "#{node[:nginx][:dir]}/ssl/#{ssl_name}.public.crt",
-  #     certificate_key: "#{node[:nginx][:dir]}/ssl/#{ssl_name}.private.key"
-  #   }
-  # end
+  ssl = if new_resource.ssl
+    ssl_name = if new_resource.ssl['name']
+      new_resource.ssl['name']
+    else
+      name
+    end
+
+    directory "#{node[:nginx][:dir]}/ssl/#{ssl_name}" do
+      owner node[:nginx][:user]
+      group node[:nginx][:group]
+      mode '0755'
+      recursive true
+    end
+
+    file "#{node[:nginx][:dir]}/ssl/#{ssl_name}/public.crt" do
+      owner node[:nginx][:user]
+      group node[:nginx][:group]
+      mode '0640'
+      content  new_resource.ssl['public'].gsub('\n', "\n")
+      notifies :create, 'service[nginx]', new_resource.reload
+    end
+
+    file "#{node[:nginx][:dir]}/ssl/#{ssl_name}/private.key" do
+      owner node[:nginx][:user]
+      group node[:nginx][:group]
+      mode '0640'
+      content new_resource.ssl['private'].gsub('\n', "\n")
+      notifies :create, 'service[nginx]', new_resource.reload
+    end
+
+    file "#{node[:nginx][:dir]}/ssl/#{ssl_name}/ca.crt" do
+      owner node[:nginx][:user]
+      group node[:nginx][:group]
+      mode '0640'
+      content new_resource.ssl['ca'].gsub('\n', "\n")
+      notifies :create, 'service[nginx]', new_resource.reload
+    end
+
+    {
+      certificate: "#{node[:nginx][:dir]}/ssl/#{ssl_name}/public.crt",
+      certificate_key: "#{node[:nginx][:dir]}/ssl/#{ssl_name}/private.key",
+      ca: "#{node[:nginx][:dir]}/ssl/#{ssl_name}/ca.crt",
+      manual: new_resource.ssl['manual'],
+      default: new_resource.ssl['default'],
+      default_server: new_resource.ssl['default_server']
+    }
+  end
 
   auth_basic = (new_resource.auth_basic && !new_resource.auth_basic.empty?)
   auth_file = if auth_basic
@@ -129,7 +138,7 @@ action :create do
               php_rewrites:  new_resource.php_rewrites,
               error_pages:   new_resource.error_pages,
               hidden:        new_resource.hidden,
-              ssl:           new_resource.ssl
+              ssl:           ssl
 
     notifies :run, test_nginx, new_resource.reload
   end

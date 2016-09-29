@@ -2,7 +2,7 @@
 # Cookbook Name:: rails
 # Recipe:: openssl
 #
-# Copyright (C) 2014 Alexander Merkulov
+# Copyright (C) 2016 Alexander Merkulov
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -25,3 +25,17 @@ when 'debian'
 when 'rhel'
   include_recipe 'openssl::upgrade'
 end
+
+if node['rails']['nginx']['dhparam']
+  execute 'ssl_dhparam_fix' do
+    command "openssl dhparam -out #{node['rails']['openssl']['dhparam_file']} 4096"
+    cwd     node['rails']['openssl']['dhparam_dir']
+    user    'root'
+    creates node['rails']['openssl']['dhparam_path']
+    group   'root'
+    notifies :run, 'service[nginx]', :delayed
+  end
+  node.default['nginx']['extra_configs'] = node['nginx']['extra_configs'].merge(node['rails']['nginx']['dhparam_configs'])
+end
+
+node.default['nginx']['extra_configs'] = node['nginx']['extra_configs'].merge(node['rails']['nginx']['extra_configs'])
