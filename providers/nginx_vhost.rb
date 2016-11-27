@@ -138,7 +138,8 @@ action :create do
               php_rewrites:  new_resource.php_rewrites,
               error_pages:   new_resource.error_pages,
               hidden:        new_resource.hidden,
-              ssl:           ssl
+              ssl:           ssl,
+              vagrant:       node.role?('vagrant')
 
     notifies :run, test_nginx, new_resource.reload
   end

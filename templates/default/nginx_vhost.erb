@@ -5,7 +5,7 @@
       server unix:/var/run/php-<%= @user %>-<%= @name %>.sock;
     }
   <% end %>
-  <% unless node.role? 'vagrant' && !@disable_www && @ssl %>
+  <% unless @vagrant && !@disable_www && @ssl %>
   server {
     listen <%= @listen %>;
     server_name www.<%= Array(@server_name)[0] %>;
