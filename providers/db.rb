@@ -380,7 +380,7 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
       database_password d['password']
       type              'mongodb'
       port              host
-      host              port
+      host              port.to_s
       path              d['app_path']
       owner             d['app_user']
       group             d['app_user']
