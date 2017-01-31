@@ -433,7 +433,7 @@ def backup_mongodb_db(d, date)
   return unless d && date
 
   exec_before = [
-    "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --db #{d['name']} --out #{d['app_backup_dir']}/#{d['name']}.$NOW >> /dev/null 2>&1",
+    "mongodump --dbpath #{node['mongodb3']['config']['mongod']['storage']['dbPath']} --db #{d['name']} --out #{d['app_backup_dir']}/#{d['name']}.$NOW >> /dev/null 2>&1",
     "gzip #{d['app_backup_dir']}/#{d['name']}.$NOW",
     "rm -f #{d['app_backup_dir']}/#{d['name']}.$NOW"
   ]
@@ -442,10 +442,15 @@ def backup_mongodb_db(d, date)
 end
 
 def stop_mongodb
-  mongo_init = ::File.join(node['mongodb']['init_dir'], node['mongodb']['instance_name'])
-  service node['mongodb']['instance_name'] do
+  service 'mongod' do
+    if node['platform'] == 'ubuntu'
+      if node['platform_version'].to_f >= 15.04
+        provider Chef::Provider::Service::Systemd
+      elsif node['platform_version'].to_f >= 14.04
+        provider Chef::Provider::Service::Upstart
+      end
+    end
     action [:stop, :disable]
-    only_if { ::FileTest.file? mongo_init }
   end
 end
 
