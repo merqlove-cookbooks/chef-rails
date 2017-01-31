@@ -349,6 +349,14 @@ end
 def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   admin = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['mongodb'], 'admin', secret)
 
+  chef_gem 'bson_ext' do
+    version '1.12.5'
+  end
+
+  chef_gem 'mongo' do
+    version '2.4.1'
+  end
+
   run_context.include_recipe 'mongodb3-objects::standalone'
 
   host = node['mongodb3']['config']['mongod']['net']['bind_ip'] || '0.0.0.0'
