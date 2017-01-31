@@ -348,19 +348,16 @@ end
 
 def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   admin = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['mongodb'], 'admin', secret)
-  run_context.include_recipe 'mongodb::default'
-  node.default['mongodb']['config']['auth'] = true if node['rails']['mongodb']['auth']
 
-  chef_gem 'mongo' do
-    version '1.12.2'
-  end
+  run_context.include_recipe 'mongodb3-objects::standalone'
 
-  mongodb_user admin['id'] do
+  host = node['mongodb3']['config']['mongod']['net']['bind_ip'] || '0.0.0.0'
+  port = node['mongodb3']['config']['mongod']['net']['port'].to_s
+
+  mongodb_admin admin['id'] do
     password   admin['password']
-    roles      %w(userAdminAnyDatabase dbAdminAnyDatabase)
-    database   'admin'
-    connection node['mongodb']
-    action     :add
+    connection_host host
+    connection_port port
   end
 
   if php_exist?
@@ -382,8 +379,8 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
       database_user     d['user']
       database_password d['password']
       type              'mongodb'
-      port              node['mongodb']['config']['port'].to_s
-      host              node['mongodb']['config']['bind_ip']
+      port              host
+      host              port
       path              d['app_path']
       owner             d['app_user']
       group             d['app_user']
@@ -394,15 +391,17 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
       password   d['password']
       database   d['name']
       roles      %w(readWrite)
-      connection node['mongodb']
-      action     :add
+      connection_host host
+      connection_port port
+      connection_user admin['id']
+      connection_password admin['password']
     end
   end
 
-  create_mongodb_admin(secret, admin)
+  create_mongodb_admin(secret, admin, host, port)
 end
 
-def create_mongodb_admin(secret, admin)
+def create_mongodb_admin(secret, admin, host, port)
   return unless secret && admin
   mongo = data_bag('mongodb')
   return unless mongo
@@ -413,9 +412,11 @@ def create_mongodb_admin(secret, admin)
     mongodb_user u['id'] do
       password   u['password']
       roles      %w(userAdminAnyDatabase dbAdminAnyDatabase)
-      database   'admin'
-      connection node['mongodb']
-      action     :add
+      connection_database 'admin'
+      connection_host host
+      connection_port port
+      connection_user admin['id']
+      connection_password admin['password']
     end
   end
 end

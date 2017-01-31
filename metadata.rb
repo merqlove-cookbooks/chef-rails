@@ -36,6 +36,7 @@ depends 'packages', '~> 1.0.0'
 
 depends 'database', '~> 4.0.3'
 depends 'memcached', '~> 2.1.0'
+depends 'mongodb3-objects', '~> 0.4.5'
 # depends 'postfix', '~> 3.4.0'
 
 # App
@@ -63,7 +64,6 @@ depends 'iptables-wrapper'
 depends 'duplicity_ng', '~> 1.2.2'
 depends 'ssh_known_hosts'
 depends 'nginx-wrapper'
-depends 'mongodb'
 depends 'postgresql-wrapper'
 depends 'php-fpm'
 depends 'msmtp'

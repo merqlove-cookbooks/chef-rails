@@ -29,9 +29,6 @@ group :mail do
   company_cookbook 'msmtp'
 end
 
-group :mongo do
-  company_cookbook 'mongodb'
-end
 group :postgres do
   company_cookbook 'postgresql-wrapper'
 end
