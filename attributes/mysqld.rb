@@ -20,7 +20,7 @@
 base_dir     = ''
 service_name = 'mysql'
 
-if platform_family?('rhel')
+if platform_family?('rhel') && node['mysql']
   version = node['mysql']['version'].sub('.', '')
   case node['platform_version']
   when /^5/

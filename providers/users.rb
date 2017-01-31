@@ -33,8 +33,10 @@ action :create do
       data = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['users'], u, secret)
       next unless data
 
-      ftp_list = user_ftps(u, data)
-      users_data = users_data.push(ftp_list).flatten.compact unless ftp_list.empty?
+      if node['rails']['vsftpd']
+        ftp_list = user_ftps(u, data)
+        users_data = users_data.push(ftp_list).flatten.compact unless ftp_list.empty?
+      end
 
       user u do
         home      "/home/#{u}"
@@ -57,12 +59,14 @@ action :create do
       user_vcs_keys(u, data, vcs, secret)
     end
 
-    node.default['vsftpd']['config']['ftp_username'] = node['nginx']['user']
-    node.default['vsftpd']['config']['chown_username'] = node['nginx']['user']
-    node.default['vsftpd']['config']['guest_username'] = node['nginx']['user']
+    if node['rails']['vsftpd']
+      node.default['vsftpd']['config']['ftp_username'] = node['nginx']['user']
+      node.default['vsftpd']['config']['chown_username'] = node['nginx']['user']
+      node.default['vsftpd']['config']['guest_username'] = node['nginx']['user']
 
-    vsftpd_virtual_users 'vsftpd_credentials' do
-      users users_data
+      vsftpd_virtual_users 'vsftpd_credentials' do
+        users users_data
+      end
     end
   end
 
