@@ -352,7 +352,7 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   run_context.include_recipe 'mongodb3-objects::standalone'
 
   host = node['mongodb3']['config']['mongod']['net']['bind_ip'] || '0.0.0.0'
-  port = node['mongodb3']['config']['mongod']['net']['port'].to_s
+  port = node['mongodb3']['config']['mongod']['net']['port'].to_i
 
   mongodb_admin admin['id'] do
     password   admin['password']
