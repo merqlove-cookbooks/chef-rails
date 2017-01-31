@@ -52,7 +52,7 @@ if ::File.exist? node['rails']['secrets']['default']
       root ||= ::Chef::EncryptedDataBagItem.load(node['rails']['d'][db], 'root', default_secret)
       exec_before.push "mysqldump --all-databases -u root -p#{root['password']} | gzip > #{db_backup_dir}/#{db}.$NOW.sql.gz"
     when 'mongodb'
-      exec_before.push "mongodump --dbpath #{node['mongodb']['config']['dbpath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
+      exec_before.push "mongodump --dbpath #{node['mongodb3']['config']['mongod']['storage']['dbPath']} --out #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
       exec_before.push "tar -zcf #{db_backup_dir}/#{db}.$NOW.tar.gz #{db_backup_dir}/#{db}.$NOW >> /dev/null 2>&1"
       exec_before.push "rm -rf #{db_backup_dir}/#{db}.$NOW"
     end
