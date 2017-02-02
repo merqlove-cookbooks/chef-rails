@@ -1,0 +1,14 @@
+Type=simple
+User=<%= @opts[:user] %>
+Group=<%= @opts[:user] %>
+WorkingDirectory=<%= @opts[:path] %>/current
+EnvironmentFile=<%= @opts[:path] %>/.rbenv-vars
+Environment=RAILS_ENV=<%= @opts[:environment] || 'production' %>
+TimeoutSec=<%= @opts[:timeout] || 15 %>
+Restart=always
+StandardInput=null
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=%n
+KillMode=process
+TimeoutStopSec=<%= @opts[:stop_timeout] || 5 %>

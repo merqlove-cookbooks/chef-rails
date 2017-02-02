@@ -160,11 +160,27 @@ def setup_rbenv(a)
   end
 end
 
+def service_name(name)
+  if rhel7x?
+    "/etc/systemd/system/#{name}"
+  else
+    "/etc/init.d/#{name}"
+  end
+end
+
+def service_base_name(name)
+  if rhel7x?
+    "#{name}.service"
+  else
+    name
+  end
+end
+
 def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
-  service_name = "#{a['ruby_server']['type']}_#{a['name']}"
-  service_name_worker = "#{a['ruby_server']['worker_type']}_#{a['name']}"
-  init_file = "/etc/init.d/#{service_name}"
-  init_file_worker = "/etc/init.d/#{service_name_worker}"
+  service_name = service_base_name("#{a['ruby_server']['type']}_#{a['name']}")
+  service_name_worker = service_base_name("#{a['ruby_server']['worker_type']}_#{a['name']}")
+  init_file = service_name(service_name)
+  init_file_worker = service_name(service_name_worker)
   rbenv_vars_file  = "#{app_path}/.rbenv-vars"
 
   service service_name do
@@ -202,6 +218,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
                 user: a['user'],
                 path: app_path,
                 environment: a['ruby_server']['environment']
+      notifies :run, 'execute[systemctl daemon-reload]', :immediately if rhel7x?
       notifies :enable, "service[#{service_name}]", :immediately
       notifies :restart, "service[#{service_name}]", :delayed
     end
@@ -216,6 +233,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
                 user: a['user'],
                 path: app_path,
                 environment: a['ruby_server']['environment']
+      notifies :run, 'execute[systemctl daemon-reload]', :immediately if rhel7x?
       notifies :enable, "service[#{service_name_worker}]", :immediately
       notifies :restart, "service[#{service_name_worker}]", :delayed
 
@@ -230,6 +248,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       action :delete
       notifies :stop,    "service[#{service_name}]", :immediately
       notifies :disable, "service[#{service_name}]", :delayed
+      notifies :run, 'execute[systemctl daemon-reload]', :immediately if rhel7x?
       only_if { ::FileTest.file? init_file }
     end
 
@@ -237,13 +256,19 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       action :delete
       notifies :stop,    "service[#{service_name_worker}]", :immediately
       notifies :disable, "service[#{service_name_worker}]", :delayed
+      notifies :run, 'execute[systemctl daemon-reload]', :immediately if rhel7x?
       only_if { ::FileTest.file? init_file_worker }
     end
+  end
+  execute 'systemctl daemon-reload' do
+    action :nothing
   end
 end
 
 def setup_ruby_server(a, app_path)
   if a['ruby_server']['enable']
+    a['nginx']['tunes'] ||= { 'js' => false }
+    a['nginx']['tunes']['private_socket'] = true if rhel7x?
     rails_nginx_vhost a['name'] do
       template 'nginx_ruby_crap.erb'
 
@@ -254,7 +279,7 @@ def setup_ruby_server(a, app_path)
       path        app_path
       ssl         a['ruby_server']['ssl']
       disable_www a['ruby_server']['www']
-      tunes       a['nginx']['tunes'] || { 'js' => false }
+      tunes       a['nginx']['tunes']
     end
     setup_ruby_server_init(a, app_path)
   else

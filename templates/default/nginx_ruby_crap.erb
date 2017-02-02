@@ -1,7 +1,11 @@
 # Maintained by Chef.  Local changes will be overwritten
 
 upstream <%= @type %>_<%= @name %> {
+  <% if @tunes['private_socket'] %>
+  server unix://<%= @path %>/shared/tmp/sockets/<%= @type %>.sock fail_timeout=0;
+  <% else %>
   server unix:///tmp/<%= @type %>.<%= @name %>.sock fail_timeout=0;
+  <% end %>
 }
 
 <% unless @disable_www %>
