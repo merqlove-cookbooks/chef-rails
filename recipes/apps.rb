@@ -46,7 +46,7 @@ template '/var/www/html/locked.html' do
   group 'nginx'
   mode 00644
   source 'locked.html.erb'
-end if node['rails']['sites'].size > 0
+end unless node['rails']['sites'].empty?
 
 node['rails']['sites'].each do |k, a|
   rails_app k do

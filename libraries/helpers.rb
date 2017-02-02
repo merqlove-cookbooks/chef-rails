@@ -26,6 +26,7 @@ module Rails
     def php_fpm?
       node['php-fpm'] && node['php-fpm']['pools'].count > 1
     end
+
     #
     # Determine if the current node using old RHEL.
     #
@@ -35,6 +36,7 @@ module Rails
       major_version = node['platform_version'].split('.').first.to_i
       platform_family?('rhel') && major_version < 6
     end
+
     #
     # Determine if the current node using 6.x RHEL.
     #
@@ -44,6 +46,7 @@ module Rails
       major_version = node['platform_version'].split('.').first.to_i
       platform_family?('rhel') && major_version >= 6 && major_version < 7
     end
+
     #
     # Determine if the current node using new RHEL.
     #
@@ -52,6 +55,7 @@ module Rails
     def rhel7x?
       platform_family?('rhel') && node['platform_version'].to_f >= 7
     end
+
     #
     # Determine if the current node using old RHEL.
     #
@@ -60,6 +64,7 @@ module Rails
     def rhel?
       platform_family?('rhel')
     end
+
     #
     # Determine if the current node using old RHEL.
     #
@@ -68,6 +73,7 @@ module Rails
     def debian?
       platform_family?('debian')
     end
+
     #
     # Determine if the current node using old RHEL.
     #
@@ -76,6 +82,7 @@ module Rails
     def php?
       ::FileTest.exist?('/usr/bin/php')
     end
+
     #
     # Determine if the current node using old RHEL.
     #
@@ -84,6 +91,7 @@ module Rails
     def ubuntu12x?
       platform_family?('debian') && node['platform_version'][/^12/]
     end
+
     #
     # Determine if the current node using old RHEL.
     #
@@ -108,11 +116,11 @@ class Hash
   def deep_merge!(other_hash, &block)
     other_hash.each_pair do |k, v|
       tv = self[k]
-      if tv.is_a?(Hash) && v.is_a?(Hash)
-        self[k] = tv.deep_merge(v, &block)
-      else
-        self[k] = block && tv ? block.call(k, tv, v) : v
-      end
+      self[k] = if tv.is_a?(Hash) && v.is_a?(Hash)
+                  tv.deep_merge(v, &block)
+                else
+                  block && tv ? yield(k, tv, v) : v
+                end
     end
     self
   end

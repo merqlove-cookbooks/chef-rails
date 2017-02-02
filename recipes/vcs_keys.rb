@@ -48,7 +48,7 @@ if node.role? 'vagrant'
           source 'ssh_config.erb'
           owner  'vagrant'
           group  'vagrant'
-          mode    00600
+          mode 00600
           variables vcs: vcs
         end
         template '/home/vagrant/.gitconfig' do

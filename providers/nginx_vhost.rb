@@ -41,11 +41,11 @@ action :create do
   # end
 
   ssl = if new_resource.ssl
-    ssl_name = if new_resource.ssl['name']
-      new_resource.ssl['name']
-    else
+    ssl_name = if new_resource.ssl['name'] # rubocop:disable Style/IndentationWidth
+      new_resource.ssl['name'] # rubocop:disable Style/IndentationWidth
+    else # rubocop:disable Style/ElseAlignment
       name
-    end
+    end # rubocop:disable Lint/EndAlignment
 
     directory "#{node['nginx']['dir']}/ssl/#{ssl_name}" do
       owner node['nginx']['user']
@@ -86,7 +86,7 @@ action :create do
       default: new_resource.ssl['default'],
       default_server: new_resource.ssl['default_server']
     }
-  end
+  end # rubocop:disable Lint/EndAlignment
 
   auth_basic = (new_resource.auth_basic && !new_resource.auth_basic.empty?)
   auth_file = if auth_basic

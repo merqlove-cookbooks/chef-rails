@@ -119,8 +119,8 @@ def use_config(new_resource, pass_key_id, store, default_secret)
 end
 
 def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
-  aws_eu  = (new_resource.s3_eu) ? '--s3-use-new-style --s3-european-buckets ' : ''
-  logfile = (new_resource.log) ? (new_resource.logfile) : '/dev/null'
+  aws_eu  = new_resource.s3_eu ? '--s3-use-new-style --s3-european-buckets ' : ''
+  logfile = new_resource.log ? new_resource.logfile : '/dev/null'
   method  = node['rails']['duplicity']['method']
   target  = new_resource.target
   path    = new_resource.path
@@ -135,7 +135,7 @@ def cronjob_script(new_resource, store, boto, duplicity_main) # rubocop:disable 
     # duplicity parameters
     # Backend to use (default: nil, required!)
     backend    backend_uri(new_resource.name, method, target, path, aws_eu)
-    passphrase duplicity_main['passphrase']  # duplicity passphrase (default: nil, required!)
+    passphrase duplicity_main['passphrase'] # duplicity passphrase (default: nil, required!)
 
     include                   new_resource.include # Default directories to backup
     exclude                   new_resource.exclude # Default directories to exclude from backup
@@ -174,7 +174,7 @@ def backend_uri(name, method, target, path = '', aws_eu = '')
   if swift?
     "#{method}://#{rails_fqdn}_#{clean_path(name)}_#{path_digest(path)}"
   elsif azure?
-    "#{method}://#{clean_path(rails_fqdn, '-').gsub('.', '-')}".gsub('--', '-').downcase + "-#{path_digest(path)}"
+    "#{method}://#{clean_path(rails_fqdn, '-').tr('.', '-')}".gsub('--', '-').downcase + "-#{path_digest(path)}"
   else
     "#{aws_eu}#{method}://#{target}/#{rails_fqdn}/#{path}"
   end
@@ -203,22 +203,22 @@ end
 def gs?
   node['rails']['duplicity']['method'].include?('gs')
 end
-alias_method :is_gs?, :gs?
+alias is_gs? gs?
 
 def aws?
   node['rails']['duplicity']['method'].include?('s3')
 end
-alias_method :is_aws?, :aws?
+alias is_aws? aws?
 
 def swift?
   node['rails']['duplicity']['method'].include?('swift')
 end
-alias_method :is_swift?, :swift?
+alias is_swift? swift?
 
 def azure?
   node['rails']['duplicity']['method'].include?('azure')
 end
-alias_method :is_azure?, :azure?
+alias is_azure? azure?
 
 def backup_active?(name)
   node['rails']['duplicity']['units'].each do |backup|

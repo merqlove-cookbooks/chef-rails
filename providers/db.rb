@@ -134,7 +134,7 @@ def install_mysql # rubocop:disable Metrics/MethodLength
     to "/etc/mysql-#{name}/my.cnf"
   end
 
-  if php_exist? # rubocop:disable Style/GuardClause
+  if php_exist?
     node.default['rails']['php']['options']['mysql.default_socket'] = mysql_socket
     node.default['rails']['php']['options']['pdo_mysql.default_socket'] = mysql_socket
     node.default['rails']['php']['options']['mysqli.default_socket '] = mysql_socket
@@ -365,7 +365,7 @@ def create_mongodb_dbs(secret, date) # rubocop:disable Metrics/MethodLength
   port = node['mongodb3']['config']['mongod']['net']['port'].to_i
 
   mongodb_admin admin['id'] do
-    password   admin['password']
+    password admin['password']
     connection_host host
     connection_port port
   end

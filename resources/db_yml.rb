@@ -27,8 +27,8 @@ attribute :port, kind_of: String, default: '3306' # Database Port
 attribute :socket, kind_of: String, default: '' # Database Socket
 attribute :pool, kind_of: Integer, default: nil # Database Pool
 attribute :type, kind_of: String, default: 'mysql' # Database Type
-attribute :database_name, kind_of: String, default: nil  # Database Name
-attribute :database_user, kind_of: String, default: nil, required: true  # User Name
+attribute :database_name, kind_of: String, default: nil # Database Name
+attribute :database_user, kind_of: String, default: nil, required: true # User Name
 attribute :database_password, kind_of: String, default: nil, required: true # Password
 attribute :owner, kind_of: String, default: 'root' # Owner
 attribute :group, kind_of: String, default: 'root' # Group

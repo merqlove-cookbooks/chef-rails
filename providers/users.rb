@@ -120,7 +120,7 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
     source 'ssh_config.erb'
     owner  u
     group  u
-    mode  '0600'
+    mode '0600'
     variables vcs: data['vcs']
   end
   template "/home/#{u}/.gitconfig" do

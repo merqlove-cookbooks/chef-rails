@@ -178,7 +178,7 @@ def service_base_name(name)
   end
 end
 
-def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
+def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   service_name = service_base_name("#{a['ruby_server']['type']}_#{a['name']}")
   service_name_worker = service_base_name("#{a['ruby_server']['worker_type']}_#{a['name']}")
   init_file = service_name(service_name)
@@ -285,16 +285,15 @@ def setup_ruby_server(a, app_path)
       disable_www a['ruby_server']['www']
       tunes       tunes
     end
-    setup_ruby_server_init(a, app_path)
   else
     rails_nginx_vhost a['name'] do
       action :delete
     end
-    setup_ruby_server_init(a, app_path)
   end
+  setup_ruby_server_init(a, app_path)
 end
 
-def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
+def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   directory "#{app_path}/docs" do
     mode      00750
     owner     a['user']
@@ -317,9 +316,9 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength
   end
 
   ssl = if a['nginx']['ssl']
-    data_bag = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['users'], a['user'], load_secret) || {}
+    data_bag = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['users'], a['user'], load_secret) || {} # rubocop:disable Style/IndentationWidth
     (a['nginx']['ssl']).merge((data_bag['ssl'] || {})[a['name']] || {}) if data_bag
-  end
+  end # rubocop:disable Lint/EndAlignment
 
   rails_nginx_vhost a['name'] do
     user             a['user']
@@ -352,7 +351,7 @@ end
 def setup_php(a, app_path)
   return unless a
 
-  node.default['rails']['php']['install']  = true
+  node.default['rails']['php']['install'] = true
   node.default['rails']['php']['modules'].push a['php']['modules']
 
   directory "/var/lib/php/session/#{a['user']}_#{a['name']}" do
@@ -408,7 +407,7 @@ def init_cron(a, app_path) # rubocop:disable Metrics/MethodLength
   return unless a['cron']
   a['cron'].each do |cron|
     environment = cron[:environment] || {}
-    environment.merge!('PHP' => "#{node['php']['prefix_dir']}/bin/#{node['php']['bin']}") if php?(a)
+    environment['PHP'] = "#{node['php']['prefix_dir']}/bin/#{node['php']['bin']}" if php?(a)
     environment.merge!('RBENV_ROOT' => node['rbenv']['root_path'],
                        'RBENV_SHIMS' => '$RBENV_ROOT/shims',
                        'RBENV_BIN' => '$RBENV_ROOT/bin',
@@ -459,11 +458,11 @@ def fill_php_config(a, app_path) # rubocop:disable Metrics/MethodLength
 
   if a[:php][:pool]
     a[:php][:pool].each do |key, value|
-      if key.include? 'php_options'
-        pool_custom[:"#{key}"] = pool_custom[:"#{key}"].merge(value)
-      else
-        pool_custom[:"#{key}"] = value
-      end
+      pool_custom[:"#{key}"] = if key.include? 'php_options'
+                                 pool_custom[:"#{key}"].merge(value)
+                               else
+                                 value
+                               end
     end
   end
 
@@ -472,11 +471,11 @@ def fill_php_config(a, app_path) # rubocop:disable Metrics/MethodLength
   end
 
   pool_custom.each do |key, value|
-    if key == :php_options
-      pool[key] = pool[key].merge(value)
-    else
-      pool[key] = value
-    end
+    pool[key] = if key == :php_options
+                  pool[key].merge(value)
+                else
+                  value
+                end
   end
 
   node.default['php-fpm']['pools'] << pool
