@@ -267,8 +267,8 @@ end
 
 def setup_ruby_server(a, app_path)
   if a['ruby_server']['enable']
-    a['nginx']['tunes'] ||= { 'js' => false }
-    a['nginx']['tunes']['private_socket'] = true if rhel7x?
+    tunes = a['nginx']['tunes'] || { 'js' => false }
+    tunes['private_socket'] = true if rhel7x?
     rails_nginx_vhost a['name'] do
       template 'nginx_ruby_crap.erb'
 
@@ -279,7 +279,7 @@ def setup_ruby_server(a, app_path)
       path        app_path
       ssl         a['ruby_server']['ssl']
       disable_www a['ruby_server']['www']
-      tunes       a['nginx']['tunes']
+      tunes       tunes
     end
     setup_ruby_server_init(a, app_path)
   else
