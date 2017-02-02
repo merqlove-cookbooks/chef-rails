@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rubocop'
-gem 'foodcritic'
+gem 'foodcritic', '~> 6.3'
 
 group :development do
   gem 'berkshelf'
