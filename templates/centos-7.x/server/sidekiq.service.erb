@@ -2,6 +2,7 @@
 <%= render 'server/service/unit.erb' %>
 
 [Service]
+Type=simple
 <%= render 'server/service/service.erb' %>
 PIDFile=<%= @opts[:path] %>/shared/tmp/pids/sidekiq.pid
 Environment=SIDEKIQ_CONFIG_FILE=<%= @opts[:path] %>/shared/config/sidekiq.yml
