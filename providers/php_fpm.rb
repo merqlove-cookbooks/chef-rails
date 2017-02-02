@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+use_inline_resources
+
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do

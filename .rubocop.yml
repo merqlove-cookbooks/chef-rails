@@ -4,10 +4,13 @@ LineLength:
 HashSyntax:
   EnforcedStyle: ruby19
 
-SingleSpaceBeforeFirstArg:
+Style/SpaceBeforeFirstArg:
   Enabled: false
 
-TrailingComma:
+Style/TrailingCommaInArguments:
+  Enabled: false
+
+Style/TrailingCommaInLiteral:
   Enabled: false
 
 Metrics/AbcSize:

@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+use_inline_resources
+
 require 'fileutils'
 require 'digest'
 

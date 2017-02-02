@@ -6,7 +6,7 @@ This cookbook makes your favorite breakfast sandwich.
 Requirements
 ------------
 
-Platforms: CentOS, Debian
+Platforms: CentOS 6,7, Ubuntu(partial)
 
 Lots of packages in metadata.rb
 

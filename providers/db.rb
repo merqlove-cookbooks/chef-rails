@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+use_inline_resources
+
 require 'fileutils'
 
 ::Chef::Provider.send(:include, Rails::Helpers)

@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+use_inline_resources
+
 action :create do
   listen = new_resource.listen
   # locations = JSON.parse(node.send(new_resource.precedence)[:nginx_conf][:locations].to_hash.merge(new_resource.locations).to_json)
@@ -45,41 +47,41 @@ action :create do
       name
     end
 
-    directory "#{node[:nginx][:dir]}/ssl/#{ssl_name}" do
-      owner node[:nginx][:user]
-      group node[:nginx][:group]
+    directory "#{node['nginx']['dir']}/ssl/#{ssl_name}" do
+      owner node['nginx']['user']
+      group node['nginx']['group']
       mode '0755'
       recursive true
     end
 
-    file "#{node[:nginx][:dir]}/ssl/#{ssl_name}/public.crt" do
-      owner node[:nginx][:user]
-      group node[:nginx][:group]
+    file "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt" do
+      owner node['nginx']['user']
+      group node['nginx']['group']
       mode '0640'
       content  new_resource.ssl['public'].gsub('\n', "\n")
-      notifies :create, 'service[nginx]', new_resource.reload
+      notifies :restart, 'service[nginx]', new_resource.reload
     end
 
-    file "#{node[:nginx][:dir]}/ssl/#{ssl_name}/private.key" do
-      owner node[:nginx][:user]
-      group node[:nginx][:group]
+    file "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key" do
+      owner node['nginx']['user']
+      group node['nginx']['group']
       mode '0640'
       content new_resource.ssl['private'].gsub('\n', "\n")
-      notifies :create, 'service[nginx]', new_resource.reload
+      notifies :restart, 'service[nginx]', new_resource.reload
     end
 
-    file "#{node[:nginx][:dir]}/ssl/#{ssl_name}/ca.crt" do
-      owner node[:nginx][:user]
-      group node[:nginx][:group]
+    file "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt" do
+      owner node['nginx']['user']
+      group node['nginx']['group']
       mode '0640'
       content new_resource.ssl['ca'].gsub('\n', "\n")
-      notifies :create, 'service[nginx]', new_resource.reload
+      notifies :restart, 'service[nginx]', new_resource.reload
     end
 
     {
-      certificate: "#{node[:nginx][:dir]}/ssl/#{ssl_name}/public.crt",
-      certificate_key: "#{node[:nginx][:dir]}/ssl/#{ssl_name}/private.key",
-      ca: "#{node[:nginx][:dir]}/ssl/#{ssl_name}/ca.crt",
+      certificate: "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt",
+      certificate_key: "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key",
+      ca: "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt",
       manual: new_resource.ssl['manual'],
       default: new_resource.ssl['default'],
       default_server: new_resource.ssl['default_server']

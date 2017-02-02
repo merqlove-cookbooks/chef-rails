@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+use_inline_resources
+
 action :create do
   database_name = new_resource.database_name || new_resource.name
   path = "#{new_resource.path}/db.#{new_resource.type}.#{database_name}.yml"

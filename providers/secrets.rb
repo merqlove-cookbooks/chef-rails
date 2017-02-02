@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+use_inline_resources
+
 action :create do
   chef_gem 'chef-vault' do # ~FC009
     compile_time true if respond_to?(:compile_time)

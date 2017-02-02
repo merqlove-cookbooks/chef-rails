@@ -33,7 +33,7 @@ if node['rails']['nginx']['dhparam']
     user    'root'
     creates node['rails']['openssl']['dhparam_path']
     group   'root'
-    notifies :run, 'service[nginx]', :delayed
+    notifies :restart, 'service[nginx]', :delayed
   end
   node.default['nginx']['extra_configs'] = node['nginx']['extra_configs'].merge(node['rails']['nginx']['dhparam_configs'])
 end
