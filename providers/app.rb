@@ -23,7 +23,7 @@ require 'fileutils'
 
 ::Chef::Provider.send(:include, Rails::Helpers)
 
-action :create do
+action :create do # rubocop:disable Metrics/BlockLength
   a            = new_resource.application
   type         = new_resource.type
   base_path    = node['rails']["#{type}_base_path"]
@@ -35,14 +35,14 @@ action :create do
     path  "#{base_path}/#{a['user']}"
     owner a['user']
     group a['user']
-    mode  00750
+    mode  0o0750
     only_if { sites?(type) }
   end
 
   directory app_path do
     owner     a['user']
     group     a['user']
-    mode      00750
+    mode      0o0750
     recursive true
   end
 
@@ -79,7 +79,7 @@ action :create do
   setup_php(a, app_path) if php?(a)
 
   directory "#{app_path}/backup" do
-    mode      00750
+    mode      0o0750
     owner     a['user']
     group     a['user']
     action    :create
@@ -200,7 +200,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
   if a['ruby_server']['enable']
     template rbenv_vars_file do
       action :create
-      mode 00700
+      mode 0o0700
       owner           a['user']
       group           a['user']
       variables vars: a['vars']
@@ -215,7 +215,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
       source "server/#{a['ruby_server']['type']}.erb"
       owner 'root'
       group 'root'
-      mode 00755
+      mode 0o0755
       variables app: a['name'],
                 opts: a['ruby_server']['opts'] || {},
                 user: a['user'],
@@ -231,7 +231,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
       source 'server/sidekiq.erb'
       owner 'root'
       group 'root'
-      mode 00755
+      mode 0o0755
       variables app: a['name'],
                 opts: a['ruby_server']['worker_opts'] || {},
                 user: a['user'],
@@ -295,14 +295,14 @@ end
 
 def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   directory "#{app_path}/docs" do
-    mode      00750
+    mode      0o0750
     owner     a['user']
     group     a['user']
     action    :create
     recursive true
   end
   directory "#{app_path}/log" do
-    mode      00755
+    mode      0o0755
     owner     a['user']
     group     a['user']
     action    :create
@@ -357,7 +357,7 @@ def setup_php(a, app_path)
   directory "/var/lib/php/session/#{a['user']}_#{a['name']}" do
     owner     a['user']
     group     a['user']
-    mode      00700
+    mode      0o0700
     action    :create
     recursive true
   end
@@ -408,10 +408,12 @@ def init_cron(a, app_path) # rubocop:disable Metrics/MethodLength
   a['cron'].each do |cron|
     environment = cron[:environment] || {}
     environment['PHP'] = "#{node['php']['prefix_dir']}/bin/#{node['php']['bin']}" if php?(a)
-    environment.merge!('RBENV_ROOT' => node['rbenv']['root_path'],
-                       'RBENV_SHIMS' => '$RBENV_ROOT/shims',
-                       'RBENV_BIN' => '$RBENV_ROOT/bin',
-                       'PATH' => '/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$PATH') if rbenv?(a)
+    if rbenv?(a)
+      environment.merge!('RBENV_ROOT' => node['rbenv']['root_path'],
+                         'RBENV_SHIMS' => '$RBENV_ROOT/shims',
+                         'RBENV_BIN' => '$RBENV_ROOT/bin',
+                         'PATH' => '/usr/local/bin:/usr/local/lib:$RBENV_SHIMS:$RBENV_BIN:$PATH')
+    end
 
     rails_cron "#{a[:name]}-#{cron[:name] || 'default'}" do
       interval    cron[:interval]

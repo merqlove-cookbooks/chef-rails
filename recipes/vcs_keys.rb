@@ -23,7 +23,7 @@ if node.role? 'vagrant'
       directory '/home/vagrant/.ssh' do
         owner 'vagrant'
         group 'vagrant'
-        mode 00700
+        mode 0o0700
       end
 
       vcs = data_bag('vcs_keys')
@@ -36,7 +36,7 @@ if node.role? 'vagrant'
             content key['file-content']
             owner 'vagrant'
             group 'vagrant'
-            mode 00600
+            mode 0o0600
           end
 
           ssh_known_hosts_entry key['host'] do
@@ -48,7 +48,7 @@ if node.role? 'vagrant'
           source 'ssh_config.erb'
           owner  'vagrant'
           group  'vagrant'
-          mode 00600
+          mode 0o0600
           variables vcs: vcs
         end
         template '/home/vagrant/.gitconfig' do

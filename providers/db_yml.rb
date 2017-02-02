@@ -26,7 +26,7 @@ action :create do
   template path do
     owner    new_resource.owner
     group    new_resource.group
-    mode     00600
+    mode     0o0600
     source   new_resource.template
     cookbook new_resource.template ? new_resource.cookbook_name.to_s : new_resource.cookbook
     variables(

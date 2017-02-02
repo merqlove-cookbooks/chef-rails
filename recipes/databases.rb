@@ -31,7 +31,7 @@ if ::File.exist? node['rails']['secrets']['default']
 
   # Backup All Databases
 
-  node['rails']['duplicity']['db'].each do |db|
+  node['rails']['duplicity']['db'].each do |db| # rubocop:disable Metrics/BlockLength
     db_backup_dir = "#{db_backup_root}/#{db}"
 
     exec_pre = [

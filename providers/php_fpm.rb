@@ -27,7 +27,7 @@ action :create do
     template node['php-fpm']['conf_file'] do
       source 'php-fpm.conf.erb'
       cookbook 'php-fpm'
-      mode 00644
+      mode 0o0644
       owner 'root'
       group 'root'
       notifies :reload, 'service[php-fpm]'
@@ -38,7 +38,7 @@ action :create do
     directory '/var/lib/php/session' do
       owner 'root'
       group 'root'
-      mode 00777
+      mode 0o0777
     end
 
     logrotate
@@ -56,7 +56,7 @@ action :fix do
   template "#{node['php']['ext_conf_dir']}/php_fix.ini" do
     owner 'root'
     group 'root'
-    mode 00755
+    mode 0o0755
     source 'php_fix.erb'
     variables(options: node['rails']['php']['options'])
     notifies :reload, 'service[php-fpm]', :delayed

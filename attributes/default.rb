@@ -22,7 +22,7 @@ default['rails']['swap']['size']    = '512' # MBs
 default['rails']['swap']['enable']  = false
 default['rails']['apps_base_path']  = '/srv/apps'
 default['rails']['sites_base_path'] = '/srv/sites'
-default['rails']['ports']           = %w( 22 )
+default['rails']['ports']           = %w(22)
 default['rails']['ruby'] = false
 default['rails']['vsftpd'] = false
 

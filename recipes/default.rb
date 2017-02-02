@@ -22,7 +22,7 @@ service 'memcached' do
 end
 
 directory node['rails']['apps_base_path'] do
-  mode      00755
+  mode      0o0755
   owner     node['rails']['user']['deploy']
   group     node['rails']['user']['deploy']
   action    :create
@@ -30,7 +30,7 @@ directory node['rails']['apps_base_path'] do
 end
 
 directory node['rails']['sites_base_path'] do
-  mode      00755
+  mode      0o0755
   owner     node['rails']['user']['deploy']
   group     node['rails']['user']['deploy']
   action    :create

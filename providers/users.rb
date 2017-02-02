@@ -21,7 +21,7 @@ use_inline_resources
 
 ::Chef::Provider.send(:include, Rails::Helpers)
 
-action :create do
+action :create do # rubocop:disable Metrics/BlockLength
   users  = new_resource.users
   secret = load_secret
   vcs    = data_bag(node['rails']['d']['vcs_keys'])
@@ -82,14 +82,14 @@ def user_ssh_keys(u, data)
     action :create
     owner  u
     group  u
-    mode   00700
+    mode   0o0700
   end
 
   template "/home/#{u}/.ssh/authorized_keys" do
     source 'authorized_keys.erb'
     owner     u
     group     u
-    mode      00600
+    mode      0o0600
     variables keys: data['ssh-keys']
   end
 end
@@ -106,7 +106,7 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
       content key['file-content']
       owner   u
       group   u
-      mode    00600
+      mode    0o0600
     end
 
     ssh_known_hosts_entry "#{key['host']} #{u}" do
@@ -127,7 +127,7 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
     source 'gitconfig.erb'
     owner u
     group u
-    mode 00644
+    mode 0o0644
 
     variables(
       name:  u,

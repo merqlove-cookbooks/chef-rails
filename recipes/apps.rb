@@ -37,16 +37,18 @@ node.default['rails']['databases'] = {}
 directory '/var/www/html/' do
   owner 'nginx'
   group 'nginx'
-  mode  00644
+  mode  0o0644
   recursive true
 end
 
-template '/var/www/html/locked.html' do
-  owner 'nginx'
-  group 'nginx'
-  mode 00644
-  source 'locked.html.erb'
-end unless node['rails']['sites'].empty?
+unless node['rails']['sites'].empty?
+  template '/var/www/html/locked.html' do
+    owner 'nginx'
+    group 'nginx'
+    mode 0o0644
+    source 'locked.html.erb'
+  end
+end
 
 node['rails']['sites'].each do |k, a|
   rails_app k do

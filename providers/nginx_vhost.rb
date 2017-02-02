@@ -19,7 +19,7 @@
 
 use_inline_resources
 
-action :create do
+action :create do # rubocop:disable Metrics/BlockLength
   listen = new_resource.listen
   # locations = JSON.parse(node.send(new_resource.precedence)[:nginx_conf][:locations].to_hash.merge(new_resource.locations).to_json)
   # options = JSON.parse(node.send(new_resource.precedence)[:nginx_conf][:options].to_hash.merge(new_resource.options).to_json)
@@ -106,10 +106,10 @@ action :create do
     notifies :reload, 'service[nginx]', new_resource.reload
   end
 
-  template "#{node['nginx']['dir']}/sites-available/#{name}" do
+  template "#{node['nginx']['dir']}/sites-available/#{name}" do # rubocop:disable Metrics/BlockLength
     owner 'root'
     group 'root'
-    mode 00644
+    mode 0o0644
     source new_resource.template
     cookbook new_resource.template ? new_resource.cookbook_name.to_s : new_resource.cookbook
     variables block:         new_resource.block,
@@ -220,7 +220,7 @@ def auth_basic_user_file(auth_basic_user_file, path, user)
     ::File.join(path, auth_basic_user_file)
   else
     directory "#{path}/conf" do
-      mode      00770
+      mode      0o0770
       owner     user
       group     user
       action    :create

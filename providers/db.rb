@@ -67,7 +67,7 @@ def create_mysql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
     socket:   mysql_socket
   }
 
-  node['rails']['databases']['mysql'].each do |_k, d|
+  node['rails']['databases']['mysql'].each do |_k, d| # rubocop:disable Metrics/BlockLength
     backup_mysql_db(d, date, root['password'])
 
     next if d['app_delete']
@@ -134,7 +134,7 @@ def install_mysql # rubocop:disable Metrics/MethodLength
     to "/etc/mysql-#{name}/my.cnf"
   end
 
-  if php_exist?
+  if php_exist? # rubocop:disable Style/GuardClause
     node.default['rails']['php']['options']['mysql.default_socket'] = mysql_socket
     node.default['rails']['php']['options']['pdo_mysql.default_socket'] = mysql_socket
     node.default['rails']['php']['options']['mysqli.default_socket '] = mysql_socket
@@ -229,7 +229,7 @@ def create_postgresql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
     )
     group  'root'
     user   'root'
-    mode   00600
+    mode   0o0600
     action :delete
   end
 
@@ -240,7 +240,7 @@ def create_postgresql_dbs(secret, date) # rubocop:disable Metrics/MethodLength
     password: postgres['password']
   }
 
-  node['rails']['databases']['postgresql'].each do |_k, d|
+  node['rails']['databases']['postgresql'].each do |_k, d| # rubocop:disable Metrics/BlockLength
     backup_postgresql_db(d, date)
 
     next if d['app_delete']

@@ -91,7 +91,7 @@ GEM
     ffi (1.9.17)
     ffi-yajl (2.3.0)
       libyajl2 (~> 1.2)
-    foodcritic (6.3.0)
+    foodcritic (9.0.0)
       cucumber-core (>= 1.3)
       erubis
       nokogiri (>= 1.5, < 2.0)
@@ -263,7 +263,7 @@ DEPENDENCIES
   berkshelf
   chef
   chef-zero
-  foodcritic (~> 6.3)
+  foodcritic
   json
   kitchen-vagrant
   ridley

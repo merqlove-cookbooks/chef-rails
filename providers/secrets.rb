@@ -38,7 +38,7 @@ action :create do
         s = Chef::Resource::File.new(node['rails']['secrets']['default'], run_context)
         s.owner      'root'
         s.group      'root'
-        s.mode       00600
+        s.mode       0o0600
         s.sensitive  true
         s.content    key['file-content']
         s.run_action :create
