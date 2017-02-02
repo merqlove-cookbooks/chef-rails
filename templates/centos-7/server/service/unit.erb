@@ -1,5 +1,8 @@
-Description=<%= @opts[:descriptuon] || 'Sidekiq Server' %>
-Requires=<%= @requres.join(' ') %>
-Wants=<%= @wants.join(' ') %>
-After=<%= @after.join(' ') %>
+<% @opts['requires'] ||= [] -%>
+<% @opts['wants'] ||= [] -%>
+<% @opts['after'] ||= [] -%>
+Description=<%= @opts['description'] || 'Sidekiq Server' %>
+Requires=<%= @opts['requires'].join(' ') %>
+Wants=<%= @opts['wants'].join(' ') %>
+After=<%= @opts['after'].join(' ') %>
 

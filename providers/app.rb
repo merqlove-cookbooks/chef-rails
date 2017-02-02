@@ -215,6 +215,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       group 'root'
       mode 00755
       variables app: a['name'],
+                opts: a['ruby_server']['opts'],
                 user: a['user'],
                 path: app_path,
                 environment: a['ruby_server']['environment']
@@ -230,6 +231,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength
       group 'root'
       mode 00755
       variables app: a['name'],
+                opts: a['ruby_server']['opts'],
                 user: a['user'],
                 path: app_path,
                 environment: a['ruby_server']['environment']
