@@ -17,9 +17,17 @@
 # limitations under the License.
 #
 
+::Chef::Recipe.send(:include, Rails::Helpers)
+
 case node['platform_family']
 when 'rhel'
-  package 'ImageMagick-last' do
+  rhel_package = if rhel7x?
+   'ImageMagick' # rubocop:disable Style/IndentationWidth
+  else # rubocop:disable Style/ElseAlignment
+   'ImageMagick-last' # rubocop:disable Style/IndentationWidth
+  end # rubocop:disable Lint/EndAlignment
+
+  package rhel_package do
     action :upgrade
   end
 when 'debian'

@@ -1,0 +1,10 @@
+Description=<%= @opts['description'] || 'Server' %>
+<% if @opts['requires'] %>
+Requires=<%= @opts['requires'].join(' ') %>
+<% end -%>
+<% if @opts['wants'] %>
+Wants=<%= @opts['wants'].join(' ') %>
+<% end -%>
+<% if @opts['after'] %>
+After=<%= @opts['after'].join(' ') %>
+<% end -%>

@@ -179,6 +179,8 @@ def service_base_name(name)
 end
 
 def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  service_type = service_base_name(a['ruby_server']['type'])
+  service_type_worker = service_base_name(a['ruby_server']['worker_type'])
   service_name = service_base_name("#{a['ruby_server']['type']}_#{a['name']}")
   service_name_worker = service_base_name("#{a['ruby_server']['worker_type']}_#{a['name']}")
   init_file = service_name(service_name)
@@ -212,7 +214,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
 
     template init_file do
       cookbook 'rails'
-      source "server/#{a['ruby_server']['type']}.erb"
+      source "server/#{service_type}.erb"
       owner 'root'
       group 'root'
       mode 0o0755
@@ -228,7 +230,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
 
     template init_file_worker do
       cookbook 'rails'
-      source 'server/sidekiq.erb'
+      source "server/#{service_type_worker}.erb"
       owner 'root'
       group 'root'
       mode 0o0755
