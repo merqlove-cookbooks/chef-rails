@@ -4,8 +4,8 @@
 [Service]
 Type=forking
 <%= render 'server/service/service.erb' %>
-PIDFile=<%= @opts[:path] %>/shared/tmp/pids/puma.pid
-Environment=PUMA_CONFIG_FILE=<%= @opts[:path] %>/shared/config/puma.rb
+PIDFile=<%= @path %>/shared/tmp/pids/puma.pid
+Environment=PUMA_CONFIG_FILE=<%= @path %>/shared/config/puma.rb
 ExecStart=<%= node['rbenv']['root_path'] %>/shims/bundle exec puma -C ${PUMA_CONFIG_FILE} --daemon
 ExecStop=<%= node['rbenv']['root_path'] %>/shims/bundle exec pumactl -F ${PUMA_CONFIG_FILE} stop
 ExecReload=<%= node['rbenv']['root_path'] %>/shims/bundle exec pumactl -F ${PUMA_CONFIG_FILE} phased-restart

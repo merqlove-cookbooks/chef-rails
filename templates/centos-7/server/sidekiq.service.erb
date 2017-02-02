@@ -4,10 +4,10 @@
 [Service]
 Type=simple
 <%= render 'server/service/service.erb' %>
-PIDFile=<%= @opts[:path] %>/shared/tmp/pids/sidekiq.pid
-Environment=SIDEKIQ_CONFIG_FILE=<%= @opts[:path] %>/shared/config/sidekiq.yml
+PIDFile=<%= @path %>/shared/tmp/pids/sidekiq.pid
+Environment=SIDEKIQ_CONFIG_FILE=<%= @path %>/shared/config/sidekiq.yml
 ExecStart=<%= node['rbenv']['root_path'] %>/shims/bundle exec sidekiq -C ${SIDEKIQ_CONFIG_FILE}
-ExecStop=<%= node['rbenv']['root_path'] %>/shims/bundle exec sidekiqctl stop ${<%= @opts[:path] %>/shared/tmp/pids/sidekiq.pid}
+ExecStop=<%= node['rbenv']['root_path'] %>/shims/bundle exec sidekiqctl stop ${<%= @path %>/shared/tmp/pids/sidekiq.pid}
 
 [Install]
 <%= render 'server/service/install.erb' %>
