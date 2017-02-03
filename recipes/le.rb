@@ -21,6 +21,9 @@
 
 acme_certificate node['rails']['le']['cn'] do
   alt_names node['rails']['le']['alt_names']
-  method   'http'
-  wwwroot  node['rails']['le']['wwwroot']
+  method    'http'
+  crt       "/etc/nginx/ssl/#{site}.crt"
+  key       "/etc/nginx/ssl/#{site}.key"
+  fullchain "/etc/nginx/ssl/#{site}.pem"
+  wwwroot   node['rails']['le']['wwwroot']
 end if node['rails']['le']['cn']
