@@ -275,6 +275,7 @@ def setup_ruby_server(a, app_path)
   if a['ruby_server']['enable']
     tunes = (a['nginx']['tunes'] || { 'js' => false }).to_hash
     tunes['private_socket'] = true if rhel7x?
+    tunes['exclude'] ||= %w(jpg jpeg gif png ico svg)
     rails_nginx_vhost a['name'] do
       template 'nginx_ruby_crap.erb'
 
