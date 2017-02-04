@@ -19,7 +19,7 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
-node['rails']['le'].each |site, le|
+node['rails']['le'].each do |site, le|
   acme_certificate le['cn'] do
     alt_names le['alt_names']
     method    'http'
