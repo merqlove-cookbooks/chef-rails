@@ -20,11 +20,19 @@
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
 node['rails']['le'].each do |site, le|
+  next unless le['cn']
+  directory le['wwwroot'] do
+    owner 'root'
+    group 'root'
+    mode  0o0644
+    recursive true
+  end
+
   acme_certificate le['cn'] do
     alt_names le['alt_names']
     method    'http'
     key       "/etc/nginx/ssl/#{site}.key"
     fullchain "/etc/nginx/ssl/#{site}.pem"
     wwwroot   le['wwwroot']
-  end if le['cn']
+  end
 end
