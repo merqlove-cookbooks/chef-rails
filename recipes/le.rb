@@ -19,14 +19,15 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
+directory '/etc/nginx/ssl' do
+  owner 'root'
+  group 'root'
+  mode  0o0644
+  recursive true
+end
+
 node['rails']['le'].each do |site, le|
   next unless le['cn']
-  directory le['wwwroot'] do
-    owner 'root'
-    group 'root'
-    mode  0o0644
-    recursive true
-  end
 
   acme_certificate le['cn'] do
     alt_names le['alt_names']
