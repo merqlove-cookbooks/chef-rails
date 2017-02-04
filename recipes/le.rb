@@ -19,6 +19,8 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
+include_recipe 'acme'
+
 directory '/etc/nginx/ssl' do
   owner 'root'
   group 'root'
@@ -35,5 +37,6 @@ node['rails']['le'].each do |site, le|
     key       "/etc/nginx/ssl/#{site}.key"
     fullchain "/etc/nginx/ssl/#{site}.pem"
     wwwroot   le['wwwroot']
+    notifies :restart, "service[nginx]", :immediate
   end
 end
