@@ -23,7 +23,6 @@ node['rails']['le'].each do |site, le|
   acme_certificate le['cn'] do
     alt_names le['alt_names']
     method    'http'
-    crt       "/etc/nginx/ssl/#{site}.crt"
     key       "/etc/nginx/ssl/#{site}.key"
     fullchain "/etc/nginx/ssl/#{site}.pem"
     wwwroot   le['wwwroot']
