@@ -17,4 +17,15 @@
 # limitations under the License.
 #
 
-iptables_rule 'port_rails'
+::Chef::Recipe.send(:include, Rails::Helpers)
+
+node.default['firewall']['allow_ssh'] = true if rhel7x?
+
+node['rails']['ports'].each_with_index do |port, idx|
+  firewall_rule port do
+    port     port
+    protocol :tcp
+    position idx
+    command  :allow
+  end
+end

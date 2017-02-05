@@ -6,7 +6,7 @@ description      'Installs/Configures ruby/rails, php, databases and so on'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 issues_url       'https://github.com/merqlove-cookbooks/chef-rails/issues'
 source_url       'https://github.com/merqlove-cookbooks/chef-rails'
-version          '1.3.1'
+version          '1.3.2'
 
 supports 'centos'
 supports 'ubuntu'
@@ -19,6 +19,7 @@ depends 'build-essential', '~> 2.2.0'
 depends 'yum-epel', '~> 0.7.0'
 depends 'yum', '~> 3.11.0'
 depends 'git', '~> 4.1.0'
+depends 'firewall', '~> 2.1'
 
 depends 'rsync', '~> 0.8.6'
 depends 'swap', '~> 0.3.8'
