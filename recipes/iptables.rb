@@ -19,6 +19,8 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
+firewall 'default'
+
 node['rails']['ports'].each_with_index do |port, idx|
   firewall_rule port do
     port     port.to_i
