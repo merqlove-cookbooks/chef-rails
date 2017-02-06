@@ -34,6 +34,7 @@ default['rails']['nginx']['ssl_extra_configs'] = {
   ssl_session_timeout: '1d',
   ssl_session_tickets: 'off'
 }
+default['rails']['nginx']['ssl_root'] = '/etc/nginx/ssl'
 default['rails']['nginx']['hsts'] = false
 default['rails']['nginx']['hsts_configs'] = {
   add_header: 'Strict-Transport-Security "max-age=31536000; includeSubDomains" always'
