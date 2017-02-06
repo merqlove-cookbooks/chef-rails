@@ -54,37 +54,39 @@ action :create do # rubocop:disable Metrics/BlockLength
       recursive true
     end
 
-    file "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt" do
-      owner node['nginx']['user']
-      group node['nginx']['group']
-      mode '0640'
-      content  new_resource.ssl['public'].gsub('\n', "\n")
-      notifies :restart, 'service[nginx]', new_resource.reload
-    end
+    if new_resource.ssl['public']
+      file "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt" do
+        owner node['nginx']['user']
+        group node['nginx']['group']
+        mode '0640'
+        content  new_resource.ssl['public'].gsub('\n', "\n")
+        notifies :restart, 'service[nginx]', new_resource.reload
+      end
 
-    file "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key" do
-      owner node['nginx']['user']
-      group node['nginx']['group']
-      mode '0640'
-      content new_resource.ssl['private'].gsub('\n', "\n")
-      notifies :restart, 'service[nginx]', new_resource.reload
-    end
+      file "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key" do
+        owner node['nginx']['user']
+        group node['nginx']['group']
+        mode '0640'
+        content new_resource.ssl['private'].gsub('\n', "\n")
+        notifies :restart, 'service[nginx]', new_resource.reload
+      end
 
-    file "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt" do
-      owner node['nginx']['user']
-      group node['nginx']['group']
-      mode '0640'
-      content new_resource.ssl['ca'].gsub('\n', "\n")
-      notifies :restart, 'service[nginx]', new_resource.reload
+      file "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt" do
+        owner node['nginx']['user']
+        group node['nginx']['group']
+        mode '0640'
+        content new_resource.ssl['ca'].gsub('\n', "\n")
+        notifies :restart, 'service[nginx]', new_resource.reload
+      end
     end
 
     {
-      certificate: "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt",
-      certificate_key: "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key",
-      ca: "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt",
-      manual: new_resource.ssl['manual'],
-      default: new_resource.ssl['default'],
-      default_server: new_resource.ssl['default_server']
+      'certificate' => new_resource.ssl['certificate'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt",
+      'certificate_key' => new_resource.ssl['certificate_key'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key",
+      'ca' => new_resource.ssl['ca'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt",
+      'manual' => new_resource.ssl['manual'],
+      'default' => new_resource.ssl['default'],
+      'default_server' => new_resource.ssl['default_server']
     }
   end # rubocop:disable Lint/EndAlignment
 
