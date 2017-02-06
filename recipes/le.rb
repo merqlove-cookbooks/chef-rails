@@ -21,7 +21,7 @@
 
 include_recipe 'acme'
 
-directory '/etc/nginx/ssl' do
+directory node['rails']['nginx']['ssl_root'] do
   owner 'root'
   group 'root'
   mode  0o0644
@@ -31,11 +31,16 @@ end
 node['rails']['le'].each do |site, le|
   next unless le['cn']
 
+  node.default['rails']['le'][site]['key'] = "#{node['rails']['nginx']['ssl_root']}/#{site}.key"
+  node.default['rails']['le'][site]['certificate'] = "#{node['rails']['nginx']['ssl_root']}/#{site}.pem"
+  node.default['rails']['le'][site]['ca'] = "#{node['rails']['nginx']['ssl_root']}/#{site}-chain.pem"
+
   acme_certificate le['cn'] do
     alt_names le['alt_names']
     method    'http'
-    key       "/etc/nginx/ssl/#{site}.key"
-    fullchain "/etc/nginx/ssl/#{site}.pem"
+    key       node['rails']['le'][site]['key']
+    fullchain node['rails']['le'][site]['certificate']
+    chain     node['rails']['le'][site]['ca']
     wwwroot   le['wwwroot']
     notifies :restart, "service[nginx]", :immediate
   end

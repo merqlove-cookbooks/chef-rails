@@ -88,7 +88,7 @@ action :create do # rubocop:disable Metrics/BlockLength
 
   setup_nginx(a, app_path) if sites?(type) && nginx?(a)
 
-  setup_ruby_server(a, app_path) if ruby_server?(a)
+  setup_ruby_servers(a, app_path) if ruby_server?(a)
 
   new_resource.updated_by_last_action(true)
 end
@@ -271,23 +271,43 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
   end
 end
 
-def setup_ruby_server(a, app_path)
+def setup_ruby_servers(a, app_path)
   if a['ruby_server']['enable']
     tunes = (a['nginx']['tunes'] || { 'js' => false }).to_hash
     tunes['private_socket'] = true if rhel7x?
     tunes['exclude'] ||= %w(jpg jpeg gif png ico svg css txt)
-    rails_nginx_vhost a['name'] do
-      template 'nginx_ruby_crap.erb'
 
-      user        a['user']
-      type        a['ruby_server']['type']
-      server_name a['ruby_server']['server_name']
-      listen      a['ruby_server']['listen']
-      path        app_path
-      ssl         a['ruby_server']['ssl']
-      disable_www a['ruby_server']['www']
-      tunes       tunes
+    a['ruby_server']['server_name'].each do |name|
+      if ssl = node['rails']['le'][name]
+        rails_nginx_vhost a['name'] do
+          template 'nginx_ruby_crap.erb'
+
+          user        a['user']
+          type        a['ruby_server']['type']
+          server_name ((ssl['alt_names'] || []) << ssl['cn'])
+          listen      '443'
+          path        app_path
+          ssl         ssl
+          disable_www a['ruby_server']['www']
+          tunes       tunes
+        end
+      end
+
+      rails_nginx_vhost a['name'] do
+        template 'nginx_ruby_crap.erb'
+
+        user        a['user']
+        type        a['ruby_server']['type']
+        server_name a['ruby_server']['server_name']
+        listen      a['ruby_server']['listen']
+        path        app_path
+        ssl         nil
+        disable_www a['ruby_server']['www']
+        tunes       tunes
+      end
     end
+
+
   else
     rails_nginx_vhost a['name'] do
       action :delete
