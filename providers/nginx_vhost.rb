@@ -82,7 +82,7 @@ action :create do # rubocop:disable Metrics/BlockLength
 
     {
       'certificate' => new_resource.ssl['certificate'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt",
-      'certificate_key' => new_resource.ssl['certificate_key'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key",
+      'certificate_key' => new_resource.ssl['key'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key",
       'ca' => new_resource.ssl['ca'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt",
       'manual' => new_resource.ssl['manual'],
       'default' => new_resource.ssl['default'],
