@@ -284,7 +284,7 @@ def setup_ruby_servers(a, app_path)
 
           user        a['user']
           type        a['ruby_server']['type']
-          server_name ((ssl['alt_names'] || []) << ssl['cn'])
+          server_name ((ssl['alt_names'] || []).to_a << ssl['cn'])
           listen      '443'
           path        app_path
           ssl         ssl
