@@ -1,6 +1,6 @@
 # Maintained by Chef.  Local changes will be overwritten
 
-upstream <%= @type %>_<%= @name %><%= '_ssl' if @ssl %> {
+upstream <%= @type %>_<%= @name %> {
   <% if @tunes['private_socket'] %>
   server unix://<%= @path %>/shared/tmp/sockets/<%= @type %>.sock fail_timeout=0;
   <% else %>
@@ -59,7 +59,7 @@ server {
     proxy_set_header Host $http_host;
     proxy_set_header X-Forwarded-Proto http<%= 's' if @ssl %>;
     proxy_redirect off;
-    proxy_pass http://<%= @type %>_<%= @name %><%= '_ssl' if @ssl %>;
+    proxy_pass http://<%= @type %>_<%= @name %>;
   }
 
   error_page 500 502 503 /500.html;
