@@ -22,6 +22,10 @@ server {
   root   <%= @path %>/current/public;
 
 <% if @ssl %>
+  if ($http_host !~ "<%= Array(@server_name).join('|') %>"){
+    rewrite ^ http://$http_host$request_uri permanent;
+  }
+
   ssl on;
   ssl_certificate <%= @ssl['certificate'] %>;
   ssl_certificate_key <%= @ssl['certificate_key'] %>;
@@ -42,10 +46,6 @@ server {
       <%= k %> <%= v %>;
     <% end %>
   <% end %>
-
-  if ($http_host !~ "<%= Array(@server_name).join('|') %>"){
-    rewrite ^ http://$http_host$request_uri permanent;
-  }
 <% end -%>
 
   autoindex off;
