@@ -30,6 +30,7 @@ attribute :server_name,      kind_of: Array, default: [] # Server name if differ
 attribute :path,             kind_of: String, default: nil, required: true # Server root
 attribute :path_suffix,      kind_of: String, default: '',  required: false # Server root
 attribute :default,          kind_of: [TrueClass, FalseClass], default: false  # Default host
+attribute :default_server,   kind_of: [TrueClass, FalseClass], default: false  # Default server
 attribute :deferred,         kind_of: [TrueClass, FalseClass], default: false  # Deffered host
 attribute :disable_www,      kind_of: [TrueClass, FalseClass], default: true # Redirect www to domain
 attribute :access_log,       kind_of: [TrueClass, FalseClass], default: false # Access log

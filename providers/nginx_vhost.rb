@@ -120,6 +120,9 @@ action :create do # rubocop:disable Metrics/BlockLength
               listen:        listen,
               # locations:   locations,
               default:       new_resource.default,
+
+              default_server: new_resource.default_server,
+
               deferred:      new_resource.deferred,
               disable_www:   new_resource.disable_www,
               access_log:    new_resource.access_log,
@@ -137,7 +140,9 @@ action :create do # rubocop:disable Metrics/BlockLength
               rewrites:      new_resource.rewrites,
               auth_basic_name: new_resource.auth_basic,
               auth_basic:    auth_basic,
+
               auth_basic_user_file: auth_file,
+
               file_rewrites: new_resource.file_rewrites,
               php_rewrites:  new_resource.php_rewrites,
               error_pages:   new_resource.error_pages,

@@ -17,7 +17,7 @@ server {
 <% end %>
 
 server {
-  listen <%= @listen || 80 %> <%= 'default' if @default %> <%= 'deferred' if @deferred %> <%= 'default_server' if @ssl['default_server'] %>;
+  listen <%= @listen || 80 %> <%= 'default' if @default %> <%= 'deferred' if @deferred %> <%= 'default_server' if @default_server || (@ssl||{})['default_server'] %>;
   server_name <%= Array(@server_name).join(' ') %>;
   root   <%= @path %>/current/public;
 
