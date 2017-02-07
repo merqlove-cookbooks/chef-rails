@@ -279,7 +279,7 @@ def setup_ruby_servers(a, app_path)
 
     a['ruby_server']['server_name'].each do |name|
       if ssl = node['rails']['le'][name]
-        rails_nginx_vhost a['name'] do
+        rails_nginx_vhost "#{a['name']}_ssl" do
           template 'nginx_ruby_crap.erb'
 
           user        a['user']
