@@ -42,6 +42,10 @@ server {
       <%= k %> <%= v %>;
     <% end %>
   <% end %>
+
+  if ($http_host !~ "<%= Array(@server_name).join('|') %>"){
+    rewrite ^ http://$http_host$request_uri permanent;
+  }
 <% end -%>
 
   autoindex off;
