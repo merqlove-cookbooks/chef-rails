@@ -23,9 +23,11 @@ node.default['firewall']['firewalld']['permanent'] = true
 
 firewall 'default'
 
+
+
 node['rails']['ports'].each_with_index do |port, idx|
   firewall_rule "#{port}" do
-    port     port.is_a?(String) ? port.to_i : port
+    port     port_cast(port)
     protocol :tcp
     position idx
     command  :allow

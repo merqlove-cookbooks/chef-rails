@@ -27,6 +27,16 @@ module Rails
       node['php-fpm'] && node['php-fpm']['pools'].count > 1
     end
 
+    def port_cast(port)
+      if port.is_a?(String)
+        port.to_i
+      elsif port.is_a?(Hash)
+        port[:min]..port[:max]
+      else
+        port
+      end
+    end
+
     #
     # Determine if the current node using old RHEL.
     #
