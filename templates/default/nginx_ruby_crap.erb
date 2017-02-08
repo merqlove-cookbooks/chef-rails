@@ -22,7 +22,7 @@ server {
   root   <%= @path %>/current/public;
 
 <% if @ssl %>
-  if ($http_host !~ "<%= Array(@server_name).join('|') %>"){
+  if ($http_host !~ ^<%= Array(@server_name).join('|') %>){
     rewrite ^ http://$http_host$request_uri permanent;
   }
 
