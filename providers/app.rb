@@ -288,6 +288,7 @@ def setup_ruby_servers(a, app_path)
           listen      '443'
           path        app_path
           ssl         ssl
+          default_server (ssl||{})['default_server']
           disable_www a['ruby_server']['www']
           tunes       tunes
         end
@@ -300,6 +301,7 @@ def setup_ruby_servers(a, app_path)
         type        a['ruby_server']['type']
         server_name a['ruby_server']['server_name']
         listen      a['ruby_server']['listen']
+        default_server a['ruby_server']['default_server']
         path        app_path
         ssl         nil
         disable_www a['ruby_server']['www']
