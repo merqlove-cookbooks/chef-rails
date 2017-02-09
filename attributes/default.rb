@@ -23,8 +23,8 @@ default['rails']['swap']['enable']  = false
 default['rails']['apps_base_path']  = '/srv/apps'
 default['rails']['sites_base_path'] = '/srv/sites'
 default['rails']['ports']           = %w(22)
-default['rails']['ruby'] = false
-default['rails']['vsftpd'] = false
+default['rails']['ruby']            = false
+default['rails']['vsftpd']          = false
 
 default['rails']['openssl']['dhparam_dir'] = '/etc/ssl/certs'
 default['rails']['openssl']['dhparam_file'] = 'dhparam.pem'
