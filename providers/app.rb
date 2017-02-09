@@ -275,7 +275,7 @@ def setup_ruby_servers(a, app_path)
   if a['ruby_server']['enable']
     tunes = (a['nginx']['tunes'] || { 'js' => false }).to_hash
     tunes['private_socket'] = true if rhel7x?
-    tunes['exclude'] ||= %w(jpg jpeg gif png ico svg css txt)
+    tunes['exclude'] ||= %w(jpg jpeg gif png ico svg css txt mp3 ogg mpe?g avi pdf doc docx xls xlsx ppt pptx)
 
     a['ruby_server']['server_name'].each do |name|
       if ssl = node['rails']['le'][name]
