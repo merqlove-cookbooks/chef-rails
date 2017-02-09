@@ -28,7 +28,7 @@ firewall 'default'
   firewall_rule "#{port_name(port)}" do
     port     port_bind
     protocol :tcp
-    position 1
+    position 2
     command  :allow
   end
 end
