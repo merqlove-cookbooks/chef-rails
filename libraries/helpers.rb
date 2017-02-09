@@ -27,6 +27,16 @@ module Rails
       node['php-fpm'] && node['php-fpm']['pools'].count > 1
     end
 
+    def port_name(port)
+      if port.is_a?(Hash)
+        port.to_a.map {|p| p.join('_') }.join('_')
+      elsif port.is_a?(Array)
+        port.join('_')
+      else
+        port
+      end
+    end
+
     def port_cast(port)
       if port.is_a?(String)
         port.to_i
