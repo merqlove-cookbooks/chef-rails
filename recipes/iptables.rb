@@ -23,7 +23,12 @@ node.default['firewall']['firewalld']['permanent'] = true
 
 firewall 'default'
 
-(node['rails']['ports'] || []).uniq.each_with_index do |port, idx|
+firewall_rule 'ssh' do
+  port     22
+  command  :allow
+end
+
+(node['rails']['ports'] || []).uniq.reject{ |port| port == '22' }.each_with_index do |port, idx|
   port_bind = port_cast(port)
   firewall_rule "#{port_name(port)}" do
     port     port_bind
