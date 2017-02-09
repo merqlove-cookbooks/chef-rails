@@ -19,21 +19,20 @@
 
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
-node.default['firewall']['firewalld']['permanent'] = true
+if rhel7x? || ubuntu16x?
+  node.default['firewall']['firewalld']['permanent'] = true
 
-firewall 'default'
+  firewall 'default'
 
-firewall_rule 'ssh' do
-  port     22
-  command  :allow
-end
-
-(node['rails']['ports'] || []).uniq.reject{ |port| port == '22' }.each_with_index do |port, idx|
-  port_bind = port_cast(port)
-  firewall_rule "#{port_name(port)}" do
-    port     port_bind
-    protocol :tcp
-    position 2
-    command  :allow
+  (node['rails']['ports'] || []).each_with_index do |port|
+    port_bind = port_cast(port)
+    firewall_rule "#{port_name(port)}" do
+      port     port_bind
+      protocol :tcp
+      command  :allow
+    end
   end
+else
+  iptables_rule 'port_rails'
 end
+

@@ -77,7 +77,7 @@ module Rails
     end
 
     #
-    # Determine if the current node using old RHEL.
+    # Determine if the current node using RHEL.
     #
     # @return [Boolean]
     #
@@ -86,7 +86,7 @@ module Rails
     end
 
     #
-    # Determine if the current node using old RHEL.
+    # Determine if the current node using debian.
     #
     # @return [Boolean]
     #
@@ -95,7 +95,7 @@ module Rails
     end
 
     #
-    # Determine if the current node using old RHEL.
+    # Determine if the current node has php installed.
     #
     # @return [Boolean]
     #
@@ -104,7 +104,7 @@ module Rails
     end
 
     #
-    # Determine if the current node using old RHEL.
+    # Determine if the current node using Ubuntu 12.
     #
     # @return [Boolean]
     #
@@ -113,12 +113,21 @@ module Rails
     end
 
     #
-    # Determine if the current node using old RHEL.
+    # Determine if the current node using Ubuntu 14.
     #
     # @return [Boolean]
     #
     def ubuntu14x?
       platform_family?('debian') && node['platform_version'][/^14/]
+    end
+
+    #
+    # Determine if the current node using Ubuntu 16.
+    #
+    # @return [Boolean]
+    #
+    def ubuntu16x?
+      platform_family?('debian') && node['platform_version'][/^16/]
     end
 
     def php_exist?
