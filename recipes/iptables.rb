@@ -25,6 +25,7 @@ firewall 'default'
 
 node['rails']['ports'].each_with_index do |port, idx|
   port_bind = port_cast(port)
+  STDERR.puts port_name(port), port_cast(port)
   firewall_rule "#{port_name(port)}" do
     port     port_bind
     protocol :tcp
