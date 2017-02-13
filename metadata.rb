@@ -18,7 +18,7 @@ depends 'chef-client', '~> 4.6.0'
 depends 'build-essential', '~> 2.2.0'
 depends 'yum-epel', '~> 0.7.0'
 depends 'yum', '~> 3.11.0'
-depends 'git', '~> 4.1.0'
+depends 'git', '~> 5.0.0'
 depends 'firewall', '~> 2.1'
 
 depends 'rsync', '~> 0.8.6'
