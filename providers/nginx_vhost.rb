@@ -41,11 +41,16 @@ action :create do # rubocop:disable Metrics/BlockLength
   # end
 
   ssl = if new_resource.ssl
+    
     ssl_name = if new_resource.ssl['name'] # rubocop:disable Style/IndentationWidth
       new_resource.ssl['name'] # rubocop:disable Style/IndentationWidth
     else # rubocop:disable Style/ElseAlignment
       name
     end # rubocop:disable Lint/EndAlignment
+
+    ca = new_resource.ssl['certificate']
+    privateKey = new_resource.ssl['key']
+    publicKey = new_resource.ssl['ca']
 
     directory "#{node['nginx']['dir']}/ssl/#{ssl_name}" do
       owner node['nginx']['user']
@@ -55,7 +60,11 @@ action :create do # rubocop:disable Metrics/BlockLength
     end
 
     if new_resource.ssl['public']
-      file "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt" do
+      ca = "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt"
+      privateKey = "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key"
+      publicKey = "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt"
+      
+      file publicKey do
         owner node['nginx']['user']
         group node['nginx']['group']
         mode '0640'
@@ -63,27 +72,27 @@ action :create do # rubocop:disable Metrics/BlockLength
         notifies :restart, 'service[nginx]', new_resource.reload
       end
 
-      file "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key" do
+      file privateKey do
         owner node['nginx']['user']
         group node['nginx']['group']
         mode '0640'
         content new_resource.ssl['private'].gsub('\n', "\n")
         notifies :restart, 'service[nginx]', new_resource.reload
-      end
+      end     
 
-      file "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt" do
+      file ca do
         owner node['nginx']['user']
         group node['nginx']['group']
         mode '0640'
         content new_resource.ssl['ca'].gsub('\n', "\n")
         notifies :restart, 'service[nginx]', new_resource.reload
-      end
+      end    
     end
 
     {
-      'certificate' => new_resource.ssl['certificate'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/public.crt",
-      'certificate_key' => new_resource.ssl['key'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/private.key",
-      'ca' => new_resource.ssl['ca'] || "#{node['nginx']['dir']}/ssl/#{ssl_name}/ca.crt",
+      'certificate' => publicKey,
+      'certificate_key' => privateKey,
+      'ca' => ca,
       'manual' => new_resource.ssl['manual'],
       'default' => new_resource.ssl['default'],
       'default_server' => new_resource.ssl['default_server']
