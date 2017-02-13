@@ -17,24 +17,30 @@
 # limitations under the License.
 #
 
+users = []
+
 if node['rails']['apps'] || node['rails']['sites']
-  users = []
   node['rails']['apps'].each do |_k, a|
     users.push a['user']
-  end
+  end  
   node['rails']['sites'].each do |_k, a|
     users.push a['user']
   end
-  users = users.unshift(node['rails']['user']['deploy']).uniq.compact
+end
 
-  # Reload OHAI 7
-  ohai 'reload_passwd' do
-    action :nothing
-    plugin 'etc'
-  end
+node['rails']['users'].each do |u|
+  users.push u
+end
 
-  rails_users 'references_for_users' do
-    users  users
-    notifies :reload, 'ohai[reload_passwd]', :immediately
-  end
+users = users.unshift(node['rails']['user']['deploy']).uniq.compact
+
+# Reload OHAI 7
+ohai 'reload_passwd' do
+  action :nothing
+  plugin 'etc'
+end
+
+rails_users 'references_for_users' do
+  users  users
+  notifies :reload, 'ohai[reload_passwd]', :immediately
 end
