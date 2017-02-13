@@ -32,6 +32,10 @@ node['rails']['users'].each do |u|
   users.push u
 end
 
+node['rails']['git']['users'].each do |u|
+  users.push u
+end
+
 users = users.unshift(node['rails']['user']['deploy']).uniq.compact
 
 # Reload OHAI 7

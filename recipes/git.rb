@@ -17,15 +17,25 @@
 # limitations under the License.
 #
 
-# Add git user to node['rails']['users']
+# Add git user to node['rails']['git']['users']
 # shell "/usr/bin/git-shell"
 
+# Add git repos to node['rails']['git']['repositories']
+
 # Setup repositories defined as node attributes
-node['rails']['git'].each do |name|
+node['rails']['git']['repositories'].each do |name|  
   execute "git init --bare #{name}.git" do
     user "git"
     group "git"
     cwd "/home/git"
     creates "/home/git/#{name}.git"
+  end
+end
+
+node['rails']['git']['users'].each do |user|
+  directory "/home/git/#{user}" do
+    user "git"
+    group "git"
+    mode "700"
   end
 end
