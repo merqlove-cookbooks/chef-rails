@@ -71,6 +71,7 @@ default['rails']['cron'] = {
   home: nil,
   shell: nil
 }
+default['rails']['git'] = {} # Git repos
 default['rails']['users'] = [] # Additional users
 default['rails']['apps'] = {
   # 'default2': {
