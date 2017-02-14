@@ -48,9 +48,9 @@ action :create do # rubocop:disable Metrics/BlockLength
       name
     end # rubocop:disable Lint/EndAlignment
 
-    ca = new_resource.ssl['certificate']
+    ca = new_resource.ssl['ca']
     privateKey = new_resource.ssl['key']
-    publicKey = new_resource.ssl['ca']
+    publicKey = new_resource.ssl['certificate']
 
     directory "#{node['nginx']['dir']}/ssl/#{ssl_name}" do
       owner node['nginx']['user']
