@@ -112,7 +112,9 @@
       include fastcgi_params;
       fastcgi_pass  php_<%= @user %>_<%= @name %>;
       fastcgi_index index.php;
-      fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+      fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+      fastcgi_param DOCUMENT_ROOT $realpath_root;
+      client_max_body_size 0;
     }
 
     # location @admin_website {
