@@ -1,3 +1,5 @@
+index index.php;
+
 <%= render 'nginx/w3tc.erb' %>
 
 location ~ ^/assets/(img|js|css|fonts)/(.*)$ {
@@ -15,11 +17,37 @@ location @engine_file_rewrite {
 }
 
 location / {
-  try_files $uri $uri/ @engine_file_rewrite /index.php?$args;
+  try_files $uri $uri/ /index.php?$args;
 }
 
 location @website {
   include fastcgi_params;
   fastcgi_pass  php_<%= @user %>_<%= @name %>;
   fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;
+}
+
+location ~* ^/wp-includes/.*(?<!(js/tinymce/wp-tinymce))\.php$ {
+  internal;
+}
+
+location = /favicon.ico {
+  log_not_found off;
+  access_log off;
+}
+
+location = /robots.txt {
+  access_log off;
+  log_not_found off;
+}
+
+location = /wp-config.php {
+  deny all;
+}
+
+location ~* /(?:uploads|files)/.*\.php$ {
+  deny all;
+}
+
+location ~* ^/wp-content/.*\.(txt|md|exe|sh|bak|inc|php|pot|po|mo|log|sql)$ {
+  deny all;
 }

@@ -69,7 +69,7 @@ depends 'duplicity_ng', '~> 1.2.2'
 depends 'ssh_known_hosts'
 depends 'nginx-wrapper'
 depends 'postgresql-wrapper'
-depends 'php-fpm'
+depends 'php-fpm-wrapper'
 depends 'msmtp'
 depends 'vagrant-ohai'
 

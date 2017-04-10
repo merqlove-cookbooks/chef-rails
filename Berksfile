@@ -13,7 +13,7 @@ group :java do
 end
 
 group :php do
-  company_cookbook 'php-fpm'
+  company_cookbook 'php-fpm-wrapper'
 end
 
 group :nginx do
