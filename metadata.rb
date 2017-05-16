@@ -63,6 +63,7 @@ depends 'apt'
 
 depends 'openssl-fips'
 depends 'vsftpd'
+depends 'docker', '~> 2.0'
 depends 'stunnel-wrapper'
 depends 'iptables-wrapper'
 depends 'duplicity_ng', '~> 1.2.2'
