@@ -1,0 +1,7 @@
+{
+        "storage-driver": "<%= @driver %>",
+        "storage-opts": [
+                "dm.thinpooldev=<%= @driver_path %>",
+                "dm.use_deferred_removal=<%= @driver_removel ? 'true' : 'false' %>"
+        ]
+}

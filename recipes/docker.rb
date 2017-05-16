@@ -17,5 +17,75 @@
 # limitations under the License.
 
 docker_service 'default' do
+  action [:create, :stop]
+end
+
+include_recipe "lvm::default"
+
+
+template '/etc/lvm/profile/docker-thinpool.profile' do
+  owner    'root'
+  group    'root'
+  mode     0o0600
+  source   'docker/docker-thinpool.profile.erb'
+  variables(
+    treshold: 80,
+    percent: 20,
+  )
+  action :create
+end
+
+lvm_volume_group '/dev/xvdf' do
+  physical_volumes ['/dev/xvdf']
+  wipe_signatures true
+
+  logical_volume 'thinpool' do
+    wipe_signatures true
+    size        '95%VG'
+  end
+
+  logical_volume 'thinpoolmeta' do
+    wipe_signatures true
+    size        '1%VG'
+  end
+
+  # thin_pool "lv-thin-pool" do
+  #   thin_volume "thinpool" do
+  #     size '95%VG'
+  #     filesystem  'ext4'
+  #     mount_point location: '/var/thin01', options: 'noatime,nodiratime'
+  #   end
+  #   thin_volume "thin01" do
+  #     size '1%VG'
+  #     filesystem  'ext4'
+  #     mount_point location: '/var/thin01', options: 'noatime,nodiratime'
+  #   end
+  # end
+end
+
+command 'lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta'
+
+command  'lvchange --metadataprofile docker-thinpool docker/thinpool'
+
+# verified the lv is monitored
+command 'lvs -o+seg_monitor'
+
+template '/etc/docker/daemon.json' do
+  owner    'root'
+  group    'root'
+  mode     0o0600
+  source   'docker/daemon.json.erb'
+  variables(
+    driver: "devicemapper",
+    driver_path: '/dev/mapper/docker-thinpool',
+    driver_removal: true,
+  )
+  action :create
+end
+
+# if docker was previously started, clear your graph driver directory
+command 'rm -rf /var/lib/docker/*'
+
+docker_service 'default' do
   action [:create, :start]
 end
