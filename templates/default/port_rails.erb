@@ -3,3 +3,7 @@
 <% node['rails']['ports'].uniq.select{|p| p.is_a?(String) }.each do |port| -%>
 -A FWR -p tcp -m tcp --dport <%= port %> -j ACCEPT
 <% end %>
+
+<% node['rails']['udp_ports'].uniq.select{|p| p.is_a?(String) }.each do |port| -%>
+-A FWR -p udp -m udp --dport <%= port %> -j ACCEPT
+<% end %>
