@@ -34,18 +34,20 @@ template '/etc/lvm/profile/docker-thinpool.profile' do
   action :create
 end
 
+lvm_physical_volume '/dev/xvdf'
+
 lvm_volume_group 'docker' do
   physical_volumes ['/dev/xvdf']
-  wipe_signatures true
+  # wipe_signatures true
 
   logical_volume 'thinpool' do
     wipe_signatures true
-    size        '95%VG'
+    size            '95%VG'
   end
 
   logical_volume 'thinpoolmeta' do
     wipe_signatures true
-    size        '1%VG'
+    size            '1%VG'
   end
 
   # thin_pool "lv-thin-pool" do
