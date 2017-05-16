@@ -94,5 +94,6 @@ if node['rails']['lvm_docker']
 else
   docker_service 'default' do
     action [:create, :start]
+    storage_driver node['rails']['docker_driver'] if node['rails']['docker_driver']
   end
 end
