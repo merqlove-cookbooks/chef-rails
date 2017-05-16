@@ -86,5 +86,5 @@ end
 execute 'rm -rf /var/lib/docker/*'
 
 docker_service 'default' do
-  action [:create, :start]
+  action [:start]
 end
