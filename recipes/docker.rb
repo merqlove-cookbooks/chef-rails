@@ -22,7 +22,6 @@ end
 
 include_recipe "lvm::default"
 
-
 template '/etc/lvm/profile/docker-thinpool.profile' do
   owner    'root'
   group    'root'
@@ -35,7 +34,7 @@ template '/etc/lvm/profile/docker-thinpool.profile' do
   action :create
 end
 
-lvm_volume_group '/dev/xvdf' do
+lvm_volume_group 'docker' do
   physical_volumes ['/dev/xvdf']
   wipe_signatures true
 
@@ -63,12 +62,12 @@ lvm_volume_group '/dev/xvdf' do
   # end
 end
 
-command 'lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta'
+execute 'lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta'
 
-command  'lvchange --metadataprofile docker-thinpool docker/thinpool'
+execute  'lvchange --metadataprofile docker-thinpool docker/thinpool'
 
 # verified the lv is monitored
-command 'lvs -o+seg_monitor'
+execute 'lvs -o+seg_monitor'
 
 template '/etc/docker/daemon.json' do
   owner    'root'
@@ -84,7 +83,7 @@ template '/etc/docker/daemon.json' do
 end
 
 # if docker was previously started, clear your graph driver directory
-command 'rm -rf /var/lib/docker/*'
+execute 'rm -rf /var/lib/docker/*'
 
 docker_service 'default' do
   action [:create, :start]
