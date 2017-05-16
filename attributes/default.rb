@@ -25,6 +25,7 @@ default['rails']['sites_base_path'] = '/srv/sites'
 default['rails']['ports']           = %w(22)
 default['rails']['ruby']            = false
 default['rails']['vsftpd']          = false
+default['rails']['lvm_docker']      = false
 
 default['rails']['openssl']['dhparam_dir'] = '/etc/ssl/certs'
 default['rails']['openssl']['dhparam_file'] = 'dhparam.pem'
