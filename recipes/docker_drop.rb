@@ -17,5 +17,5 @@
 # limitations under the License.
 
 docker_service 'default' do
-  action [:create, :stop, :remove]
+  action [:create, :stop, :delete]
 end
