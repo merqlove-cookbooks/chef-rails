@@ -24,15 +24,17 @@ if rhel7x? || ubuntu16x?
 
   firewall 'default'
 
-  (node['rails']['ports'] || []).each_with_index do |port|
-    port_bind = port_cast(port)
-    firewall_rule "#{port_name(port)}" do
-      port     port_bind
-      protocol :tcp
-      command  :allow
+  [{ports: (node['rails']['ports'] || []), type: :tcp}, 
+   {ports: (node['rails']['udp_ports'] || []), type: :udp}].each_with_index do |list|
+    list[:ports].each do |port| 
+      port_bind = port_cast(port)
+      firewall_rule "#{port_name(port)}" do
+        port     port_bind
+        protocol list[:type]
+        command  :allow
+      end
     end
   end
 else
   iptables_rule 'port_rails'
 end
-
