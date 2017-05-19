@@ -20,6 +20,11 @@ directory node['rails']['rancher']['server']['db_dir'] do
   mode '0755'
 end
 
+docker_image node['rails']['rancher']['server']['image'] do
+  tag node['rails']['rancher']['server']['version']
+  action :pull
+end
+
 docker_container 'rancher' do
   repo node['rails']['rancher']['server']['image']
   tag node['rails']['rancher']['server']['version']
