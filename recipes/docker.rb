@@ -27,8 +27,8 @@ if node['rails']['lvm_docker']
         opts[:no_lvm] = false
       end
     end
-    action :nothing
-  end.run_action(:create)
+    action :run
+  end
 
   if opts[:no_lvm] && node['rails']['docker_volume']
     docker_service 'default' do
