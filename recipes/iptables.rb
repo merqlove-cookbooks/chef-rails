@@ -24,9 +24,9 @@ if rhel7x? || ubuntu16x?
 
   firewall 'default'
   
-  execute 'firewall-cmd --zone=public --permanent --add-masquerade' do
-    ignore_failure true
-  end
+  # execute 'firewall-cmd --zone=public --permanent --add-masquerade' do
+  #   ignore_failure true
+  # end
 
   [{ports: (node['rails']['ports'] || []), type: :tcp}, 
    {ports: (node['rails']['udp_ports'] || []), type: :udp}].each_with_index do |list|
