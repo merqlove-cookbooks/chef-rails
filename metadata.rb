@@ -15,7 +15,7 @@ supports 'ubuntu'
 
 depends 'chef-client', '~> 4.6.0'
 
-depends 'build-essential', '~> 2.2.0'
+depends 'build-essential', '~> 8.0.1'
 depends 'yum-epel', '~> 0.7.0'
 depends 'yum', '~> 3.11.0'
 depends 'git', '~> 5.0.0'
