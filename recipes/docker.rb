@@ -39,17 +39,17 @@ if node['rails']['lvm_docker']
 
   lvm_volume_group 'docker' do
     physical_volumes ['/dev/xvdf']
-    # wipe_signatures true
+    wipe_signatures true
 
-    logical_volume 'thinpool' do
-      wipe_signatures true
-      size            '95%VG'
-    end
-
-    logical_volume 'thinpoolmeta' do
-      wipe_signatures true
-      size            '1%VG'
-    end
+    # logical_volume 'thinpool' do
+    #   wipe_signatures true
+    #   size            '95%VG'
+    # end
+    # 
+    # logical_volume 'thinpoolmeta' do
+    #   wipe_signatures true
+    #   size            '1%VG'
+    # end
 
     thin_pool "thinpool" do            
       size '1%VG'    
