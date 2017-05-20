@@ -1,6 +1,6 @@
-#
+
 # Cookbook Name:: rails
-# Recipe:: docker
+# Resource:: docker
 #
 # Copyright (C) 2017 Alexander Merkulov
 #
@@ -15,7 +15,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-rails_docker 'default' do
-  action :create
-end
+actions :create
+
+default_action :create
+
+attribute :name, name_attribute: true, kind_of: String
+attribute :cookbook, kind_of: String, default: 'rails'
