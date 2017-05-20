@@ -26,9 +26,9 @@ if node['rails']['lvm_docker']
       unless `lvs -o+seg_monitor | grep 'thinpool.*monitored'`.strip.empty?
         opts[:no_lvm] = false
       end
-    end
-    action :run
-  end
+    end    
+    action :nothing
+  end.run_action(:create)
 
   if opts[:no_lvm] && node['rails']['docker_volume']
     docker_service 'default' do
@@ -97,7 +97,7 @@ if node['rails']['lvm_docker']
   end
 
   docker_service 'default' do
-    action [:enable, :start]
+    action [:create, :start]
   end
 else
   docker_service 'default' do
