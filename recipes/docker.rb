@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if node['rails']['lvm_docker'] 
+if node['rails']['lvm_docker'] && node['rails']['docker_volume']
   docker_service 'default' do
     action [:create, :stop]
   end
@@ -35,10 +35,10 @@ if node['rails']['lvm_docker']
     action :create
   end
 
-  lvm_physical_volume '/dev/xvdf'
+  lvm_physical_volume node['rails']['docker_volume']
 
   lvm_volume_group 'docker' do
-    physical_volumes ['/dev/xvdf']
+    physical_volumes [node['rails']['docker_volume']]
     # wipe_signatures true
 
     logical_volume 'thinpool' do
