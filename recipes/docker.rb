@@ -39,32 +39,30 @@ if node['rails']['lvm_docker']
 
   lvm_volume_group 'docker' do
     physical_volumes ['/dev/xvdf']
-    wipe_signatures true
+    # wipe_signatures true
 
-    # logical_volume 'thinpool' do
-    #   wipe_signatures true
-    #   size            '95%VG'
-    # end
-    # 
-    # logical_volume 'thinpoolmeta' do
-    #   wipe_signatures true
-    #   size            '1%VG'
-    # end
-
-    thin_pool "thinpool" do            
-      size '1%VG'    
-      filesystem 'xfs'
-      thin_volume "thinpool" do
-        filesystem 'xfs'
-        filesystem_params '--zero n -c 512K --poolmetadatasize 1%VG --metadataprofile docker-thinpool'
-        size '95%VG'    
-      end
+    logical_volume 'thinpool' do
+      wipe_signatures true
+      size            '95%VG'
     end
+    
+    logical_volume 'thinpoolmeta' do
+      wipe_signatures true
+      size            '1%VG'
+    end
+
+    # thin_pool "thinpool" do
+    #   size '95%VG'
+    #   thin_volume "thinpool" do
+    #     filesystem 'xfs'
+    #     filesystem_params '--zero n -c 512K --poolmetadatasize 1%VG --metadataprofile docker-thinpool'       
+    #   end
+    # end
   end
 
-  # execute 'lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta'
+  execute 'lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta'
 
-  # execute  'lvchange --metadataprofile docker-thinpool docker/thinpool'
+  execute  'lvchange --metadataprofile docker-thinpool docker/thinpool'
 
   # verified the lv is monitored
   execute 'lvs -o+seg_monitor'
