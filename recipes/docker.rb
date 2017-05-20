@@ -51,23 +51,19 @@ if node['rails']['lvm_docker']
       size            '1%VG'
     end
 
-    # thin_pool "lv-thin-pool" do
-    #   thin_volume "thinpool" do
-    #     size '95%VG'
-    #     filesystem  'ext4'
-    #     mount_point location: '/var/thin01', options: 'noatime,nodiratime'
-    #   end
-    #   thin_volume "thin01" do
-    #     size '1%VG'
-    #     filesystem  'ext4'
-    #     mount_point location: '/var/thin01', options: 'noatime,nodiratime'
-    #   end
-    # end
+    thin_pool "thinpool" do            
+      size '1%VG'    
+      thin_volume "thinpool" do
+        filesystem 'xfs'
+        filesystem_params '--zero n -c 512K --poolmetadatasize 1%VG --metadataprofile docker/thinpool'
+        size '95%VG'    
+      end
+    end
   end
 
-  execute 'lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta'
+  # execute 'lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta'
 
-  execute  'lvchange --metadataprofile docker-thinpool docker/thinpool'
+  # execute  'lvchange --metadataprofile docker-thinpool docker/thinpool'
 
   # verified the lv is monitored
   execute 'lvs -o+seg_monitor'

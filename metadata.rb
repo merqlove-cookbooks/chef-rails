@@ -63,6 +63,7 @@ depends 'apt'
 
 depends 'openssl-fips'
 depends 'vsftpd'
+depends 'rancher-x'
 depends 'docker', '~> 2.0'
 depends 'lvm', '~> 4.1.0'
 depends 'stunnel-wrapper'
