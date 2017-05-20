@@ -53,6 +53,7 @@ if node['rails']['lvm_docker']
 
     thin_pool "thinpool" do            
       size '1%VG'    
+      filesystem 'xfs'
       thin_volume "thinpool" do
         filesystem 'xfs'
         filesystem_params '--zero n -c 512K --poolmetadatasize 1%VG --metadataprofile docker/thinpool'
