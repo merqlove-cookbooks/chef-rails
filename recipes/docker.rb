@@ -19,4 +19,5 @@
 rails_docker 'default' do
   action :create
   version node['rails']['docker_version']
+  checksum node['rails']['docker_checksum']
 end

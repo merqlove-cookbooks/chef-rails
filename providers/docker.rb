@@ -123,7 +123,8 @@ def docker_create(new_resource)
   docker_service new_resource.name do
     action [:create, :start]
     install_method 'tarball'
-    version new_resource.version
+    version new_resource.version if new_resource.version
+    checksum new_resource.checksum if checksum new_resource.checksum
     storage_driver node['rails']['docker_driver'] if node['rails']['docker_driver']
   end
 end
