@@ -2,6 +2,7 @@ module DockerCookbook
   module DockerHelpers
     module Service
       def installed_docker_version
+        return nil unless ::File.exist?(docker_bin)
         o = shell_out("#{docker_bin} --version")
         s = o.stdout.split[2]
         s.chomp(',') if s
