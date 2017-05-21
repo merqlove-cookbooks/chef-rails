@@ -20,6 +20,8 @@
 use_inline_resources
 
 action :create do
+  run_context.include_recipe('chef-yum-docker::default')
+
   if thin_enabled?
     lvm(new_resource)
   else
