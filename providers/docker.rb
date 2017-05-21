@@ -122,7 +122,8 @@ end
 def docker_create(new_resource)
   docker_service new_resource.name do
     action [:create, :start]
-    version new_resource.docker_version
+    install_method :package
+    version new_resource.version
     storage_driver node['rails']['docker_driver'] if node['rails']['docker_driver']
   end
 end
