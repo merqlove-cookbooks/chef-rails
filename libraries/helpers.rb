@@ -1,3 +1,15 @@
+module DockerCookbook
+  module DockerHelpers
+    module Service
+      def installed_docker_version
+        o = shell_out("#{docker_bin} --version")
+        s = o.stdout.split[2]
+        s.chomp(',') if s
+      end
+    end
+  end
+end
+
 module Rails
   # include Chef::
   # Helpers for cookbook
