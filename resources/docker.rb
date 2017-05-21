@@ -24,4 +24,4 @@ default_action :create
 attribute :name, name_attribute: true, kind_of: String
 attribute :cookbook, kind_of: String, default: 'rails'
 
-attribute :version, kind_of: String, default: '17.03.0-ce'
+attribute :version, kind_of: String, default: '17.03.1-ce'
