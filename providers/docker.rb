@@ -47,7 +47,7 @@ def lvm(new_resource)
   template '/etc/lvm/profile/docker-thinpool.profile' do
     owner    'root'
     group    'root'
-    mode     0o0600
+    mode     0o0644
     source   'docker/docker-thinpool.profile.erb'
     variables(
       treshold: 80,
@@ -122,6 +122,7 @@ end
 def docker_create(new_resource)
   docker_service new_resource.name do
     action [:create, :start]
+    version new_resource.version
     storage_driver node['rails']['docker_driver'] if node['rails']['docker_driver']
   end
 end

@@ -18,4 +18,5 @@
 
 rails_docker 'default' do
   action :create
+  version node['rails']['docker_version']
 end

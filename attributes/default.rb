@@ -27,6 +27,7 @@ default['rails']['ruby']            = false
 default['rails']['vsftpd']          = false
 default['rails']['lvm_docker']      = false
 default['rails']['docker_volume']   = nil
+default['rails']['docker_version']  = '17.03.x-ce'
 
 default['rails']['openssl']['dhparam_dir'] = '/etc/ssl/certs'
 default['rails']['openssl']['dhparam_file'] = 'dhparam.pem'
