@@ -7,6 +7,14 @@ module DockerCookbook
         s = o.stdout.split[2]
         s.chomp(',') if s
       end
+
+      def docker_major_version
+        ray = installed_docker_version
+        return if ray.nil?
+        ray = ray.split('.')
+        ray.pop
+        ray.push.join('.')
+      end
     end
   end
 end
