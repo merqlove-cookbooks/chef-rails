@@ -35,13 +35,23 @@ node['rails']['le'].each do |site, le|
   node.default['rails']['le'][site]['certificate'] = "#{node['rails']['nginx']['ssl_root']}/#{site}.pem"
   node.default['rails']['le'][site]['ca'] = "#{node['rails']['nginx']['ssl_root']}/#{site}-chain.pem"
 
+  acme_selfsigned le['cn'] do
+    crt node['rails']['le'][site]['certificate']
+    key node['rails']['le'][site]['key']
+    chain node['rails']['le'][site]['ca']
+    notifies :restart, "service[nginx]", :immediate
+  end
+
   acme_certificate le['cn'] do
     alt_names le['alt_names']
-    method    'http'
+    output :fullchain
+
     key       node['rails']['le'][site]['key']
     fullchain node['rails']['le'][site]['certificate']
     chain     node['rails']['le'][site]['ca']
+
     wwwroot   le['wwwroot']
+    
     notifies :restart, "service[nginx]", :immediate
   end
 end
