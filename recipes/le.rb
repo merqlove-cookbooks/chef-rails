@@ -44,7 +44,6 @@ node['rails']['le'].each do |site, le|
 
   acme_certificate le['cn'] do
     alt_names le['alt_names']
-    output :fullchain
 
     key       node['rails']['le'][site]['key']
     fullchain node['rails']['le'][site]['certificate']
