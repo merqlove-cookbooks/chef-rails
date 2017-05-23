@@ -288,12 +288,15 @@ def setup_ruby_servers(a, app_path)
     else
       a['ruby_server']['server_name'].each do |name|
         if ssl = node['rails']['le'][name]
+          server_names = (ssl['alt_names'] || []).to_a 
+          server_names << ssl['cn']
+          server_names.delete("www.#{ssl['cn']}") if a['ruby_server']['www']
           rails_nginx_vhost "#{a['name']}_ssl" do
             template 'nginx_ruby_crap.erb'
 
             user        a['user']
             type        a['ruby_server']['type']
-            server_name ((ssl['alt_names'] || []).to_a << ssl['cn'])
+            server_name server_names
             listen      '443'
             path        app_path
             ssl         ssl
