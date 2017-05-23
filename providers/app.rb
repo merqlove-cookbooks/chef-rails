@@ -277,20 +277,22 @@ def setup_ruby_servers(a, app_path)
     tunes['private_socket'] = true if rhel7x?
     tunes['exclude'] ||= %w(jpg jpeg gif png ico svg css txt mp3 ogg mpe?g avi pdf doc docx xls xlsx ppt pptx)
 
-    a['ruby_server']['server_name'].each do |name|
-      if ssl = node['rails']['le'][name]
-        rails_nginx_vhost "#{a['name']}_ssl" do
-          template 'nginx_ruby_crap.erb'
+    unless a['ruby_server']['no_ssl']
+      a['ruby_server']['server_name'].each do |name|
+        if ssl = node['rails']['le'][name]
+          rails_nginx_vhost "#{a['name']}_ssl" do
+            template 'nginx_ruby_crap.erb'
 
-          user        a['user']
-          type        a['ruby_server']['type']
-          server_name ((ssl['alt_names'] || []).to_a << ssl['cn'])
-          listen      '443'
-          path        app_path
-          ssl         ssl
-          default_server (ssl||{})['default_server']
-          disable_www a['ruby_server']['www']
-          tunes       tunes
+            user        a['user']
+            type        a['ruby_server']['type']
+            server_name ((ssl['alt_names'] || []).to_a << ssl['cn'])
+            listen      '443'
+            path        app_path
+            ssl         ssl
+            default_server (ssl||{})['default_server']
+            disable_www a['ruby_server']['www']
+            tunes       tunes
+          end
         end
       end
 
