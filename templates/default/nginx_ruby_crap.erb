@@ -24,7 +24,7 @@ server {
   server_name <%= Array(@server_name).join(' ') %>;
   root   <%= @path %>/current/public;
 
-  <%= render 'ssl.erb' %>
+  <%= render 'ssl.erb', with_default: true %>
 
   autoindex off;
   charset utf-8;

@@ -1,7 +1,10 @@
+<% with_defaults ||= false %>
 <% if @ssl %>
+    <% if with_defaults %>
     if ($http_host !~ ^<%= Array(@server_name).join('|') %>){
       rewrite ^ http://$http_host$request_uri permanent;
     }
+    <% end -%>
 
     ssl on;
     ssl_certificate <%= @ssl['certificate'] %>;
