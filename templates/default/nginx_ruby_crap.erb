@@ -12,6 +12,9 @@ upstream <%= @type %>_<%= @name %> {
 server {
   listen <%= @listen || 80 %>;
   server_name  www.<%= Array(@server_name)[0] %>;
+
+  <%= render 'ssl.erb' %>
+
   return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
 }
 <% end %>
@@ -21,32 +24,7 @@ server {
   server_name <%= Array(@server_name).join(' ') %>;
   root   <%= @path %>/current/public;
 
-<% if @ssl %>
-  if ($http_host !~ ^<%= Array(@server_name).join('|') %>){
-    rewrite ^ http://$http_host$request_uri permanent;
-  }
-
-  ssl on;
-  ssl_certificate <%= @ssl['certificate'] %>;
-  ssl_certificate_key <%= @ssl['certificate_key'] %>;
-  <% if @ssl['ca'] %>ssl_trusted_certificate <%= @ssl['ca'] %>;<% end %>
-
-  <% if node['rails']['nginx']['hsts'] %>
-    <% node['rails']['nginx']['hsts_configs'].each do |k, v| %>
-      <%= k %> <%= v %>;
-    <% end %>
-  <% end %>
-
-  <% node['rails']['nginx']['ssl_extra_configs'].each do |k, v| %>
-    <%= k %> <%= v %>;
-  <% end %>
-
-  <% if node['rails']['nginx']['stapling'] %>
-    <% node['rails']['nginx']['stapling_configs'].each do |k, v| %>
-      <%= k %> <%= v %>;
-    <% end %>
-  <% end %>
-<% end -%>
+  <%= render 'ssl.erb' %>
 
   autoindex off;
   charset utf-8;
