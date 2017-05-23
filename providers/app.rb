@@ -290,7 +290,7 @@ def setup_ruby_servers(a, app_path)
         if ssl = node['rails']['le'][name]
           server_names = (ssl['alt_names'] || []).to_a 
           server_names << ssl['cn']
-          server_names.delete("www.#{ssl['cn']}") if a['ruby_server']['www']
+          server_names.delete("www.#{ssl['cn']}") unless a['ruby_server']['www']
           rails_nginx_vhost "#{a['name']}_ssl" do
             template 'nginx_ruby_crap.erb'
 
