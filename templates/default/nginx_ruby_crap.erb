@@ -10,7 +10,7 @@ upstream <%= @type %>_<%= @name %> {
 
 <% unless @disable_www %>
 server {
-  listen 80;
+  listen <%= @listen || 80 %>;
   server_name  www.<%= Array(@server_name)[0] %>;
   return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
 }
