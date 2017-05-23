@@ -4,7 +4,7 @@ upstream <%= @type %>_<%= @name %> {
   <% if @tunes['private_socket'] %>
   server unix://<%= @path %>/shared/tmp/sockets/<%= @type %>.sock fail_timeout=0;
   <% else %>
-  server unix:///tmp/<%= @type %>.<%= @name.sub(/\A_ssl\z/, '') %>.sock fail_timeout=0;
+  server unix:///tmp/<%= @type %>.<%= @name.sub(/_ssl\z/, '') %>.sock fail_timeout=0;
   <% end %>
 }
 
