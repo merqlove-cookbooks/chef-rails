@@ -303,7 +303,7 @@ def setup_ruby_servers(a, app_path)
         type        a['ruby_server']['type']
         server_name a['ruby_server']['server_name']
         listen      a['ruby_server']['listen']
-        default_server a['ruby_server']['default_server']
+        default_server a['ruby_server']['default_server'] || false
         path        app_path
         ssl         nil
         disable_www a['ruby_server']['www']
