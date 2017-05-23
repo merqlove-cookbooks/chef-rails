@@ -277,7 +277,15 @@ def setup_ruby_servers(a, app_path)
     tunes['private_socket'] = true if rhel7x?
     tunes['exclude'] ||= %w(jpg jpeg gif png ico svg css txt mp3 ogg mpe?g avi pdf doc docx xls xlsx ppt pptx)
 
-    unless a['ruby_server']['no_ssl']
+    if a['ruby_server']['no_ssl']
+      a['ruby_server']['server_name'].each do |name|
+        if node['rails']['le'][name]
+          rails_nginx_vhost "#{a['name']}_ssl" do
+            action :delete
+          end
+        end
+      end
+    else
       a['ruby_server']['server_name'].each do |name|
         if ssl = node['rails']['le'][name]
           rails_nginx_vhost "#{a['name']}_ssl" do
