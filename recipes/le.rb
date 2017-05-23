@@ -31,9 +31,15 @@ end
 node['rails']['le'].each do |site, le|
   next unless le['cn']
 
-  node.default['rails']['le'][site]['key'] = "#{node['rails']['nginx']['ssl_root']}/#{site}.key"
-  node.default['rails']['le'][site]['certificate'] = "#{node['rails']['nginx']['ssl_root']}/#{site}.pem"
-  node.default['rails']['le'][site]['ca'] = "#{node['rails']['nginx']['ssl_root']}/#{site}-chain.pem"
+  directory "#{node['rails']['nginx']['ssl_root']}/#{site}" do
+    owner 'root'
+    group 'root'
+    mode  0o0644
+  end
+
+  node.default['rails']['le'][site]['key'] = "#{node['rails']['nginx']['ssl_root']}/#{site}/#{site}.key"
+  node.default['rails']['le'][site]['certificate'] = "#{node['rails']['nginx']['ssl_root']}/#{site}/#{site}.pem"
+  node.default['rails']['le'][site]['ca'] = "#{node['rails']['nginx']['ssl_root']}/#{site}/#{site}-chain.pem"
 
   acme_selfsigned le['cn'] do
     crt node['rails']['le'][site]['certificate']
