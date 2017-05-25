@@ -363,7 +363,9 @@ def nginx_template(a, template=nil)
   end
 end
 
-def setup_nginx(a, app_path, template=nil, ssl=nil, server_name=nil, suffix='') # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+def setup_nginx(a, app_path, template=nil, ssl=nil, server_name=nil, suffix='', listen=nil) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  listen ||= a['nginx']['listen']
+
   directory "#{app_path}/docs" do
     mode      0o0750
     owner     a['user']
@@ -409,7 +411,7 @@ def setup_nginx(a, app_path, template=nil, ssl=nil, server_name=nil, suffix='') 
     php              a.include?('php')
     seo_url          a['nginx']['seo_url']
     block            a['nginx']['block']
-    listen           a['nginx']['listen']
+    listen           listen
     ssl              ssl
     engine           a['nginx']['engine']
     server_name      server_names
@@ -433,7 +435,7 @@ def setup_rancher(a, app_path)
   ssl, server_names = gen_ssl(a, server_name.first, a['nginx']['disable_www'])
 
   setup_nginx(a, app_path, 'rancher')  
-  setup_nginx(a, app_path, 'rancher', ssl, server_names, '_ssl') if ssl
+  setup_nginx(a, app_path, 'rancher', ssl, server_names, '_ssl', '443') if ssl
 end
 
 def setup_php(a, app_path)
