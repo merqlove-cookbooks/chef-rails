@@ -1,6 +1,6 @@
 <% with_defaults ||= false %>
 <% if @tunes['force_ssl'] && !@ssl %>
-rewrite ^ http://$server_name$request_uri permanent;    
+return 301 http://$server_name$request_uri;    
 <% end -%>
 <% if @ssl %>
     <% if with_defaults %>
