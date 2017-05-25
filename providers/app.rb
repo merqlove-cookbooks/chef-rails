@@ -286,7 +286,7 @@ end
 
 def gen_ssl(a, name, www=false)
   ssl = node['rails']['le'][name]
-  return [nil, name] unless ssl
+  return [nil, [name]] unless ssl
   server_names = (ssl['alt_names'] || []).to_a 
   server_names << ssl['cn']
   server_names.delete("www.#{ssl['cn']}") unless www
@@ -399,9 +399,8 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
   end # rubocop:disable Lint/EndAlignment
 
   server_names = server_name
-  ssl, server_names = gen_ssl(a, a['name'], a['nginx']['disable_www']) if ssl.nil? || ssl.empty?
-  log "#{ssl}"
-  log "#{server_names}"
+  ssl, server_names = gen_ssl(a, server_name.first, a['nginx']['disable_www']) if ssl.nil? || ssl.empty?
+
   rails_nginx_vhost a['name'] do
     user             a['user']
     access_log       a['nginx']['access_log']
