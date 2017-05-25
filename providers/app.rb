@@ -337,8 +337,8 @@ def setup_ruby_servers(a, app_path)
   setup_ruby_server_init(a, app_path)
 end
 
-def nginx_template(a)
-  case a['nginx']['template']
+def nginx_template(a, template=nil)
+  case (template || a['nginx']['template'])
   when 'rancher'
     'rancher.erb'
   else
@@ -367,7 +367,7 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
   end
 
   template_path = if template
-    nginx_template(template)
+    nginx_template(a, template)
   else 
     nginx_template(a)
   end
