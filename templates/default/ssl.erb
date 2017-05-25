@@ -1,4 +1,7 @@
 <% with_defaults ||= false %>
+<% if @tunes['force_ssl'] && !@ssl %>
+rewrite ^ http://$server_name$request_uri permanent;    
+<% end -%>
 <% if @ssl %>
     <% if with_defaults %>
     if ($http_host !~ ^<%= Array(@server_name).join('|') %>){
