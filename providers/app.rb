@@ -430,7 +430,7 @@ def setup_nginx(a, app_path, template=nil, ssl=nil, server_name=nil, suffix='', 
 end
 
 def setup_rancher(a, app_path)
-  server_name ||= a['nginx']['server_name'].dup
+  server_name = a['nginx']['server_name'].dup
 
   ssl, server_names = gen_ssl(a, server_name.first, a['nginx']['disable_www'])
 
