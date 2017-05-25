@@ -401,7 +401,7 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
   server_names = server_name
   ssl, server_names = gen_ssl(a, a['name'], a['nginx']['disable_www']) if ssl.nil? || ssl.empty?
   log "#{ssl}"
-  log "#{ssl_names}"
+  log "#{server_names}"
   rails_nginx_vhost a['name'] do
     user             a['user']
     access_log       a['nginx']['access_log']
