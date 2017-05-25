@@ -340,7 +340,7 @@ end
 def nginx_template(a, template=nil)
   case (template || a['nginx']['template'])
   when 'rancher'
-    'rancher.erb'
+    'nginx_rancher.erb'
   else
     if a['locked']
       'nginx_vhost_locked.erb'
