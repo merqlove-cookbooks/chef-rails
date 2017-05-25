@@ -398,10 +398,10 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
     (a['nginx']['ssl']).merge((data_bag['ssl'] || {})[a['name']] || {}) if data_bag
   end # rubocop:disable Lint/EndAlignment
 
-  log "#{ssl}"
   server_names = server_name
-  ssl, server_names = gen_ssl(a, a['name'], a['nginx']['disable_www']) if ssl.nil?
-
+  ssl, server_names = gen_ssl(a, a['name'], a['nginx']['disable_www']) if ssl.nil? || ssl.empty?
+  log "#{ssl}"
+  log "#{ssl_names}"
   rails_nginx_vhost a['name'] do
     user             a['user']
     access_log       a['nginx']['access_log']
@@ -416,7 +416,7 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
     listen           a['nginx']['listen']
     ssl              ssl
     engine           a['nginx']['engine']
-    server_name      server_name
+    server_name      server_names
     path             app_path
     path_suffix      a['nginx']['path_suffix']
     auth_basic       a['nginx']['auth_basic']
