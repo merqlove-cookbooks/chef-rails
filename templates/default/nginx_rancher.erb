@@ -60,11 +60,11 @@ server {
     deny all;
   }
 
-  <% exclude = @tunes['exclude'] + %w(dmg tgz tar.gz zip gz bz2? rar ttf woff syx) %>
-  <% exclude << 'js' unless @tunes['js'] == false %>
-  location ~* ^.+\.(<%= exclude.join('|') %>)$ {
+  <% if @tunes['override'] %>
+  location ^~ <%= @tunes['override'] %> {
     access_log        off;
     log_not_found     off;
     expires           360d;
   }
+  <% end -%>
 }
