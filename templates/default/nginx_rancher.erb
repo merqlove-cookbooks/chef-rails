@@ -53,4 +53,10 @@ server {
     <% hidden_paths = '|' %>
     <% hidden_paths << Array(@hidden).join('|') %>
   <% end %>
+
+  location ~ (^/(uploads/|ini.php)|/\.svn/|/\.git/|/.hta.+<%=hidden_paths%>){
+    access_log off;
+    log_not_found off;
+    deny all;
+  }
 }
