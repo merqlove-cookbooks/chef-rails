@@ -414,7 +414,7 @@ def setup_nginx(a, app_path, template=nil, ssl=nil, server_name=nil, suffix='', 
     listen           listen
     ssl              ssl
     engine           a['nginx']['engine']
-    server_name      server_names
+    server_name      server_name
     path             app_path
     path_suffix      a['nginx']['path_suffix']
     auth_basic       a['nginx']['auth_basic']
