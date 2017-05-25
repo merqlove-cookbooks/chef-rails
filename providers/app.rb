@@ -398,7 +398,7 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
     (a['nginx']['ssl']).merge((data_bag['ssl'] || {})[a['name']] || {}) if data_bag
   end # rubocop:disable Lint/EndAlignment
 
-  log server_name
+  log ssl
   server_names = server_name
   ssl, server_names = gen_ssl(a, a['name'], a['nginx']['disable_www']) if ssl.nil?
 
