@@ -284,6 +284,15 @@ def gen_tunes(a)
   tunes
 end
 
+def gen_ssl(a, name, www=false)
+  ssl = node['rails']['le'][name]
+  return [nil, name] unless ssl
+  server_names = (ssl['alt_names'] || []).to_a 
+  server_names << ssl['cn']
+  server_names.delete("www.#{ssl['cn']}") unless www
+  [ssl, server_names]
+end
+
 def setup_ruby_servers(a, app_path)
   if a['ruby_server']['enable']
     tunes = gen_tunes(a)
@@ -299,10 +308,8 @@ def setup_ruby_servers(a, app_path)
       end
     else
       a['ruby_server']['server_name'].each do |name|
-        if ssl = node['rails']['le'][name]
-          server_names = (ssl['alt_names'] || []).to_a 
-          server_names << ssl['cn']
-          server_names.delete("www.#{ssl['cn']}") unless a['ruby_server']['www']
+        ssl, server_names = gen_ssl(a, name, a['ruby_server']['www'])
+        if ssl
           rails_nginx_vhost "#{a['name']}_ssl" do
             template 'nginx_ruby_crap.erb'
 
@@ -356,7 +363,7 @@ def nginx_template(a, template=nil)
   end
 end
 
-def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+def setup_nginx(a, app_path, template=nil, ssl=nil) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   directory "#{app_path}/docs" do
     mode      0o0750
     owner     a['user']
@@ -390,6 +397,9 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
     data_bag = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['users'], a['user'], load_secret) || {} # rubocop:disable Style/IndentationWidth
     (a['nginx']['ssl']).merge((data_bag['ssl'] || {})[a['name']] || {}) if data_bag
   end # rubocop:disable Lint/EndAlignment
+
+  server_names = server_name
+  ssl, server_names = gen_ssl(a, a['name'], a['nginx']['disable_www']) if ssl.nil?
 
   rails_nginx_vhost a['name'] do
     user             a['user']
