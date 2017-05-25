@@ -277,11 +277,17 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
   end
 end
 
+def gen_tunes(a)
+  tunes = (a['nginx']['tunes'] || { 'js' => false }).to_hash
+  tunes['private_socket'] = true if rhel7x?
+  tunes['exclude'] ||= []
+  tunes
+end
+
 def setup_ruby_servers(a, app_path)
   if a['ruby_server']['enable']
-    tunes = (a['nginx']['tunes'] || { 'js' => false }).to_hash
-    tunes['private_socket'] = true if rhel7x?
-    tunes['exclude'] ||= %w(jpg jpeg gif png ico svg css txt mp3 ogg mpe?g avi pdf doc docx xls xlsx ppt pptx)
+    tunes = gen_tunes(a)
+    tunes['exclude'] = %w(jpg jpeg gif png ico svg css txt mp3 ogg mpe?g avi pdf doc docx xls xlsx ppt pptx) if tunes['exclude'].empty?
 
     if a['ruby_server']['no_ssl']
       a['ruby_server']['server_name'].each do |name|
@@ -366,6 +372,8 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
     recursive true
   end
 
+  tunes = gen_tunes(a)
+
   template_path = if template
     nginx_template(a, template)
   else 
@@ -408,6 +416,7 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
     error_pages      a['nginx']['error_pages']
     template         template_path
     action           :create
+    tunes            tunes
   end
 end
 
