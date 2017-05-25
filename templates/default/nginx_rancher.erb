@@ -1,7 +1,7 @@
 # Maintained by Chef.  Local changes will be overwritten
 
 upstream <%= @user %>_<%= @name %> {
-  server <%= node['rancher_ng']['server']['name'] %>:<%= node['rancher_ng']['server']['port'] %> fail_timeout=0;
+  server localhost:<%= node['rancher_ng']['server']['port'] %> fail_timeout=0;
 }
 
 <% unless @disable_www %>
