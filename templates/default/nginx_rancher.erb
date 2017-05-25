@@ -1,0 +1,56 @@
+# Maintained by Chef.  Local changes will be overwritten
+
+upstream <%= @user %>_<%= @name %> {
+  server <%= node['rancher_ng']['server']['name'] %>:<%= node['rancher_ng']['server']['port'] %> fail_timeout=0;
+}
+
+<% unless @disable_www %>
+server {
+  listen <%= @listen || 80 %>;
+  server_name  www.<%= Array(@server_name)[0] %>;
+
+  <%= render 'ssl.erb' %>
+
+  return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
+}
+<% end %>
+
+server {
+  listen <%= @listen || 80 %> <%= 'default' if @default %> <%= 'deferred' if @deferred %> <%= 'default_server' if @default_server %>;
+  server_name <%= Array(@server_name).join(' ') %>;
+
+  root   <%= @path %>/docs/<%= @path_suffix || '' %>;
+
+  <%= render 'ssl.erb', with_default: true %>
+
+  autoindex off;
+  charset utf-8;
+
+  location / {
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Port $server_port;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://<%= @user %>_<%= @name %>;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    # This allows the ability for the execute shell window to remain open for up to 15 minutes. Without this parameter, the default is 1 minute and will automatically close.
+    proxy_read_timeout 900s;
+  }
+
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+  server_tokens off;
+
+  <% if @rewrites %>
+    <% @rewrites.each do |rewrite| %>
+      rewrite <%= rewrite['query'] %> <%= rewrite['uri'] %> <%= rewrite['options'] %>;
+    <% end %>
+  <% end %>
+
+  <% if @hidden && @hidden.count > 0 %>
+    <% hidden_paths = '|' %>
+    <% hidden_paths << Array(@hidden).join('|') %>
+  <% end %>
+}

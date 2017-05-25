@@ -74,6 +74,8 @@ action :create do # rubocop:disable Metrics/BlockLength
 
   setup_rbenv(a) if rbenv?(a)
 
+  setup_rancher(a) if rancher?(a)
+
   init_smtp(a, app_path) if smtp?(a)
 
   setup_php(a, app_path) if php?(a)
@@ -98,6 +100,10 @@ action :delete do
 end
 
 # Helpers
+
+def rancher?(a)
+  a.include? 'rancher'
+end
 
 def rbenv?(a)
   a.include? 'rbenv'
@@ -331,6 +337,19 @@ def setup_ruby_servers(a, app_path)
   setup_ruby_server_init(a, app_path)
 end
 
+def nginx_template(a)
+  case a['nginx']['template']
+  when 'rancher'
+    'rancher.erb'
+  else
+    if a['locked']
+      'nginx_vhost_locked.erb'
+    else
+      'nginx_vhost.erb'
+    end
+  end
+end
+
 def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   directory "#{app_path}/docs" do
     mode      0o0750
@@ -381,9 +400,14 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/Cyc
     file_rewrites    a['nginx']['file_rewrites']
     php_rewrites     a['nginx']['php_rewrites']
     error_pages      a['nginx']['error_pages']
-    template         'nginx_vhost_locked.erb' if a['locked']
+    template         nginx_template(a)
     action           :create
   end
+end
+
+def setup_rancher(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  a['nginx']['template'] = 'rancher'
+  setup_nginx(a, app_path)
 end
 
 def setup_php(a, app_path)
