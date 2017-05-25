@@ -363,7 +363,7 @@ def nginx_template(a, template=nil)
   end
 end
 
-def setup_nginx(a, app_path, template=nil, ssl=nil) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   directory "#{app_path}/docs" do
     mode      0o0750
     owner     a['user']
