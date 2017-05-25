@@ -427,15 +427,20 @@ def setup_nginx(a, app_path, template=nil, ssl=nil, server_name=nil, suffix='', 
     action           :create
     tunes            tunes
   end
+
+  install_le_ssl(a, app_path, template) unless ssl
 end
 
-def setup_rancher(a, app_path)
+def install_le_ssl(a, app_path, template=nil)
   server_name = a['nginx']['server_name'].dup
 
   ssl, server_names = gen_ssl(a, server_name.first, a['nginx']['disable_www'])
 
+  setup_nginx(a, app_path, template, ssl, server_names, '_ssl', '443') if ssl && server_names
+end
+
+def setup_rancher(a, app_path)
   setup_nginx(a, app_path, 'rancher')  
-  setup_nginx(a, app_path, 'rancher', ssl, server_names, '_ssl', '443') if ssl
 end
 
 def setup_php(a, app_path)
