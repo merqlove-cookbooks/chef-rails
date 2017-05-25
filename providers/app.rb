@@ -350,7 +350,7 @@ def nginx_template(a)
   end
 end
 
-def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   directory "#{app_path}/docs" do
     mode      0o0750
     owner     a['user']
@@ -364,6 +364,12 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/Cyc
     group     a['user']
     action    :create
     recursive true
+  end
+
+  template_path = if template
+    nginx_template(template)
+  else 
+    nginx_template(a)
   end
 
   server_name = a['nginx']['server_name'].dup
@@ -400,14 +406,13 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/Cyc
     file_rewrites    a['nginx']['file_rewrites']
     php_rewrites     a['nginx']['php_rewrites']
     error_pages      a['nginx']['error_pages']
-    template         nginx_template(a)
+    template         template_path
     action           :create
   end
 end
 
 def setup_rancher(a, app_path)
-  a['nginx']['template'] = 'rancher'
-  setup_nginx(a, app_path)
+  setup_nginx(a, app_path, 'rancher')
 end
 
 def setup_php(a, app_path)
