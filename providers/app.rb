@@ -74,7 +74,7 @@ action :create do # rubocop:disable Metrics/BlockLength
 
   setup_rbenv(a) if rbenv?(a)
 
-  setup_rancher(a) if rancher?(a)
+  setup_rancher(a, app_path) if rancher?(a)
 
   init_smtp(a, app_path) if smtp?(a)
 
@@ -405,7 +405,7 @@ def setup_nginx(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/Cyc
   end
 end
 
-def setup_rancher(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+def setup_rancher(a, app_path)
   a['nginx']['template'] = 'rancher'
   setup_nginx(a, app_path)
 end
