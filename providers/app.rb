@@ -363,7 +363,7 @@ def nginx_template(a, template=nil)
   end
 end
 
-def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+def setup_nginx(a, app_path, template=nil, ssl=nil, server_name=nil, suffix='') # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   directory "#{app_path}/docs" do
     mode      0o0750
     owner     a['user']
@@ -387,21 +387,18 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
     nginx_template(a)
   end
 
-  server_name = a['nginx']['server_name'].dup
+  server_name ||= a['nginx']['server_name'].dup
 
   if node.role?('vagrant') && a['nginx']['vagrant_server_name']
     server_name.push "#{a['nginx']['vagrant_server_name']}.#{node['vagrant']['fqdn']}"
   end
 
-  ssl = if a['nginx']['ssl']
+  ssl ||= if a['nginx']['ssl']
     data_bag = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['users'], a['user'], load_secret) || {} # rubocop:disable Style/IndentationWidth
     (a['nginx']['ssl']).merge((data_bag['ssl'] || {})[a['name']] || {}) if data_bag
   end # rubocop:disable Lint/EndAlignment
 
-  server_names = server_name
-  ssl, server_names = gen_ssl(a, server_name.first, a['nginx']['disable_www']) if ssl.nil? || ssl.empty?
-
-  rails_nginx_vhost a['name'] do
+  rails_nginx_vhost "#{a['name']}#{suffix}" do
     user             a['user']
     access_log       a['nginx']['access_log']
     error_log        a['nginx']['error_log']
@@ -431,7 +428,12 @@ def setup_nginx(a, app_path, template=nil) # rubocop:disable Metrics/MethodLengt
 end
 
 def setup_rancher(a, app_path)
-  setup_nginx(a, app_path, 'rancher')
+  server_name ||= a['nginx']['server_name'].dup
+
+  ssl, server_names = gen_ssl(a, server_name.first, a['nginx']['disable_www'])
+
+  setup_nginx(a, app_path, 'rancher')  
+  setup_nginx(a, app_path, 'rancher', ssl, server_names, '_ssl') if ssl
 end
 
 def setup_php(a, app_path)
