@@ -440,7 +440,7 @@ def install_le_ssl(a, app_path, template=nil)
 end
 
 def setup_rancher(a, app_path)
-  setup_nginx(a, app_path, 'rancher')  
+  setup_nginx(a, app_path, 'rancher')
 end
 
 def setup_php(a, app_path)
