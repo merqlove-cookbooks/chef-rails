@@ -25,7 +25,7 @@ end
 # Install Db4
 case node['platform_family']
 when 'debian'
-  if ubuntu14x?
+  if ubuntu14x? || ubuntu16x?
     package 'libdb5.3'
   else
     package 'libdb5.1'
