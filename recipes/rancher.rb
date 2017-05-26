@@ -1,7 +1,7 @@
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
 if node['rails']['rancher']
-  data_bag = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['rancher'], node['rancher_ng']['name'], load_secret) || {} # rubocop:disable Style/IndentationWidth
+  data_bag = ::Chef::EncryptedDataBagItem.load(node['rails']['d']['rancher'], node['rancher_ng']['server']['name'], load_secret) || {} # rubocop:disable Style/IndentationWidth
 
   if data_bag
     if data_bag['server']
