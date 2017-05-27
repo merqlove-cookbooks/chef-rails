@@ -38,7 +38,7 @@ node['rails']['drives'].each do |name, params|
     action :nothing
     notifies :mount, mount_disk, :immediately if mount_point
     notifies :enable, mount_disk, :delayed if mount_point
-    not_if with_format
+    not_if { with_format }
   end
 
   execute "parted #{name} --script -- mklabel #{label} mkpart #{part_type} #{file_system} 1 -1s" do
