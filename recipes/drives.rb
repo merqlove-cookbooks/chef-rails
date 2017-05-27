@@ -23,6 +23,7 @@ node['rails']['drives'].each do |name, params|
   children = params['children'] || false
   mkfs_name = "#{name}#{children ? 1 : ''}"
   force_format = params['force'] || false
+  label = params['label'] || 'loop'
 
   mount_disk = mount(name) do
     device name
@@ -37,7 +38,7 @@ node['rails']['drives'].each do |name, params|
     notifies :enable, mount_disk, :delayed
   end
 
-  execute "parted #{name} --script -- mklabel msdos mkpart #{part_type} #{file_system} 1 -1s" do
+  execute "parted #{name} --script -- mklabel #{label} mkpart #{part_type} #{file_system} 1 -1s" do
     # Number  Start   End    Size   File system  Name  Flags
     #  1      17.4kB  537GB  537GB               xfs
     not_if "parted #{name} --script -- print |sed '1,/^Number/d' |grep #{part_type}"
