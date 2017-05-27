@@ -20,7 +20,9 @@
 ::Chef::Recipe.send(:include, Rails::Helpers)
 
 if node['rails']['firewall'].nil? || node['rails']['firewall'] == false
-  include_recipe 'firewall::disable_firewall'
+  firewall 'default' do
+    action :disable
+  end
 elsif rhel7x? || ubuntu16x?
   node.default['firewall']['firewalld']['permanent'] = true
 
