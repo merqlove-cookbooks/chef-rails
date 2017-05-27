@@ -22,6 +22,7 @@ node['rails']['drives'].each do |name, params|
   file_system = params['file_system'] || 'xfs'
   children = params['children'] || false
   mkfs_name = "#{name}#{children ? 1 : ''}"
+  force_format = params['force'] || false
 
   mount_disk = mount(name) do
     device name
@@ -30,7 +31,7 @@ node['rails']['drives'].each do |name, params|
     action :nothing
   end
 
-  mkfs = execute("mkfs.#{file_system} #{mkfs_name}") do
+  mkfs = execute("mkfs.#{file_system} #{force_format ? '-f ' : ''}#{mkfs_name}") do
     action :nothing
     notifies :mount, mount_disk, :immediately
     notifies :enable, mount_disk, :delayed
