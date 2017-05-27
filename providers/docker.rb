@@ -46,7 +46,7 @@ end
 def lvm(new_resource)
   run_context.include_recipe 'lvm::default'
 
-  return new_resource.updated_by_last_action(false) unless lvm_disabled?
+  return new_resource.updated_by_last_action(false) unless thin_enabled?
   
   docker_service new_resource.name do
     action [:create, :stop]
