@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-node['rails']['azure']['drives'].each do |name, params|
+node['rails']['drives'].each do |name, params|
   part_type = params['part_type'] || 'primary'
   file_system = params['file_system'] || 'xfs'
 
@@ -30,7 +30,8 @@ node['rails']['azure']['drives'].each do |name, params|
 
   mkfs = execute("mkfs.#{file_system} -f #{name}") do
     action :nothing
-    notifies [:mount, :enable], mount_disk, :immediately
+    notifies :mount, mount_disk, :immediately
+    notifies :enable, mount_disk, :immediately
   end
 
   execute "parted #{name} --script -- mklabel msdos mkpart #{part_type} #{file_system} \
