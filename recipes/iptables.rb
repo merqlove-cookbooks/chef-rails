@@ -30,7 +30,7 @@ if rhel7x? || ubuntu16x?
 
   [{ports: (node['rails']['ports'] || []), type: :tcp}, 
    {ports: (node['rails']['udp_ports'] || []), type: :udp}].each_with_index do |list|
-    list[:ports].each do |port| 
+    (list[:ports] || []).uniq.each do |port| 
       port_bind = port_cast(port)
       firewall_rule "#{port_name(port)}" do
         port     port_bind
