@@ -1,1 +1,0 @@
-default['rails']['azure']['drives'] = {}

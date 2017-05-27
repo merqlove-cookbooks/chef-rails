@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+default['rails']['drives'] = {}
 
 default['rails']['d']['aws'] = 'aws'
 default['rails']['d']['azure'] = 'azure'
