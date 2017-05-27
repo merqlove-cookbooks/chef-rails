@@ -31,7 +31,7 @@ node['rails']['drives'].each do |name, params|
   mkfs = execute("mkfs.#{file_system} -f #{name}") do
     action :nothing
     notifies :mount, mount_disk, :immediately
-    notifies :enable, mount_disk, :immediately
+    notifies :enable, mount_disk, :delayed
   end
 
   execute "parted #{name} --script -- mklabel msdos mkpart #{part_type} #{file_system} \
