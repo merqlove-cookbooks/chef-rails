@@ -18,9 +18,9 @@
 #
 
 if node['rails']['fail2ban'].nil? || node['rails']['fail2ban'] == false
-  include_recipe 'fail2ban::default'
-else
   package 'fail2ban' do
     action :remove
   end
+else
+  include_recipe 'fail2ban::default'
 end
