@@ -20,7 +20,7 @@ if node['rails']['swap']['custom']
   swap_file '/swapfile' do
     action :remove
   end
-  include_recipe "#{node['rails']['swap']['custom']}_swap"
+  include_recipe "rails::#{node['rails']['swap']['custom']}_swap"
 else
   swap_file '/swapfile' do
     size      node['rails']['swap']['size'].to_i # MBs
