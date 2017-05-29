@@ -94,6 +94,22 @@ def lvm(new_resource)
   execute  'lvchange --metadataprofile docker-thinpool docker/thinpool'
 
   if node['rails']['docker_cache_volume'] 
+    unmount_resource = mount '/mnt/resource' do
+      device node['rails']['docker_cache_volume']
+      action :noting
+    end
+
+    ruby_block 'disable resource disk in waagent.conf' do
+      block do
+        file = Chef::Util::FileEdit.new("/etc/waagent.conf")
+        if file
+          file.search_file_replace_line(/Resource\.Disk\.Format\=y/, 'Resource.Disk.Format=n')
+          file.write_file
+        end
+      end
+      notifies :umount, unmount_resource, :immediately
+    end
+
     lvm_physical_volume node['rails']['docker_cache_volume']
     lvm_volume_group 'docker' do
       physical_volumes [node['rails']['docker_cache_volume']]
