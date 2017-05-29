@@ -100,11 +100,11 @@ def lvm(new_resource)
     end
 
     waagent_file = "/etc/waagent.conf"
-    waagent_regex = /Resource\.Disk\.Format\=y/
+    waagent_regex = /ResourceDisk\.Format\=y/
     ruby_block 'disable resource disk in waagent.conf' do
       block do
         file = Chef::Util::FileEdit.new(waagent_file)
-        file.search_file_replace_line(waagent_regex, 'Resource.Disk.Format=n')
+        file.search_file_replace_line(waagent_regex, 'ResourceDisk.Format=n')
         file.write_file
       end
       notifies :umount, unmount_resource, :immediately

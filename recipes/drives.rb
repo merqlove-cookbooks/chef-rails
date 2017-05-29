@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Definition:: azure
+# Definition:: drives
 #
 # Copyright (C) 2017 Alexander Merkulov
 #
