@@ -93,6 +93,22 @@ def lvm(new_resource)
 
   execute  'lvchange --metadataprofile docker-thinpool docker/thinpool'
 
+  if node['rails']['docker_cache_volume'] 
+    lvm_physical_volume node['rails']['docker_cache_volume']
+    lvm_volume_group 'docker' do
+      physical_volumes [node['rails']['docker_cache_volume']]
+      action :extend
+    end
+    lvm_logical_volume 'cachepool' do
+      size      '100%FREE'
+      lv_params "--type cache"
+      physical_volumes ['/dev/docker/thinpool', node['rails']['docker_cache_volume']]
+    end
+    # execute "pvcreate #{node['rails']['docker_cache_volume']}"
+    # execute "vgextend docker #{node['rails']['docker_cache_volume']}"
+    # execute "lvcreate --type cache -l100%FREE -n cachepool /dev/docker/thinpool node['rails']['docker_cache_volume']"
+  end
+
   # verified the lv is monitored
   execute 'lvs -o+seg_monitor'
 
