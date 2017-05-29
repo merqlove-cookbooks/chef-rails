@@ -19,7 +19,6 @@
 if node['rails']['swap']['custom']
   swap_file '/swapfile' do
     action :remove
-    only_if { node['rails']['swap']['enable'] }
   end
   include_recipe "#{node['rails']['swap']['custom']}_swap"
 else
