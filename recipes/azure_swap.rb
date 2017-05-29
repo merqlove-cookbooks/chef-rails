@@ -28,7 +28,7 @@ if node['rails']['azure']['swap']
     owner 'root'
     group 'root'
     mode 0o0644
-    source '/etc/profile.d/temp-folder.sh.erb'
+    source 'etc/profile.d/temp-folder.sh.erb'
   end
 
   ruby_block 'resource swap in waagent.conf' do
