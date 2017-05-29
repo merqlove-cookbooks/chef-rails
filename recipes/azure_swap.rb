@@ -24,6 +24,8 @@ if node['rails']['azure']['swap']
   waagent_no_swap_size_regex = /ResourceDisk\.SwapSizeMB\=0/
   waagent_no_format_regex = /ResourceDisk\.Format\=n/
 
+  log node['platform_family']
+
   template '/etc/profile.d/temp-folder.sh' do
     owner 'root'
     group 'root'
