@@ -17,6 +17,6 @@
 # limitations under the License.
 #
 
-unless node['rails']['fail2ban'].nil? || node['rails']['fail2ban'] == false
+if node['rails']['fail2ban'].nil? || node['rails']['fail2ban'] == false
   include_recipe 'fail2ban::default'
 end
