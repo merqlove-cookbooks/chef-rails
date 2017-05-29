@@ -22,6 +22,7 @@ if node['rails']['azure']['swap']
   waagent_no_swap_regex = /ResourceDisk\.EnableSwap\=n/
   waagent_swap_regex = /ResourceDisk\.EnableSwap\=y/
   waagent_no_swap_size_regex = /ResourceDisk\.SwapSizeMB\=0/
+  waagent_no_format_regex = /ResourceDisk\.Format\=n/
 
   ruby_block 'resource swap in waagent.conf' do
     block do
@@ -32,6 +33,7 @@ if node['rails']['azure']['swap']
         file.search_file_replace_line(waagent_swap_regex, 'ResourceDisk.EnableSwap=n')
       end
       file.search_file_replace_line(waagent_no_swap_size_regex, "ResourceDisk.SwapSizeMB=#{node['rails']['swap']['size']}")
+      file.search_file_replace_line(waagent_no_format_regex, "ResourceDisk.Format=y")
       file.write_file
     end
   end
