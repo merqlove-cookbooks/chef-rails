@@ -16,9 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-swap_file '/swapfile' do
-  size      node['rails']['swap']['size'].to_i # MBs
-  persist   true
-  only_if { node['rails']['swap']['enable'] }
+if node['rails']['swap']['custom']
+  swap_file '/swapfile' do
+    action :remove
+    only_if { node['rails']['swap']['enable'] }
+  end
+  include_recipe "#{node['rails']['swap']['custom']}_swap"
+else
+  swap_file '/swapfile' do
+    size      node['rails']['swap']['size'].to_i # MBs
+    persist   true
+    only_if { node['rails']['swap']['enable'] }
+  end
 end
