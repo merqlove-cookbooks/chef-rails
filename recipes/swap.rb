@@ -19,6 +19,7 @@
 if node['rails']['swap']['custom']
   swap_file '/swapfile' do
     action :remove
+    only_if { File.exist?('/swapfile') }
   end
   include_recipe "rails::#{node['rails']['swap']['custom']}_swap"
 else
