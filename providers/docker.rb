@@ -94,7 +94,7 @@ def lvm(new_resource)
   execute  'lvchange --metadataprofile docker-thinpool docker/thinpool'
 
   if node['rails']['docker_cache_volume'] 
-    unmount_resource = mount '/mnt/resource' do
+    unmount_resource = mount node['rails']['azure']['mnt']do
       device node['rails']['docker_cache_volume']
       action :noting
     end
