@@ -24,6 +24,13 @@ if node['rails']['azure']['swap']
   waagent_no_swap_size_regex = /ResourceDisk\.SwapSizeMB\=0/
   waagent_no_format_regex = /ResourceDisk\.Format\=n/
 
+  template 'azure temp folder' do
+    owner 'root'
+    group 'root'
+    mode 0o0644
+    source '/etc/profile.d/temp-folder.sh.erb'
+  end
+
   ruby_block 'resource swap in waagent.conf' do
     block do
       file = Chef::Util::FileEdit.new(waagent_file)
