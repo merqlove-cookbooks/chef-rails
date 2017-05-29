@@ -99,15 +99,16 @@ def lvm(new_resource)
       action :noting
     end
 
+    waagent_file = "/etc/waagent.conf"
+    waagent_regex = /Resource\.Disk\.Format\=y/
     ruby_block 'disable resource disk in waagent.conf' do
       block do
-        file = Chef::Util::FileEdit.new("/etc/waagent.conf")
-        if file
-          file.search_file_replace_line(/Resource\.Disk\.Format\=y/, 'Resource.Disk.Format=n')
-          file.write_file
-        end
+        file = Chef::Util::FileEdit.new(waagent_file)
+        file.search_file_replace_line(waagent_regex, 'Resource.Disk.Format=n')
+        file.write_file
       end
       notifies :umount, unmount_resource, :immediately
+      only_if { File.exist?(waagent_file) && File.readlines(waagent_file).grep(waagent_regex).size > 0 }
     end
 
     lvm_physical_volume node['rails']['docker_cache_volume']
