@@ -44,5 +44,6 @@ elsif rhel7x? || ubuntu16x?
     end
   end
 else
+  include_recipe 'openssh::iptables'
   iptables_rule 'port_rails'
 end
