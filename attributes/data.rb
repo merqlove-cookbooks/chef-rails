@@ -18,6 +18,8 @@
 #
 default['rails']['drives'] = {}
 
+default['rails']['nfs']['exports'] = {}
+
 default['rails']['d']['aws'] = 'aws'
 default['rails']['d']['azure'] = 'azure'
 default['rails']['d']['gs'] = 'gs'
