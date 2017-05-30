@@ -24,12 +24,19 @@
     mode 0o0755
   end
 
-  nfs_export k do
-    network v['network'] if v['network']
-    anonuser v['anonuser'] if v['anonuser']
-    anongroup v['anongroup'] if v['anongroup']
-    writeable v['writeable'] || true
-    sync v['sync'] || true
-    options v['options'] || ['no_subtree_check']
+  options = []
+  network = v['network'] ? v['network'] : '*'
+  writeable = v['writeable'] ? 'rw' : 'r'
+  sync = v['sync'] || false
+  custom_options = v['options'] || 'no_subtree_check'
+
+  options << writeable
+  options << 'sync' if sync
+  options << custom_options
+  
+  template '/etc/exports' do
+    source 'etc/exports.erb'
+    variables network: network,
+              options: options
   end
 end
