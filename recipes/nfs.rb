@@ -21,8 +21,8 @@ exports = []
 
 (node['rails']['nfs']['exports'] || {}).each do |k, v|
   directory k do
-    owner 'root'
-    group 'root'
+    owner 'nobody'
+    group 'nogroup'
     mode 0o0755
   end
 
