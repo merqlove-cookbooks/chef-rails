@@ -35,7 +35,7 @@ node['rails']['drives'].each do |name, params|
     end
   end
 
-  mount_disk = mount(name) do
+  mount_disk = mount(mount_point) do
     device mkfs_name
     options 'defaults,nofail'
     fstype file_system
