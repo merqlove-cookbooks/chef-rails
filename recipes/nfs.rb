@@ -18,6 +18,12 @@
 #
 
 (node['rails']['nfs']['exports'] || {}).each do |k, v|
+  directory k do
+    owner 'root'
+    group 'root'
+    mode 0o0755
+  end
+
   nfs_export k do
     network v['network'] if v['network']
     network v['anonuser'] if v['anonuser']
