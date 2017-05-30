@@ -37,6 +37,7 @@
   template '/etc/exports' do
     source 'etc/exports.erb'
     variables network: network,
-              options: options
+              options: options,
+              path: k
   end
 end
