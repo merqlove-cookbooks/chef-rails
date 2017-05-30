@@ -29,6 +29,7 @@ depends 'sudo', '~> 2.9.0'
 depends 'fail2ban', '~> 2.3.0'
 depends 'cron', '~> 1.7.0'
 depends 'acme', '~> 3.0'
+depends 'rsyslog', '~> 6.0'
 
 depends 'logrotate', '~> 1.9.1'
 depends 'newrelic', '~> 2.19.0'
