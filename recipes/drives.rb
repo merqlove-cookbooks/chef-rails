@@ -27,6 +27,14 @@ node['rails']['drives'].each do |name, params|
   label = params['label'] || 'loop'
   mount_point = params['mount_point'] || false
 
+  if mount_point
+    directory mount_point do
+      owner 'root'
+      group 'root'
+      mode 0o0755
+    end
+  end
+
   mount_disk = mount(name) do
     device mkfs_name
     options 'defaults,nofail'
