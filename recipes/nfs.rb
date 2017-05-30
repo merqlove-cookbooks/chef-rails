@@ -37,9 +37,9 @@ exports = []
   options << custom_options
   
   exports << { 
-    network: network,
-    options: options.flatten.join(','),
-    path: k
+    'network' => network,
+    'options' => options.flatten.join(','),
+    'path' => k
   } 
 end
 
