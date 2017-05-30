@@ -26,8 +26,8 @@
 
   nfs_export k do
     network v['network'] if v['network']
-    network v['anonuser'] if v['anonuser']
-    network v['anongroup'] if v['anongroup']
+    anonuser v['anonuser'] if v['anonuser']
+    anongroup v['anongroup'] if v['anongroup']
     writeable v['writeable'] || true
     sync v['sync'] || true
     options v['options'] || ['no_subtree_check']
