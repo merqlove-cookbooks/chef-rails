@@ -1,5 +1,7 @@
 include_recipe 'rsyslog::default'
 
+package 'rsyslog-gnutls'
+
 node['rails']['rsyslog']['configs'].each do |config, rows|
   data = rows.join("\n")
   template "/etc/rsyslog.d/#{config}" do
