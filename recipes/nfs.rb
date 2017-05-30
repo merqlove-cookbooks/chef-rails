@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+exports = []
+
 (node['rails']['nfs']['exports'] || {}).each do |k, v|
   directory k do
     owner 'root'
@@ -34,10 +36,14 @@
   options << 'sync' if sync
   options << custom_options
   
-  template '/etc/exports' do
-    source 'etc/exports.erb'
-    variables network: network,
-              options: options,
-              path: k
-  end
+  exports << { 
+    network: network,
+    options: options.flatten.join(','),
+    path: k
+  } 
+end
+
+template '/etc/exports' do
+  source 'etc/exports.erb'
+  variables exports: exports
 end
