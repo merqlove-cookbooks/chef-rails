@@ -20,6 +20,7 @@ depends 'yum-epel', '~> 0.7.0'
 depends 'yum', '~> 3.11.0'
 depends 'git', '~> 5.0.0'
 depends 'firewall', '~> 2.1'
+depends 'nfs', '>= 0'
 
 depends 'rsync', '~> 0.8.6'
 depends 'swap', '~> 0.3.8'

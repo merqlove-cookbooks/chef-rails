@@ -40,7 +40,7 @@ hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
     end
   end
 
-  network = v['network'] ? v['network'] : '*'
+  network = v['network'] || '*'
   writeable = v['writeable'] ? 'rw' : 'r'
   sync = v['sync'] || false
   custom_options = v['options'] || 'no_subtree_check'
@@ -49,17 +49,30 @@ hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
   options << 'sync' if sync
   options << custom_options
   
-  exports << { 
-    'network' => network,
-    'options' => options.flatten.join(','),
-    'path' => k,
-    'hosts' => hosts
-  } 
+  # exports << { 
+  #   'network' => network,
+  #   'options' => options.flatten.join(','),
+  #   'path' => k,
+  #   'hosts' => hosts
+  # } 
+
+  nfs_export k do
+    writeable (v['writeable'] && true)
+    sync (v['sync'] && true)
+    options options.flatten
+    network (hosts || network)
+  end
 end
 
 hosts_file.write_file
 
-template '/etc/exports' do
-  source 'etc/exports.erb'
-  variables exports: exports
+execute 'nfs exportfs' do
+  command 'exportfs -ar'
+  action :nothing
 end
+
+# template '/etc/exports' do
+#   source 'etc/exports.erb'
+#   variables exports: exports
+#   notifies :run, 'execute[nfs exportfs]', :immediately
+# end
