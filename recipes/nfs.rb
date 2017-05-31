@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-exports = []
+# exports = []
 
 hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
 
@@ -41,12 +41,12 @@ hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
   end
 
   network = v['network'] || '*'
-  writeable = v['writeable'] ? 'rw' : 'r'
-  sync = v['sync'] || false
+  # writeable = v['writeable'] ? 'rw' : 'r'
+  # sync = v['sync'] || false
   custom_options = v['options'] || 'no_subtree_check'
 
-  options << writeable
-  options << 'sync' if sync
+  # options << writeable
+  # options << 'sync' if sync
   options << custom_options
   
   # exports << { 
