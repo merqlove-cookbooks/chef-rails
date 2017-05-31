@@ -19,6 +19,8 @@
 
 exports = []
 
+hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
+
 (node['rails']['nfs']['exports'] || {}).each do |k, v|
   directory k do
     owner 'nfsnobody'
@@ -31,7 +33,6 @@ exports = []
 
   if v['search']
     nodes = search(:node, v['search'])
-    hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
     hosts = nodes.map do |n|
       host = "#{n['cloud_v2']['public_ipv4']} #{n['cloud']['vm_name']}"
       hosts_file.insert_line_if_no_match(/\s#{n['cloud']['vm_name']}/, host)
@@ -55,6 +56,8 @@ exports = []
     'hosts' => hosts
   } 
 end
+
+hosts_file.write_file
 
 template '/etc/exports' do
   source 'etc/exports.erb'
