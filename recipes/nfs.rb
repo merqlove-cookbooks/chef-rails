@@ -29,8 +29,8 @@ exports = []
   options = []
   hosts = nil
 
-  if v['restricted']
-    nodes = search(:node, "tags:rancher AND tags:host AND tags:nsa")
+  if v['search']
+    nodes = search(:node, v['search'])
     hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
     hosts = nodes.map do |n|
       host = "#{n['cloud_v2']['public_ipv4']} #{n['cloud']['vm_name']}"
