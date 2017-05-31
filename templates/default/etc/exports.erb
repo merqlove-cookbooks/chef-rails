@@ -10,5 +10,9 @@
 #
 
 <% @exports.each do |export| %>
+<% if export['hosts'] %>
+<%= export['path'] %>    <%= export['hosts'].map { |host| "#{host}(#{export['options']})" }.join(' ') %>
+<% else %>
 <%= export['path'] %>    <%= export['network'] %>(<%= export['options'] %>)
+<% end %>
 <% end %>
