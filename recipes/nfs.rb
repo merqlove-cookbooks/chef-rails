@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-# exports = []
-
 hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
 
 (node['rails']['nfs']['exports'] || {}).each do |k, v|
@@ -41,20 +39,9 @@ hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
   end
 
   network = v['network'] || '*'
-  # writeable = v['writeable'] ? 'rw' : 'r'
-  # sync = v['sync'] || false
   custom_options = v['options'] || 'no_subtree_check'
 
-  # options << writeable
-  # options << 'sync' if sync
   options << custom_options
-  
-  # exports << { 
-  #   'network' => network,
-  #   'options' => options.flatten.join(','),
-  #   'path' => k,
-  #   'hosts' => hosts
-  # } 
 
   nfs_export k do
     writeable (v['writeable'] && true)
@@ -65,14 +52,3 @@ hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
 end
 
 hosts_file.write_file
-
-execute 'nfs exportfs' do
-  command 'exportfs -ar'
-  action :nothing
-end
-
-# template '/etc/exports' do
-#   source 'etc/exports.erb'
-#   variables exports: exports
-#   notifies :run, 'execute[nfs exportfs]', :immediately
-# end
