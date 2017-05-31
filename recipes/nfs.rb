@@ -34,7 +34,7 @@ exports = []
     hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
     hosts = nodes.map do |n|
       host = "#{n['cloud_v2']['public_ipv4']} #{n['cloud']['vm_name']}"
-      hosts_file.insert_line_if_no_match(/#{host}/, host)
+      hosts_file.insert_line_if_no_match(/\s#{n['cloud']['vm_name']}/, host)
       n['cloud']['vm_name']
     end
   end
