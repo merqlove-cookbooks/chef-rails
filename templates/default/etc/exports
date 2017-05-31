@@ -1,3 +1,0 @@
-<% exports.each do |export| %>
-export['path']    export['network'](export['write'],export['sync'],export['options'])
-<% end %>
