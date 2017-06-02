@@ -40,7 +40,7 @@ node['rails']['drives'].each do |name, params|
     options 'defaults,nofail'
     fstype file_system
     action :nothing
-    only_if { mount_point && true }
+    only_if { mount_point && true }    
   end
 
   mkfs = execute("mkfs.#{file_system} #{force_format ? '-f ' : ''}#{mkfs_name}") do
@@ -50,12 +50,19 @@ node['rails']['drives'].each do |name, params|
     only_if { with_format }
   end
 
-  execute "parted /bin/true" do
+  execute "parted mount /bin/true" do
     command "/bin/true"
     action :run
     only_if "parted #{name} --script -- print |sed '1,/^Number/d' |grep #{part_type}"
     notifies :mount, mount_disk, :immediately
-    notifies :enable, mount_disk, :delayed
+  end
+
+  execute "mount enable /bin/true" do
+    command "/bin/true"
+    action :run
+    only_if "parted #{name} --script -- print |sed '1,/^Number/d' |grep #{part_type}"
+    only_if "mountpoint -q #{mount_point}"
+    notifies :enable, mount_disk, :immediately
   end
 
   execute "parted #{name} --script -- mklabel #{label} mkpart #{part_type} #{file_system} 1 -1s" do
