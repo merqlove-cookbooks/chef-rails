@@ -25,6 +25,17 @@ execute 'echo "" > /etc/exports' do
   only_if { exports.size > 0 }
 end
 
+if node['rails']['nfs']['cachefilesd']
+  package 'cachefilesd'
+  file "/etc/default/cachefilesd" do
+    content <<-EOS
+RUN=yes
+EOS
+    action :create
+    mode 0755
+  end
+end
+
 exports.each do |k, v|
   directory k do
     owner 'nfsnobody'
