@@ -31,14 +31,17 @@ default['rails']['lvm_docker']      = false
 default['rails']['rancher']         = false
 default['rails']['docker_volume']   = nil
 default['rails']['docker_version']  = '17.03.1'
-default['rails']['docker_checksum']  = nil #'820d13b5699b5df63f7032c8517a5f118a44e2be548dd03271a86656a544af55'
-
+default['rails']['docker_checksum'] = nil #'820d13b5699b5df63f7032c8517a5f118a44e2be548dd03271a86656a544af55'
+default['rails']['mnt']             = nil
 default['rails']['rsyslog']['configs'] = {}
 
-if platform_family?('rhel')
-  default['rails']['azure']['mnt'] = '/mnt/resource' 
-else
-  default['rails']['azure']['mnt'] = '/mnt' 
+if node['cloud_v2']['provider'] == 'azure'
+  if platform_family?('rhel')
+    default['rails']['azure']['mnt'] = '/mnt/resource' 
+  else
+    default['rails']['azure']['mnt'] = '/mnt' 
+  end
+  default['rails']['mnt'] = node['rails']['azure']['mnt']
 end
 
 default['rails']['openssl']['dhparam_dir'] = '/etc/ssl/certs'

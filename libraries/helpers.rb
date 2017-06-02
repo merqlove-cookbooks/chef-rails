@@ -32,6 +32,10 @@ module Rails
       false
     end
 
+    def azure?
+      node['cloud_v2']['provider'] == 'azure'
+    end
+
     def rails_fqdn
       node['rails']['fqdn'] ? node['fqdn'] : node.name
     end
