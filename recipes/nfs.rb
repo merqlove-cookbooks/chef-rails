@@ -19,7 +19,13 @@
 
 hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
 
-(node['rails']['nfs']['exports'] || {}).each do |k, v|
+exports = (node['rails']['nfs']['exports'] || {})
+
+execute 'echo "" > /etc/exports' do
+  only_if { exports.size > 0 }
+end
+
+exports.each do |k, v|
   directory k do
     owner 'nfsnobody'
     group 'nfsnobody'
@@ -42,8 +48,6 @@ hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
   custom_options = v['options'] || 'no_subtree_check'
 
   options << custom_options
-
-  execute 'echo "" > /etc/exports'
 
   nfs_export k do
     writeable (v['writeable'] && true)
