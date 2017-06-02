@@ -6,7 +6,7 @@ if node['rails']['nfs']['cachefilesd']
 RUN=yes
 EOS
     action :create
-    mode 0755
+    mode 0644
   end
 
   restart_cachefilesd = service 'cachefilesd' do
