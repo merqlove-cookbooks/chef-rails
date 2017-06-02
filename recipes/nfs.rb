@@ -43,6 +43,8 @@ hosts_file = Chef::Util::FileEdit.new('/etc/hosts')
 
   options << custom_options
 
+  execute 'echo "" > /etc/exports'
+
   nfs_export k do
     writeable (v['writeable'] && true)
     sync (v['sync'] && true)
