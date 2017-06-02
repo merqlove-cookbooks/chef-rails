@@ -4,6 +4,7 @@ if node['rails']['nfs']['cachefilesd']
   file "/etc/default/cachefilesd" do
     content <<-EOS
 RUN=yes
+DAEMON_OPTS=""
 EOS
     action :create
     mode 0644
