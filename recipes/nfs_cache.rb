@@ -9,7 +9,7 @@ EOS
     mode 0755
   end
 
-  restart_cachefilesd = execute '/sbin/service cachefilesd  restart' do
+  restart_cachefilesd = service 'cachefilesd' do
     action :nothing
   end
 
@@ -19,7 +19,7 @@ EOS
       file.search_file_replace_line(/^dir.*/, "dir #{node['rails']['mnt']}")
       file.write_file
     end
-    notifies :run, restart_cachefilesd, :immediately
+    notifies :restart, restart_cachefilesd, :immediately
     only_if { File.exist?(node['rails']['mnt']) }
   end
 end
