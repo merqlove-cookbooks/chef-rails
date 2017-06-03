@@ -72,5 +72,3 @@ node['rails']['drives'].each do |name, params|
     notifies :run, mkfs, :immediately
   end
 end
-
-include_recipe 'rails::tmp'
