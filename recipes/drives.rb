@@ -40,7 +40,7 @@ node['rails']['drives'].each do |name, params|
     options 'defaults,nofail'
     fstype file_system
     action :nothing
-    only_if { mount_point && true }    
+    only_if { mount_point && File.exist?(mount_point) && true }    
   end
 
   mkfs = execute("mkfs.#{file_system} #{force_format ? '-f ' : ''}#{mkfs_name}") do
