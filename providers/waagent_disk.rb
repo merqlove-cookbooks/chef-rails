@@ -20,7 +20,6 @@
 use_inline_resources
 
 action :update do
-  update_tmp(new_resource)
   ruby_block "update #{new_resource.config_path}" do
     block do
       file = Chef::Util::FileEdit.new(new_resource.config_path)
@@ -34,18 +33,6 @@ action :update do
   end
 
   new_resource.updated_by_last_action(true)
-end
-
-def update_tmp(new_resource)
-  template_action = (new_resource.tmp && new_resource.format) ? :create : :delete
-
-  template '/etc/profile.d/temp-folder.sh' do
-    owner 'root'
-    group 'root'
-    mode 0o0644
-    source 'etc/profile.d/temp-folder.sh.erb'
-    action template_action
-  end
 end
 
 def update_format(new_resource, file)

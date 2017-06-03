@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Recipe:: swap
+# Recipe:: tmp
 #
 # Copyright (C) 2013 Alexander Merkulov
 #
@@ -16,19 +16,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+template_action = (File.exist?(node['rails']['mnt'])) ? :create : :delete
 
-include_recipe 'rails::tmp'
-
-if node['rails']['swap']['custom']
-  swap_file '/swapfile' do
-    action :remove
-    only_if { File.exist?('/swapfile') }
-  end
-  include_recipe "rails::#{node['rails']['swap']['custom']}_swap"
-else
-  swap_file '/swapfile' do
-    size      node['rails']['swap']['size'].to_i # MBs
-    persist   true
-    only_if { node['rails']['swap']['enable'] }
-  end
+template '/etc/profile.d/temp-folder.sh' do
+  owner 'root'
+  group 'root'
+  mode 0o0644
+  source 'etc/profile.d/temp-folder.sh.erb'
+  action template_action
 end

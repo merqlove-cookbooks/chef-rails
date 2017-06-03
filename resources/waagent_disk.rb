@@ -30,4 +30,3 @@ attribute :format, kind_of: [TrueClass,FalseClass], default: false
 attribute :mount_point, kind_of: String, default: node['rails']['azure']['mnt']
 attribute :enable_swap, kind_of: [TrueClass,FalseClass], default: false
 attribute :swap_size, kind_of: Integer, default: 0
-attribute :tmp, kind_of: [TrueClass,FalseClass], default: false
