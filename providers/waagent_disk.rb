@@ -30,6 +30,7 @@ action :update do
       update_mount_point(new_resource, file)
       file.write_file
     end
+    only_if { new_resource.mount_point }
   end
 
   new_resource.updated_by_last_action(true)
