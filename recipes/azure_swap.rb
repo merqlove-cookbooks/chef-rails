@@ -19,4 +19,10 @@
 
 if node['rails']['azure']['swap']
   include_recipe 'rails::waagent'
+  swap_file "#{node['rails']['mnt']}/swapfile" do
+    size      node['rails']['swap']['size'].to_i # MBs
+    persist   true
+    only_if { node['rails']['swap']['enable'] }
+    only_if { File.exist?(node['rails']['mnt']) }
+  end
 end
