@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Definition:: azure_swap
+# Definition:: waagent
 #
 # Copyright (C) 2017 Alexander Merkulov
 #
@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
-if node['rails']['azure']['swap']
-  include_recipe 'rails::waagent'
+rails_waagent_disk 'default' do
+  enable_swap node['rails']['azure']['swap']
+  swap_size node['rails']['swap']['size']
+  format true
+  tmp true
 end
