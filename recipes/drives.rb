@@ -50,6 +50,13 @@ node['rails']['drives'].each do |name, params|
     only_if { with_format }
   end
 
+  execute "parted #{name} --script -- mklabel #{label} mkpart #{part_type} #{file_system} 1 -1s" do
+    # Number  Start   End    Size   File system  Name  Flags
+    #  1      17.4kB  537GB  537GB               xfs
+    not_if "parted #{name} --script -- print |sed '1,/^Number/d' |grep #{part_type}"
+    notifies :run, mkfs, :immediately
+  end
+
   execute "parted mount /bin/true" do
     command "/bin/true"
     action :run
@@ -63,12 +70,5 @@ node['rails']['drives'].each do |name, params|
     only_if "parted #{name} --script -- print |sed '1,/^Number/d' |grep #{part_type}"
     only_if "mountpoint -q #{mount_point}"
     notifies :enable, mount_disk, :immediately
-  end
-
-  execute "parted #{name} --script -- mklabel #{label} mkpart #{part_type} #{file_system} 1 -1s" do
-    # Number  Start   End    Size   File system  Name  Flags
-    #  1      17.4kB  537GB  537GB               xfs
-    not_if "parted #{name} --script -- print |sed '1,/^Number/d' |grep #{part_type}"
-    notifies :run, mkfs, :immediately
   end
 end
