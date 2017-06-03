@@ -12,6 +12,7 @@ EOS
 
   restart_cachefilesd = service 'cachefilesd' do
     action :nothing
+    ignore_failure true
   end
 
   dir = "#{node['rails']['mnt']}/fscache"
