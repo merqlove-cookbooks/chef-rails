@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe 'rails::tmp'
-
 if node['rails']['swap']['custom']
   swap_file '/swapfile' do
     action :remove
