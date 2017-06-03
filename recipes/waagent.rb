@@ -19,7 +19,7 @@
 
 rails_waagent_disk 'default' do
   enable_swap node['rails']['azure']['swap']
-  swap_size node['rails']['swap']['size']
+  swap_size node['rails']['swap']['size'].to_i
   format true
   tmp true
 end
