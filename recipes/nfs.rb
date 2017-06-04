@@ -42,6 +42,7 @@ exports.each do |k, v|
       hosts_file.insert_line_if_no_match(/\s#{n['cloud']['vm_name']}/, host)
       n['cloud']['vm_name']
     end
+    hosts << node['rails']['nfs']['admin_ip'] if node['rails']['nfs']['admin_ip']
   end
 
   network = v['network'] || '*'
