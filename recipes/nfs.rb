@@ -42,13 +42,12 @@ exports.each do |k, v|
       hosts_file.insert_line_if_no_match(/\s#{n['cloud']['vm_name']}/, host)
       n['cloud']['vm_name']
     end
-    log hosts.size
+
     if node['rails']['nfs']['admin_ip']
       host = "#{node['rails']['nfs']['admin_ip']} nfsadmin"
       hosts_file.insert_line_if_no_match(/\snfsadmin/, host)
-      hosts << node['rails']['nfs']['admin_ip'] 
+      hosts << "nfsadmin"
     end
-    log hosts.size
   end
 
   network = v['network'] || '*'
