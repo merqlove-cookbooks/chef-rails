@@ -141,7 +141,7 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def user_groups(u, all_groups=[], web=true) # rubocop:disable Metrics/MethodLength
+def user_groups(u, data) # rubocop:disable Metrics/MethodLength
   return unless u
 
   base_group = data['group'] || u
