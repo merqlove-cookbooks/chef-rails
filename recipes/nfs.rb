@@ -42,13 +42,13 @@ exports.each do |k, v|
       hosts_file.insert_line_if_no_match(/\s#{n['cloud']['vm_name']}/, host)
       n['cloud']['vm_name']
     end
+  end
 
-    export_suffix = ''
-    if node['rails']['nfs']['admin_ip']
-      export_suffix << ' nfsadmin(rw,sync,no_subtree_check,all_squash,insecure,anonuid=0,anongid=0)'
-      host = "#{node['rails']['nfs']['admin_ip']} nfsadmin"
-      hosts_file.insert_line_if_no_match(/\snfsadmin/, host)
-    end
+  export_suffix = ''
+  if node['rails']['nfs']['admin_ip']
+    export_suffix << ' nfsadmin(rw,sync,no_subtree_check,all_squash,insecure,anonuid=0,anongid=0)'
+    host = "#{node['rails']['nfs']['admin_ip']} nfsadmin"
+    hosts_file.insert_line_if_no_match(/\snfsadmin/, host)
   end
 
   network = v['network'] || '*'
