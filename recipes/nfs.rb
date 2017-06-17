@@ -43,10 +43,11 @@ exports.each do |k, v|
       n['cloud']['vm_name']
     end
 
+    export_suffix = ''
     if node['rails']['nfs']['admin_ip']
+      export_suffix << ' nfsadmin(rw,sync,no_subtree_check,all_squash,insecure,anonuid=0,anongid=0)'
       host = "#{node['rails']['nfs']['admin_ip']} nfsadmin"
       hosts_file.insert_line_if_no_match(/\snfsadmin/, host)
-      hosts << "nfsadmin"
     end
   end
 
@@ -60,6 +61,7 @@ exports.each do |k, v|
     sync (v['sync'] && true)
     options options.flatten
     network (hosts || network)
+    suffix export_suffix
   end
 end
 
