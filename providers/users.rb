@@ -42,7 +42,7 @@ action :create do # rubocop:disable Metrics/BlockLength
 
       user u do
         home      "/home/#{u}"
-        gid       data['groups'][0] if data['groups'] && !data['groups'].empty?
+        gid       data['group'] if data['group']
         password  data['password']
         shell     data['shell']
         comment   data['comment']
