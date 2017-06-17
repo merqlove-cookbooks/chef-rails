@@ -56,7 +56,7 @@ action :create do # rubocop:disable Metrics/BlockLength
         not_if { data['no_web'] }
       end
 
-      user_groups(u, data['groups'], data['no_web'])
+      user_groups(u, data)
 
       user_ssh_keys(u, data)
 
@@ -79,25 +79,28 @@ end
 
 def user_ssh_keys(u, data)
   return unless data['ssh-keys'] && u
+  g = data['group'] || u
 
   directory "/home/#{u}/.ssh" do
     action :create
     owner  u
-    group  u
+    group  g
     mode   0o0700
   end
 
   template "/home/#{u}/.ssh/authorized_keys" do
     source 'authorized_keys.erb'
     owner     u
-    group     u
+    group     g
     mode      0o0600
     variables keys: data['ssh-keys']
   end
 end
 
 def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
-  return unless data['vcs'] && u && secret
+  return unless data['vcs'] && u && secret\
+
+  g = data['group'] || u
 
   data['vcs'].each do |v|
     next unless vcs.include?(v)
@@ -107,7 +110,7 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
     file "/home/#{u}/.ssh/#{key['file-name']}" do
       content key['file-content']
       owner   u
-      group   u
+      group   g
       mode    0o0600
     end
 
@@ -121,14 +124,14 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
   template "/home/#{u}/.ssh/config" do
     source 'ssh_config.erb'
     owner  u
-    group  u
+    group  g
     mode '0600'
     variables vcs: data['vcs']
   end
   template "/home/#{u}/.gitconfig" do
     source 'gitconfig.erb'
     owner u
-    group u
+    group g
     mode 0o0644
 
     variables(
@@ -140,11 +143,14 @@ end
 
 def user_groups(u, all_groups=[], web=true) # rubocop:disable Metrics/MethodLength
   return unless u
+
+  base_group = data['group'] || u
+  web = data['web'] || true
   
   m, g = if u == node['rails']['user']['deploy']
     [[node['rails']['user']['deploy']],  'admin']
   elsif web
-    [[node['nginx']['user'], node['rails']['user']['deploy']], u]
+    [[node['nginx']['user'], node['rails']['user']['deploy']], base_group]
   else
     [nil, nil]
   end
@@ -156,7 +162,6 @@ def user_groups(u, all_groups=[], web=true) # rubocop:disable Metrics/MethodLeng
       only_if { m && g }
     end
   end
-
   group "#{node['rbenv']['group']} #{u}" do
     group_name node['rbenv']['group']
     append     true
