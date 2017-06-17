@@ -145,7 +145,7 @@ def user_groups(u, data) # rubocop:disable Metrics/MethodLength
   return unless u
 
   base_group = data['group'] || u
-  web = data['web'] || true
+  web = !data['no_web'] && true
   
   m, g = if u == node['rails']['user']['deploy']
     [[node['rails']['user']['deploy']],  'admin']
