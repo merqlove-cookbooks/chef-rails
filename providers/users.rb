@@ -138,7 +138,7 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def user_groups(u, user_groups=[], web=true) # rubocop:disable Metrics/MethodLength
+def user_groups(u, all_groups=[], web=true) # rubocop:disable Metrics/MethodLength
   return unless u
   
   m, g = if u == node['rails']['user']['deploy']
