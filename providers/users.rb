@@ -42,6 +42,7 @@ action :create do # rubocop:disable Metrics/BlockLength
 
       user u do
         home      "/home/#{u}"
+        gid       data['groups'][0] if data['groups'] && !data['groups'].empty?
         password  data['password']
         shell     data['shell']
         comment   data['comment']
@@ -52,9 +53,10 @@ action :create do # rubocop:disable Metrics/BlockLength
         group_name node['nginx']['user']
         append     true
         members    [u]
+        not_if { data['no_web'] }
       end
 
-      user_groups(u)
+      user_groups(u, data['groups'], data['no_web'])
 
       user_ssh_keys(u, data)
 
@@ -136,19 +138,21 @@ def user_vcs_keys(u, data, vcs, secret) # rubocop:disable Metrics/MethodLength
   end
 end
 
-def user_groups(u) # rubocop:disable Metrics/MethodLength
+def user_groups(u, user_groups=[], web=true) # rubocop:disable Metrics/MethodLength
   return unless u
-
-  if u == node['rails']['user']['deploy']
-    group 'admin' do
-      append  true
-      members [node['rails']['user']['deploy']]
-    end
+  
+  m, g = if u == node['rails']['user']['deploy']
+    [[node['rails']['user']['deploy']],  'admin']
+  elsif web
+    [[node['nginx']['user'], node['rails']['user']['deploy']], u]
   else
-    group u do
-      append  true
-      members [node['nginx']['user'], node['rails']['user']['deploy']]
-    end
+    [nil, nil]
+  end
+
+  group g do
+    append  true
+    members m
+    only_if { m && g }
   end
 
   group "#{node['rbenv']['group']} #{u}" do
@@ -162,6 +166,7 @@ def user_groups(u) # rubocop:disable Metrics/MethodLength
     group_name node['msmtp']['group']
     append     true
     members    [u]
+    only_if { node['msmtp'] }
   end
 end
 
