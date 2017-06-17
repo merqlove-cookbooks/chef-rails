@@ -149,10 +149,12 @@ def user_groups(u, all_groups=[], web=true) # rubocop:disable Metrics/MethodLeng
     [nil, nil]
   end
 
-  group g do
-    append  true
-    members m
-    only_if { m && g }
+  if g
+    group g do
+      append  true
+      members m
+      only_if { m && g }
+    end
   end
 
   group "#{node['rbenv']['group']} #{u}" do
