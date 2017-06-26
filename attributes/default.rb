@@ -35,7 +35,7 @@ default['rails']['docker_checksum'] = nil #'820d13b5699b5df63f7032c8517a5f118a44
 default['rails']['mnt']             = nil
 default['rails']['rsyslog']['configs'] = {}
 
-if node['cloud_v2']['provider'] == 'azure'
+if node['cloud_v2'] && node['cloud_v2']['provider'] == 'azure'
   if platform_family?('rhel')
     default['rails']['azure']['mnt'] = '/mnt/resource' 
   else
