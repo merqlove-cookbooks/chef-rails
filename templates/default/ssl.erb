@@ -1,6 +1,7 @@
 <% with_defaults ||= false %>
+<% with_ssl_on ||= false %>
 <% if @tunes['force_ssl'] && !@ssl %>
-return 301 https://$server_name$request_uri;    
+return 301 https://$server_name$request_uri;
 <% end -%>
 <% if @ssl %>
     <% if with_defaults %>
@@ -9,7 +10,9 @@ return 301 https://$server_name$request_uri;
     }
     <% end -%>
 
+    <% if with_ssl_on %>
     ssl on;
+    <% end -%>
     ssl_certificate <%= @ssl['certificate'] %>;
     ssl_certificate_key <%= @ssl['certificate_key'] %>;
     <% if @ssl['ca'] %>ssl_trusted_certificate <%= @ssl['ca'] %>;<% end %>
