@@ -4,6 +4,9 @@
   server {
     listen <%= @listen %>;
     server_name www.<%= Array(@server_name)[0] %>;
+
+    <%= render 'ssl.erb', variables: { :with_ssl_on => true } %>
+
     return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
   }
   <% end %>
@@ -11,6 +14,8 @@
   server {
     listen <%= @listen %> <%= 'default' if @default %> <%= 'deferred' if @deferred %>;
     server_name <%= Array(@server_name).join(' ') %>;
+
+    <%= render 'ssl.erb', variables: { :with_defaults => true, :with_ssl_on => true } %>
 
     root /var/www/html;
     autoindex off;

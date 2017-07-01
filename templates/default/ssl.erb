@@ -1,16 +1,16 @@
-<% with_defaults ||= false %>
-<% with_ssl_on ||= false %>
+<% @with_defaults ||= false %>
+<% @with_ssl_on ||= false %>
 <% if @tunes['force_ssl'] && !@ssl %>
 return 301 https://$server_name$request_uri;
 <% end -%>
 <% if @ssl %>
-    <% if with_defaults %>
+    <% if @with_defaults %>
     if ($http_host !~ ^<%= Array(@server_name).join('|') %>){
       rewrite ^ http://$http_host$request_uri permanent;
     }
     <% end -%>
 
-    <% if with_ssl_on %>
+    <% if @with_ssl_on %>
     ssl on;
     <% end -%>
     ssl_certificate <%= @ssl['certificate'] %>;
