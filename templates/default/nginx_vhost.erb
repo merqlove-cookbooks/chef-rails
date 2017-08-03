@@ -11,7 +11,7 @@
     <% if @ssl && !@ssl['manual'] %>listen 443 <%= 'default' if @ssl['default'] %><%= 'default_server' if @ssl['default_server'] %> ssl;<% end %>
     server_name www.<%= Array(@server_name)[0] %>;
     
-    <%= render 'ssl.erb' %>
+    <%= render 'ssl.erb', :variables => { :ssl => @ssl, :server_name => @server_name } %>
 
     return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
   }
@@ -22,7 +22,7 @@
     <% if @ssl && !@ssl['manual'] %>listen 443 <%= 'default' if @ssl['default'] %><%= 'default_server' if @ssl['default_server'] %> ssl;<% end %>
     server_name <%= Array(@server_name).join(' ') %>;
 
-    <%= render 'ssl.erb', :variables => { :with_defaults => true } %>
+    <%= render 'ssl.erb', :variables => { :with_defaults => true, :ssl => @ssl, :server_name => @server_name } %>
 
     root   <%= @path %>/docs/<%= @path_suffix || '' %>;
     autoindex off;
