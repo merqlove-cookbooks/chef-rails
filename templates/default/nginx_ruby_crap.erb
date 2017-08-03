@@ -13,7 +13,7 @@ server {
   listen <%= @listen || 80 %>;
   server_name  www.<%= Array(@server_name)[0] %>;
 
-  <%= render 'ssl.erb', :variables => { :with_ssl_on => true, :ssl => @ssl, :server_name => @server_name } %>
+  <%= render 'ssl.erb', :variables => { :with_ssl_on => true, :ssl => @ssl, :server_name => @server_name, :tunes => @tunes } %>
 
   return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
 }
@@ -24,7 +24,7 @@ server {
   server_name <%= Array(@server_name).join(' ') %>;
   root   <%= @path %>/current/public;
 
-  <%= render 'ssl.erb', :variables => { :with_defaults => true, :with_ssl_on => true, :ssl => @ssl, :server_name => @server_name } %>
+  <%= render 'ssl.erb', :variables => { :with_defaults => true, :with_ssl_on => true, :ssl => @ssl, :server_name => @server_name, :tunes => @tunes } %>
 
   autoindex off;
   charset utf-8;
