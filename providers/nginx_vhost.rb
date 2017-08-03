@@ -119,6 +119,8 @@ action :create do # rubocop:disable Metrics/BlockLength
 
   template_name = "#{node['nginx']['dir']}/sites-available/#{name}"
 
+  STDERR.puts new_resource
+
   template template_name do # rubocop:disable Metrics/BlockLength
     owner 'root'
     group 'root'
