@@ -3,6 +3,7 @@
 <% @server_name ||= [] %>
 <% @tunes ||= {} %>
 <% @ssl ||= {} %>
+<% @nginx ||= {} %>
 <% if @tunes['force_ssl'] && !@ssl %>
 return 301 https://$server_name$request_uri;
 <% end -%>
@@ -20,18 +21,18 @@ return 301 https://$server_name$request_uri;
     ssl_certificate_key <%= @ssl['certificate_key'] %>;
     <% if @ssl['ca'] %>ssl_trusted_certificate <%= @ssl['ca'] %>;<% end %>
 
-    <% if node['rails']['nginx']['hsts'] %>
-      <% node['rails']['nginx']['hsts_configs'].each do |k, v| %>
+    <% if @nginx['hsts'] %>
+      <% @nginx['hsts_configs'].each do |k, v| %>
         <%= k %> <%= v %>;
       <% end %>
     <% end %>
 
-    <% node['rails']['nginx']['extra_configs'].each do |k, v| %>
+    <% @nginx['extra_configs'].each do |k, v| %>
       <%= k %> <%= v %>;
     <% end %>
 
-    <% if node['rails']['nginx']['stapling'] %>
-      <% node['rails']['nginx']['stapling_configs'].each do |k, v| %>
+    <% if @nginx['stapling'] %>
+      <% @nginx['stapling_configs'].each do |k, v| %>
         <%= k %> <%= v %>;
       <% end %>
     <% end -%>
