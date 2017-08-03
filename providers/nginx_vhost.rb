@@ -117,9 +117,9 @@ action :create do # rubocop:disable Metrics/BlockLength
     notifies :reload, 'service[nginx]', new_resource.reload
   end
 
-  STDERR.puts node['nginx']['dir']
+  template_name = "#{node['nginx']['dir']}/sites-available/#{name}"
 
-  template "#{node['nginx']['dir']}/sites-available/#{name}" do # rubocop:disable Metrics/BlockLength
+  template template_name do # rubocop:disable Metrics/BlockLength
     owner 'root'
     group 'root'
     mode 0o0644
