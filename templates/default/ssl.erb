@@ -22,18 +22,20 @@ return 301 https://$server_name$request_uri;
     <% if @ssl['ca'] %>ssl_trusted_certificate <%= @ssl['ca'] %>;<% end %>
 
     <% if @nginx['hsts'] %>
-      <% @nginx['hsts_configs'].each do |k, v| %>
-        <%= k %> <%= v %>;
-      <% end %>
+    <% @nginx['hsts_configs'].each do |k, v| %>
+      <%= k %> <%= v %>;
+    <% end %>
     <% end %>
 
+    <% if @nginx['extra_configs'] %>
     <% @nginx['extra_configs'].each do |k, v| %>
       <%= k %> <%= v %>;
     <% end %>
+    <% end -%>
 
     <% if @nginx['stapling'] %>
-      <% @nginx['stapling_configs'].each do |k, v| %>
-        <%= k %> <%= v %>;
-      <% end %>
+    <% @nginx['stapling_configs'].each do |k, v| %>
+      <%= k %> <%= v %>;
+    <% end %>
     <% end -%>
   <% end -%>
