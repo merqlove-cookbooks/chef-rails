@@ -108,7 +108,7 @@ def lvm(new_resource)
         file.write_file
       end
       notifies :umount, unmount_resource, :immediately
-      only_if { File.exist?(waagent_file) && File.readlines(waagent_file).grep(waagent_regex).size > 0 }
+      only_if { ::File.exist?(waagent_file) && ::File.readlines(waagent_file).grep(waagent_regex).size > 0 }
     end
 
     lvm_physical_volume node['rails']['docker_cache_volume']
