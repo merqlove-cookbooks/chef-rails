@@ -8,6 +8,10 @@ location ~ ^/(protected|framework|themes/w+/views) {
 
 location / {
   index  index.html index.php;
+  <% if @auth_basic %>
+    auth_basic '<%= @auth_basic_name %>';
+    auth_basic_user_file <%= @auth_basic_user_file %>;
+  <% end %>
   try_files $uri $uri/ /index.php?$args;
 }
 
