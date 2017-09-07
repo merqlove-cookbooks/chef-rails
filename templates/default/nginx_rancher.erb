@@ -9,7 +9,7 @@ server {
   listen <%= @listen || 80 %>;
   server_name  www.<%= Array(@server_name)[0] %>;
 
-  <%= render 'ssl.erb' %>
+  <%= render 'ssl.erb', :variables => { :with_ssl_on => true, :ssl => @ssl, :server_name => @server_name, :tunes => @tunes, :nginx => node['rails']['nginx'] } %>
 
   return 301 $scheme://<%= Array(@server_name)[0] %>$request_uri;
 }
@@ -21,7 +21,7 @@ server {
 
   root   <%= @path %>/docs/<%= @path_suffix || '' %>;
 
-  <%= render 'ssl.erb', with_default: true %>
+  <%= render 'ssl.erb', :variables => { :with_defaults => true, :with_ssl_on => true, :ssl => @ssl, :server_name => @server_name, :tunes => @tunes, :nginx => node['rails']['nginx'] } %>
 
   autoindex off;
   charset utf-8;
