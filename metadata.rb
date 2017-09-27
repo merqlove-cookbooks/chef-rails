@@ -13,11 +13,11 @@ supports 'ubuntu'
 
 # Base
 
-depends 'chef-client', '~> 8.0.0'
+depends 'chef-client', '~> 8.0'
 
 depends 'build-essential'
-depends 'yum-epel', '~> 0.7.0'
-depends 'yum', '~> 3.11.0'
+depends 'yum-epel', '~> 2.1.0'
+depends 'yum', '~> 5.0'
 depends 'git', '~> 5.0.0'
 depends 'firewall', '~> 2.1'
 depends 'nfs', '>= 0'
@@ -48,7 +48,7 @@ depends 'mongodb3-objects', '~> 0.4.5'
 # App
 
 depends 'python', '~> 1.4.6'
-depends 'yum-mysql-community', '~> 0.1.14'
+depends 'yum-mysql-community', '~> 2.1.0'
 depends 'composer', '~> 2.3.0'
 depends 'mysql', '~> 6.0.17'
 depends 'mysql2_chef_gem', '~> 1.0.1'
