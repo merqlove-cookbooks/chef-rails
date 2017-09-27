@@ -13,12 +13,12 @@ supports 'ubuntu'
 
 # Base
 
-depends 'chef-client', '~> 8.1.0'
+depends 'chef-client', '~> 4.6.0'
 
 depends 'build-essential'
-depends 'yum-epel', '~> 2.1.0'
-depends 'yum', '~> 5.0.0'
-depends 'git', '~> 8.0.0'
+depends 'yum-epel', '~> 0.7.0'
+depends 'yum', '~> 3.11.0'
+depends 'git', '~> 5.0.0'
 depends 'firewall', '~> 2.1'
 depends 'nfs', '>= 0'
 
@@ -33,7 +33,7 @@ depends 'acme', '~> 3.0'
 depends 'rsyslog', '~> 6.0'
 
 depends 'logrotate', '~> 1.9.1'
-# depends 'newrelic', '~> 2.30.0'
+depends 'newrelic', '~> 2.19.0'
 
 depends 'selinux', '~> 0.9.0'
 depends 'vim', '~> 2.0.1'
@@ -48,9 +48,9 @@ depends 'mongodb3-objects', '~> 0.4.5'
 # App
 
 depends 'python', '~> 1.4.6'
-depends 'yum-mysql-community', '~> 2.1.0'
+depends 'yum-mysql-community', '~> 0.1.14'
 depends 'composer', '~> 2.3.0'
-depends 'php', '~> 4.5.0'
+depends 'php', '~> 1.9.0'
 depends 'mysql', '~> 6.0.17'
 depends 'mysql2_chef_gem', '~> 1.0.1'
 # depends 'apache2'
