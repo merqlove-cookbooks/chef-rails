@@ -13,7 +13,7 @@ supports 'ubuntu'
 
 # Base
 
-depends 'chef-client', '~> 4.6.0'
+depends 'chef-client', '~> 8.0.0'
 
 depends 'build-essential'
 depends 'yum-epel', '~> 0.7.0'
