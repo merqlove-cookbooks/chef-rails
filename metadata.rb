@@ -33,7 +33,7 @@ depends 'acme', '~> 3.0'
 depends 'rsyslog', '~> 6.0'
 
 depends 'logrotate', '~> 1.9.1'
-depends 'newrelic', '~> 2.19.0'
+depends 'newrelic', '~> 2.30.0'
 
 depends 'selinux', '~> 0.9.0'
 depends 'vim', '~> 2.0.1'
