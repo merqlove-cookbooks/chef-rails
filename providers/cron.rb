@@ -21,7 +21,7 @@ use_inline_resources
 
 action :init do
   node['rails']['crons'].each do |cron|
-    cron_d "cron-#{cron.name}" do
+    cron_d "cron-#{cron[:name]}" do
       predefined_value cron[:interval]
       minute      cron[:minute]
       hour        cron[:hour]

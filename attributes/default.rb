@@ -79,6 +79,8 @@ default['rails']['nginx']['extra_configs'] = {
   ssl_prefer_server_ciphers: 'on'
 }
 
+default['rails']['crons'] = []
+
 default['rails']['cron'] = {
   minute: '*',
   hour: '*',
