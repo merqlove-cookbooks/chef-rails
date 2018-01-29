@@ -36,7 +36,7 @@ elsif rhel7x? || ubuntu16x?
    {ports: (node['rails']['udp_ports'] || []), type: :udp}].each_with_index do |list|
     (list[:ports] || []).uniq.each do |port| 
       port_bind = port_cast(port)
-      firewall_rule "#{port_name(port)}" do
+      firewall_rule "#{port_name(port)}-#{list[:type]}" do
         port     port_bind
         protocol list[:type]
         command  :allow
