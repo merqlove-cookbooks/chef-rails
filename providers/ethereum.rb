@@ -31,7 +31,6 @@ action :create do
     return
   end
 
-  
   ethereum_service(new_resource)
 
   new_resource.updated_by_last_action(true)
