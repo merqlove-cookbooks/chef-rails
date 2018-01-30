@@ -63,6 +63,8 @@ def ethereum_service(new_resource)
     ignore_failure true
   end
 
+  wallet = wallet_get(new_resource)
+
   template "#{new_resource.service_path}/#{new_resource.service_name}" do
     owner 'root'
     group 'root'
@@ -71,13 +73,23 @@ def ethereum_service(new_resource)
     cookbook new_resource.template ? new_resource.cookbook_name.to_s : new_resource.cookbook
     variables(
       name: new_resource.name,
-      wallet: new_resource.wallet,
+      wallet: wallet,
       log_path: new_resource.log_path
     )
     action :create
     notifies :run, 'execute[systemctl daemon-reload]', :immediately
     notifies :enable, "service[#{service_name}]", :immediately
     notifies :restart, "service[#{service_name}]", :delayed
+  end
+end
+
+def wallet_get(new_resource)
+  secret = load_secret
+  root = ::Chef::EncryptedDataBagItem.load("ethereum", new_resource.wallet, secret)
+  if root
+    root['value']
+  else
+    ''
   end
 end
 
