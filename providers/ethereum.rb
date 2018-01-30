@@ -22,6 +22,11 @@ use_inline_resources
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
+  unless ubuntu16x?
+    new_resource.updated_by_last_action(false)
+    return
+  end
+
   ethereum_create(new_resource)
   ethereum_service(new_resource)
 
