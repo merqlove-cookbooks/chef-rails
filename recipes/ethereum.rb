@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rails
-# Resource:: docker
+# Definition:: ethereum
 #
 # Copyright (C) 2017 Alexander Merkulov
 #
@@ -17,12 +17,6 @@
 # limitations under the License.
 #
 
-actions :create, :delete
-
-default_action :create
-
-attribute :name, name_attribute: true, kind_of: String
-attribute :cookbook, kind_of: String, default: 'rails'
-
-attribute :version, kind_of: String, default: node['rails']['docker_version']
-attribute :checksum, kind_of: String, default: node['rails']['docker_checksum']
+rails_ethereum node['rails']['ethereum']['name'] do
+  wallet node['rails']['ethereum']['wallet']
+end

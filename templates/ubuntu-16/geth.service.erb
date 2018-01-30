@@ -1,0 +1,14 @@
+# Maintained by Chef.  Local changes will be overwritten
+
+[Unit]
+Description=Ethereum go client
+Requires=network.target
+
+[Service]
+Type=forking
+User=%I
+ExecStart=geth -S <%= @name %> --etherbase '<%= @wallet %>' 2><%= @log_path %>
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
