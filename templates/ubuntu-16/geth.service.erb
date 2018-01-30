@@ -7,7 +7,7 @@ Requires=network.target
 [Service]
 Type=forking
 User=%I
-ExecStart=geth -S <%= @name %> --etherbase '<%= @wallet %>' 2><%= @log_path %>
+ExecStart=geth -S <%= @name %> --etherbase '<%= @wallet %>' --mine 2><%= @log_path %>
 Restart=on-failure
 
 [Install]
