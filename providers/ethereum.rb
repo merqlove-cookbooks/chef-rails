@@ -22,12 +22,16 @@ use_inline_resources
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
-  unless ubuntu16x?
+  if ubuntu16x?
+    ethereum_create_ubuntu(new_resource)
+  elsif rhel7x?
+    ethereum_create_rhel(new_resource)
+  else
     new_resource.updated_by_last_action(false)
     return
   end
 
-  ethereum_create(new_resource)
+  
   ethereum_service(new_resource)
 
   new_resource.updated_by_last_action(true)
@@ -39,7 +43,7 @@ action :delete do
   new_resource.updated_by_last_action(true)
 end
 
-def ethereum_create(new_resource)
+def ethereum_create_ubuntu(new_resource)
   apt_repository 'ethereum' do
     uri          'http://ppa.launchpad.net/ethereum/ethereum/ubuntu'
     distribution node['lsb']['codename']
@@ -54,6 +58,31 @@ def ethereum_create(new_resource)
   end
 
   package 'ethereum'
+end
+
+def ethereum_create_rhel(new_resource)
+  package 'golang'
+  package 'gmp-devel'
+
+  gz_filename = "v#{node['rails']['ethereum']['source']['version']}"
+
+  remote_file "#{Chef::Config[:file_cache_path]}/#{gz_filename}.tar.gz" do
+    source   node['rails']['ethereum']['source']['url']
+    checksum node['rails']['ethereum']['source']['checksum']
+    action   :create
+    notifies :run, 'bash[compile_ethereum_from_source]', :immediately
+  end
+
+  bash 'compile_ethereum_from_source' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-EOH
+      tar -xvf #{gz_filename}.tar.gz
+      cd #{gz_filename}/
+      make geth
+      mv build/bin/* /usr/bin/
+    EOH
+    action :nothing
+  end
 end
 
 def ethereum_service(new_resource)
