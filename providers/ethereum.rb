@@ -53,7 +53,7 @@ def ethereum_create(new_resource)
     only_if { debian? }
   end
 
-  package 'etherium'
+  package 'ethereum'
 end
 
 def ethereum_service(new_resource)
