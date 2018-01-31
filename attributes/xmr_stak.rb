@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-defaults['rails']['xmr_stak'] = {
+default['rails']['xmr_stak'] = {
   'name' => node['hostname'],
   'wallet_address' => '',
   'currency' => 'monero',
@@ -25,10 +25,10 @@ defaults['rails']['xmr_stak'] = {
   'pool_password' => 'x'
 }
 
-defaults['rails']['xmr_stak']['path'] = '/usr/local/xmr_stak'
-defaults['rails']['xmr_stak']['bin'] = "#{['rails']['xmr_stak']['path']}/bin/xmr-stak"
-defaults['rails']['xmr_stak']['config'] = "#{['rails']['xmr_stak']['path']}/config.txt"
-defaults['rails']['xmr_stak']['cpu_config'] = "#{['rails']['xmr_stak']['path']}/cpu.config.txt"
-defaults['rails']['xmr_stak']['source']['version'] = '2.2.0'
-defaults['rails']['xmr_stak']['source']['checksum'] = 'a44c1315be4e3cf4ba8a01550a244408b27318b40ebbc0c9f0164d3ffdfe259d',
-defaults['rails']['xmr_stak']['source']['url'] = "https://github.com/fireice-uk/xmr-stak/archive/v#{gz_filename}.tar.gz"
+default['rails']['xmr_stak']['path'] = '/usr/local/xmr_stak'
+default['rails']['xmr_stak']['bin'] = "#{['rails']['xmr_stak']['path']}/bin/xmr-stak"
+default['rails']['xmr_stak']['config'] = "#{['rails']['xmr_stak']['path']}/config.txt"
+default['rails']['xmr_stak']['cpu_config'] = "#{['rails']['xmr_stak']['path']}/cpu.config.txt"
+default['rails']['xmr_stak']['source']['version'] = '2.2.0'
+default['rails']['xmr_stak']['source']['checksum'] = 'a44c1315be4e3cf4ba8a01550a244408b27318b40ebbc0c9f0164d3ffdfe259d',
+default['rails']['xmr_stak']['source']['url'] = "https://github.com/fireice-uk/xmr-stak/archive/v#{gz_filename}.tar.gz"
