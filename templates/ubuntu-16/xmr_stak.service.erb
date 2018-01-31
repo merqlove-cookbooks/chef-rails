@@ -1,0 +1,14 @@
+# Maintained by Chef.  Local changes will be overwritten
+
+[Unit]
+Description=XmrStak
+Requires=network.target
+
+[Service]
+Type=forking
+User=root
+ExecStart=<%= node['rails']['xmr_stak']['bin'] %> -c <%= node['rails']['xmr_stak']['config'] %> --cpu <%= node['rails']['xmr_stak']['cpu_config'] %>
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
