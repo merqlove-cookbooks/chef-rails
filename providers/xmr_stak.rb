@@ -98,7 +98,7 @@ def fix_huge_pages
   file.write_file
 end
 
-def xmr_service(new_resource)
+def xmr_stak_service(new_resource)
   service new_resource.service_name do
     supports status: true, restart: true, stop: true, reload: true
     action :nothing
