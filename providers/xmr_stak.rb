@@ -119,7 +119,7 @@ def xmr_stak_service(new_resource)
       pool_password: new_resource.pool_password
     )
     action :create
-    notifies :restart, "service[#{service_name}]", :delayed
+    notifies :restart, "service[#{new_resource.service_name}]", :delayed
   end
 
   template node['rails']['xmr_stak']['cpu_config'] do
@@ -132,7 +132,7 @@ def xmr_stak_service(new_resource)
       name: new_resource.name,
     )
     action :create
-    notifies :restart, "service[#{service_name}]", :delayed
+    notifies :restart, "service[#{new_resource.service_name}]", :delayed
   end
 
   template "#{new_resource.service_path}/#{new_resource.service_name}" do
@@ -146,8 +146,8 @@ def xmr_stak_service(new_resource)
     )
     action :create
     notifies :run, 'execute[systemctl daemon-reload]', :immediately
-    notifies :enable, "service[#{service_name}]", :immediately
-    notifies :restart, "service[#{service_name}]", :delayed
+    notifies :enable, "service[#{new_resource.service_name}]", :immediately
+    notifies :restart, "service[#{new_resource.service_name}]", :delayed
   end
 end
 
