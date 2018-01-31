@@ -97,6 +97,8 @@ def fix_huge_pages
   file = Chef::Util::FileEdit.new('/etc/sysctl.conf')
   file.insert_line_if_no_match(/#{line}/, line)
   file.write_file
+
+  execute 'sysctl -p'
 end
 
 def xmr_stak_service(new_resource)
