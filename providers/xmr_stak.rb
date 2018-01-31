@@ -47,6 +47,7 @@ def xmr_stak_create_ubuntu(new_resource)
     package p
   end
 
+  fix_huge_pages
   xmr_stak_install(new_resource, "cmake")
 end
 
