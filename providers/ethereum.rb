@@ -106,8 +106,12 @@ def ethereum_service(new_resource)
     )
     action :create
     notifies :run, 'execute[systemctl daemon-reload]', :immediately
-    notifies :enable, "service[#{service_name}]", :immediately
-    notifies :restart, "service[#{service_name}]", :delayed
+    notifies :enable, "service[#{new_resource.service_name}]", :immediately
+    notifies :restart, "service[#{new_resource.service_name}]", :delayed
+  end
+
+  execute 'systemctl daemon-reload' do
+    action :nothing
   end
 end
 

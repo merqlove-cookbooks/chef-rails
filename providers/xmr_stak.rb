@@ -149,6 +149,10 @@ def xmr_stak_service(new_resource)
     notifies :enable, "service[#{new_resource.service_name}]", :immediately
     notifies :restart, "service[#{new_resource.service_name}]", :delayed
   end
+
+  execute 'systemctl daemon-reload' do
+    action :nothing
+  end
 end
 
 def ethereum_delete(new_resource)
