@@ -18,5 +18,6 @@
 #
 
 rails_ethereum node['rails']['ethereum']['name'] do
-  wallet node['rails']['ethereum']['wallet']
+  wallet_address node['rails']['ethereum']['wallet_address']
+  pool_address node['rails']['ethereum']['pool_address']
 end

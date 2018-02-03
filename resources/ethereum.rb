@@ -23,10 +23,11 @@ default_action :create
 
 attribute :name, name_attribute: true, kind_of: String
 attribute :cookbook, kind_of: String, default: 'rails'
-attribute :template, kind_of: String, default: 'geth.service.erb'
+attribute :template, kind_of: String, default: 'ethminer.service.erb'
 
 attribute :log_path, kind_of: String, default: "%h/.ethereum/geth.log"
-attribute :wallet, kind_of: String, default: ""
+attribute :wallet_address, kind_of: String, default: ""
+attribute :pool_address, kind_of: String, default: ""
 
-attribute :service_name, kind_of: String, default: "geth.service"
+attribute :service_name, kind_of: String, default: "ethminer.service"
 attribute :service_path, kind_of: String, default: "/etc/systemd/system"

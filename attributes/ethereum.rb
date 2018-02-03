@@ -19,7 +19,8 @@
 
 default['rails']['ethereum'] = {
   'name' => 'ether1',
-  'wallet' => ''
+  'wallet_address' => '',
+  'pool_address' => ''
 }
 default['rails']['ethereum']['source']['version'] = '1.7.3'
 default['rails']['ethereum']['source']['checksum'] = '64a9f19eeccb3c094e7f9d2d936cd2d48aee3a2cc03148b980e0462c7579a73a',
