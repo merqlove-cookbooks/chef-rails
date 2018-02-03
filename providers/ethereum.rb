@@ -54,7 +54,9 @@ def ethereum_create_ubuntu(new_resource)
     only_if { debian? }
   end
 
-  package 'ethereum'
+  package 'ethereum' do
+    options '--allow-unauthenticated'
+  end
   package 'ethminer'
 end
 
