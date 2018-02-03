@@ -45,18 +45,20 @@ def ethereum_create_ubuntu(new_resource)
     uri          'http://ppa.launchpad.net/ethereum/ethereum/ubuntu'
     distribution node['lsb']['codename']
     components   ['main']
+    keyserver    'keyserver.ubuntu.com'
+    key          '923F6CA9'
     only_if { debian? }
   end
   apt_repository 'ethereum-dev' do
     uri          'http://ppa.launchpad.net/ethereum/ethereum-dev/ubuntu'
     distribution node['lsb']['codename']
     components   ['main']
+    keyserver    'keyserver.ubuntu.com'
+    key          '923F6CA9'
     only_if { debian? }
   end
 
-  package 'ethereum' do
-    options '--allow-unauthenticated'
-  end
+  package 'ethereum'
   package 'ethminer'
 end
 
