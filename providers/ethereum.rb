@@ -41,7 +41,7 @@ action :delete do
 end
 
 def ethereum_create_ubuntu(new_resource)
-  ['libboost-all-dev', ' libleveldb-dev', 'libcurl4-openssl-dev', 'libmicrohttpd-dev', 'libminiupnpc-dev', 'libgmp-dev', 'cmake'].each do |p|
+  ['libboost-all-dev', 'libleveldb-dev', 'libcurl4-openssl-dev', 'libmicrohttpd-dev', 'libminiupnpc-dev', 'libgmp-dev', 'cmake'].each do |p|
     package p
   end
   gz_filename = "develop"
