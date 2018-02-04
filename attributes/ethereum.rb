@@ -22,6 +22,11 @@ default['rails']['ethereum'] = {
   'wallet_address' => '',
   'pool_address' => ''
 }
+default['rails']['ethereum']['git_repo'] = 'https://github.com/ethereum/cpp-ethereum.git'
 default['rails']['ethereum']['source']['version'] = '1.7.3'
-default['rails']['ethereum']['source']['checksum'] = '64a9f19eeccb3c094e7f9d2d936cd2d48aee3a2cc03148b980e0462c7579a73a',
-default['rails']['ethereum']['source']['url'] = "https://github.com/ethereum/go-ethereum/archive/v#{node['rails']['ethereum']['source']['version']}.tgz"
+default['rails']['ethereum']['source']['checksum'] = 'a3b89d9428402152c3d782e3289ddc81c57ee3cb02a77c583e9e3edc6f6e3382',
+# default['rails']['ethereum']['source']['url'] = "https://github.com/ethereum/go-ethereum/archive/v#{node['rails']['ethereum']['source']['version']}.tgz"
+default['rails']['ethereum']['source']['url'] = "https://github.com/ethereum/cpp-ethereum/archive/develop.zip"
+
+default['rails']['ethereum']['path'] = '/usr/local/ethereum'
+default['rails']['ethereum']['bin'] = "#{node['rails']['ethereum']['path']}/bin/ethminer"

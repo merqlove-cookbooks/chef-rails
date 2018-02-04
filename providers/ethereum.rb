@@ -41,28 +41,29 @@ action :delete do
 end
 
 def ethereum_create_ubuntu(new_resource)
-  apt_repository 'ethereum' do
-    uri          'http://ppa.launchpad.net/ethereum/ethereum/ubuntu'
-    distribution node['lsb']['codename']
-    components   ['main']
-    keyserver    'keyserver.ubuntu.com'
-    key          '923F6CA9'
-    only_if { debian? }
+  ['libboost-all-dev', ' libleveldb-dev', 'libcurl4-openssl-dev', 'libmicrohttpd-dev', 'libminiupnpc-dev', 'libgmp-dev', 'cmake'].each do |p|
+    package p
   end
-  apt_repository 'ethereum-dev' do
-    uri          'http://ppa.launchpad.net/ethereum/ethereum-dev/ubuntu'
-    distribution node['lsb']['codename']
-    components   ['main']
-    keyserver    'keyserver.ubuntu.com'
-    key          '923F6CA9'
-    only_if { debian? }
+  gz_filename = "develop"
+  gz_dir = "cpp-ethereum-#{gz_filename}"
+
+  git "#{Chef::Config[:file_cache_path]}/#{gz_dir}" do
+    repository node['rails']['ethereum']['git_repo']
+    enable_submodules true
+    action :sync
+    notifies :run, 'bash[compile_eth_from_source]', :immediately
   end
 
-  package 'ethereum' do
-    options '--allow-unauthenticated'
-  end
-  package 'ethminer' do
-    options '--allow-unauthenticated'
+  bash 'compile_eth_from_source' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-EOH
+      mkdir -p #{gz_dir}/build
+      cd #{gz_dir}/build
+      mkdir -p #{node['rails']['ethereum']['path']}
+      #{cmake} -DCMAKE_INSTALL_PREFIX=#{node['rails']['xmr_stak']['path']} ..
+      make install
+    EOH
+    action :nothing
   end
 end
 
