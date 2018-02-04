@@ -60,7 +60,7 @@ def ethereum_create_ubuntu(new_resource)
       mkdir -p #{gz_dir}/build
       cd #{gz_dir}/build
       mkdir -p #{node['rails']['ethereum']['path']}
-      #{cmake} -DCMAKE_INSTALL_PREFIX=#{node['rails']['xmr_stak']['path']} ..
+      cmake -DCMAKE_INSTALL_PREFIX=#{node['rails']['xmr_stak']['path']} ..
       make install
     EOH
     action :nothing
