@@ -5,8 +5,7 @@ Description=ZCache client
 Requires=network.target
 
 [Service]
-Type=forking
-User=%I
+User=root
 ExecStart=<%= node['rails']['zcache']['bin'] %> -l <%= @pool_address %> -u <%= @wallet_address %>
 Restart=on-failure
 

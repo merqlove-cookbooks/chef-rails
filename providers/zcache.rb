@@ -41,19 +41,27 @@ action :delete do
 end
 
 def zcache_create_ubuntu(new_resource)
-  gz_filename = node['rails']['zcache']['file']
-
-  remote_file "#{Chef::Config[:file_cache_path]}/#{gz_filename}.zip" do
-    source   node['rails']['zcache']['url']
-    checksum node['rails']['zcache']['checksum']
-    action   :create
-    notifies :run, 'bash[copy_nheqminer_bin]', :immediately
+  ['cmake', 'libboost-all-dev'].each do |p|
+    package p
   end
 
-  bash 'copy_nheqminer_bin' do
+  gz_dir = "nheqminer"
+
+  git "#{Chef::Config[:file_cache_path]}/#{gz_dir}" do
+    repository node['rails']['zcache']['git_repo']
+    enable_submodules true
+    action :sync
+    notifies :run, 'bash[compile_nheq_from_source]', :immediately
+  end
+
+  bash 'compile_nheq_from_source' do
     cwd Chef::Config[:file_cache_path]
     code <<-EOH
-      unzip "#{gz_filename}.zip"
+      cd #{gz_dir}/#{gz_dir}
+      mkdir build
+      cd build
+      cmake -DXENON=1 ..
+      make      
       mkdir -p #{node['rails']['zcache']['path']}/bin
       mv #{node['rails']['zcache']['binary']} #{node['rails']['zcache']['bin']}
       chmod +x #{node['rails']['zcache']['bin']}
@@ -77,7 +85,7 @@ def nheqminer_service(new_resource)
     cookbook new_resource.template ? new_resource.cookbook_name.to_s : new_resource.cookbook
     variables(
       name: new_resource.name,
-      wallet: new_resource.wallet_address,
+      wallet_address: new_resource.wallet_address,
       pool_address: new_resource.pool_address
     )
     action :create
