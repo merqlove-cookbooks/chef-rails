@@ -30,5 +30,5 @@ default['rails']['xmr_stak']['bin'] = "#{node['rails']['xmr_stak']['path']}/bin/
 default['rails']['xmr_stak']['config'] = "#{node['rails']['xmr_stak']['path']}/config.txt"
 default['rails']['xmr_stak']['cpu_config'] = "#{node['rails']['xmr_stak']['path']}/cpu.config.txt"
 default['rails']['xmr_stak']['source']['version'] = '2.2.0'
-default['rails']['xmr_stak']['source']['checksum'] = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+default['rails']['xmr_stak']['source']['checksum'] = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 default['rails']['xmr_stak']['source']['url'] = "https://github.com/fireice-uk/xmr-stak/archive/v#{node['rails']['xmr_stak']['source']['version']}.tar.gz"
