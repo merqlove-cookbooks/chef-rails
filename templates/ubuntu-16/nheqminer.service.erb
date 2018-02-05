@@ -7,7 +7,7 @@ Requires=network.target
 [Service]
 Type=forking
 User=%I
-ExecStart=node['rails']['zcache']['bin'] -l <%= @pool_address %> -u <%= @wallet_address %>
+ExecStart=<%= node['rails']['zcache']['bin'] %> -l <%= @pool_address %> -u <%= @wallet_address %>
 Restart=on-failure
 
 [Install]

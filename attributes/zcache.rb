@@ -22,11 +22,11 @@ default['rails']['zcache'] = {
   'wallet_address' => '',
   'pool_address' => ''
 }
-default['rails']['zcache']['source']['binary'] = 'nheqminer_16_04'
-default['rails']['zcache']['source']['version'] = '0.5c'
-default['rails']['zcache']['source']['file'] = 'Ubuntu_16_04_x64_cuda_djezo_avx_nheqminer-5c'
-default['rails']['zcache']['source']['checksum'] = '0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5'
-default['rails']['zcache']['source']['url'] = "https://github.com/nicehash/nheqminer/releases/download/#{node['rails']['zcache']['source']['version']}/#{node['rails']['zcache']['source']['file']}.tar.gz"
+default['rails']['zcache']['binary'] = 'nheqminer_16_04'
+default['rails']['zcache']['version'] = '0.5c'
+default['rails']['zcache']['file'] = 'Ubuntu_16_04_x64_cuda_djezo_avx_nheqminer-5c'
+default['rails']['zcache']['checksum'] = '7f7ae8c448307f7632ad48f50e7663a7191b65d876f2fe502bb9f09422e1e8b3'
+default['rails']['zcache']['url'] = "https://github.com/nicehash/nheqminer/releases/download/#{node['rails']['zcache']['version']}/#{node['rails']['zcache']['file']}.zip"
 
 default['rails']['zcache']['path'] = '/usr/local/zcache'
 default['rails']['zcache']['bin'] = "#{node['rails']['zcache']['path']}/bin/nheqminer"

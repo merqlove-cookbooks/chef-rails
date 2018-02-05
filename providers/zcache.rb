@@ -41,11 +41,11 @@ action :delete do
 end
 
 def zcache_create_ubuntu(new_resource)
-  gz_filename = node['rails']['zcache']['source']['file']
+  gz_filename = node['rails']['zcache']['file']
 
-  remote_file "#{Chef::Config[:file_cache_path]}/#{gz_filename}.tar.gz" do
-    source   node['rails']['zcache']['source']['url']
-    checksum node['rails']['zcache']['source']['checksum']
+  remote_file "#{Chef::Config[:file_cache_path]}/#{gz_filename}.zip" do
+    source   node['rails']['zcache']['url']
+    checksum node['rails']['zcache']['checksum']
     action   :create
     notifies :run, 'bash[copy_nheqminer_bin]', :immediately
   end
@@ -53,8 +53,9 @@ def zcache_create_ubuntu(new_resource)
   bash 'copy_nheqminer_bin' do
     cwd Chef::Config[:file_cache_path]
     code <<-EOH
-      mkdir -p #{node['rails']['zcache']['path']}
-      cp #{node['rails']['zcache']['binary']} #{node['rails']['zcache']['bin']}
+      unzip "#{gz_filename}.zip"
+      mkdir -p #{node['rails']['zcache']['path']}/bin
+      mv #{node['rails']['zcache']['binary']} #{node['rails']['zcache']['bin']}
       chmod +x #{node['rails']['zcache']['bin']}
     EOH
     action :nothing
