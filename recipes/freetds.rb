@@ -18,5 +18,5 @@
 #
 
 rails_freetds "localtds" do
-  # nothing
+  action :create
 end

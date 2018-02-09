@@ -23,9 +23,9 @@ use_inline_resources
 
 action :create do
   if node['rails']['freetds']['install_method'] == 'package'
-    install_package
+    install_package(new_resource)
   else
-    install_source
+    install_source(new_resource)
   end
 
   directory node['rails']['freetds']['dir'] do
