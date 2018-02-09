@@ -27,7 +27,7 @@ else
   default['rails']['freetds']['packages']       = %w(freetds-bin freetds-dev)
 end
 
-default['rails']['freetds']['tds_version']    = '7.4'
+default['rails']['freetds']['tds_version']    = '7.3'
 default['rails']['freetds']['odbc']           = false
 default['rails']['freetds']['text_size']      = 64_512
 default['rails']['freetds']['client_charset'] = nil
