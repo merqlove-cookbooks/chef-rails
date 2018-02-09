@@ -22,11 +22,15 @@ use_inline_resources
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
-  if node['rails']['freetds']['install_method'] == 'package'
+  case node['rails']['freetds']['install_method']
+  when 'package'
     install_package(new_resource)
-  else
+  when 'source'
     install_source(new_resource)
-  end
+  else 
+    new_resource.updated_by_last_action(false)
+    return
+  end 
 
   directory node['rails']['freetds']['dir'] do
     owner 'root'
@@ -34,7 +38,7 @@ action :create do
     recursive true
   end
 
-  template File.join(node['rails']['freetds']['dir'], 'freetds.conf') do
+  template ::File.join(node['rails']['freetds']['dir'], 'freetds.conf') do
     source new_resource.template
     owner 'root'
     group 'root'
