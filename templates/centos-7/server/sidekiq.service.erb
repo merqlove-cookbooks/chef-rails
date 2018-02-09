@@ -2,11 +2,11 @@
 <%= render 'server/service/unit.erb' %>
 
 [Service]
-Type=simple
+Type=forking
 <%= render 'server/service/service.erb' %>
 PIDFile=<%= @path %>/shared/tmp/pids/sidekiq.pid
 Environment=SIDEKIQ_CONFIG_FILE=<%= @path %>/shared/config/sidekiq.yml
-ExecStart=<%= node['rbenv']['root_path'] %>/shims/bundle exec sidekiq -C ${SIDEKIQ_CONFIG_FILE}
+ExecStart=<%= node['rbenv']['root_path'] %>/shims/bundle exec sidekiq -C ${SIDEKIQ_CONFIG_FILE} --daemon
 ExecStop=<%= node['rbenv']['root_path'] %>/shims/bundle exec sidekiqctl stop ${<%= @path %>/shared/tmp/pids/sidekiq.pid}
 
 [Install]
