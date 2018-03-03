@@ -4,7 +4,6 @@ WorkingDirectory=<%= @path %>/current
 EnvironmentFile=<%= @path %>/.rbenv-vars
 Environment=RAILS_ENV=<%= @environment || 'production' %>
 TimeoutSec=<%= @opts['timeout'] || 15 %>
-Restart=always
 StandardInput=null
 StandardOutput=syslog
 StandardError=syslog

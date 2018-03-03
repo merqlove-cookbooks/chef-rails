@@ -4,6 +4,7 @@
 [Service]
 Type=forking
 <%= render 'server/service/service.erb' %>
+Restart=always
 PIDFile=<%= @path %>/shared/tmp/pids/puma.pid
 Environment=PUMA_CONFIG_FILE=<%= @path %>/shared/config/puma.rb
 ExecStart=<%= node['rbenv']['root_path'] %>/shims/bundle exec puma -C ${PUMA_CONFIG_FILE} --daemon
