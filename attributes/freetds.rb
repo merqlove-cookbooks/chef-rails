@@ -19,7 +19,7 @@
 
 default['rails']['freetds']['install_method'] = 'package'
 default['rails']['freetds']['version']        = '1.00.80'
-default['rails']['freetds']['checksum']       = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+default['rails']['freetds']['checksum']       = 'c5721eeed39372edd4831daf2e309a859f5682a27df8ae8e7dd71da666807497'
 
 if platform_family?('rhel') 
   default['rails']['freetds']['packages']       = %w(freetds freetds-devel)
