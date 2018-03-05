@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-default['rails']['freetds']['install_method'] = 'package'
+default['rails']['freetds']['install_method'] = 'source'
 default['rails']['freetds']['version']        = '1.00.80'
 default['rails']['freetds']['checksum']       = 'c5721eeed39372edd4831daf2e309a859f5682a27df8ae8e7dd71da666807497'
 
