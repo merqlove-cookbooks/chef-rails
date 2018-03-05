@@ -9,8 +9,8 @@
 # Global settings are overridden by those in a database
 # server specific section
 [global]
-        # TDS protocol version
-  tds version = <%= node['rails']['freetds']['tds_version'] %>
+  # TDS protocol version
+  tds version = <%= node['rails']['freetds']['tds_version'] || 'auto' %>
 
   # Whether to write a TDSDUMP file for diagnostic purposes
   # (setting this to /tmp is insecure on a multi-user system)
@@ -25,3 +25,7 @@
   # is trying to allocate a huge buffer for a TEXT field.
   # Try setting 'text size' to a more reasonable limit
   text size = <%= node['rails']['freetds']['text_size'] %>
+
+	# If you experience TLS handshake errors and are using openssl,
+	# try adjusting the cipher list (don't surround in double or single quotes)
+	# openssl ciphers = HIGH:!SSLv2:!aNULL:-DH
