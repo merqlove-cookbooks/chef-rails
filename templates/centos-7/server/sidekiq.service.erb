@@ -11,7 +11,7 @@ Environment=SIDEKIQ_CONFIG_FILE=<%= @path %>/shared/config/sidekiq.yml
 
 ExecStart=/bin/bash -lc 'bundle exec sidekiq -C ${SIDEKIQ_CONFIG_FILE}'
 
-Umask8002
+Umask=8002
 
 RestartSec=1
 Restart=on-failure
