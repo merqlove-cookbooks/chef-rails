@@ -246,39 +246,6 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
       notifies :restart, "service[#{service_name}]", :delayed
     end
 
-    sudo service_worker do
-      user      a['user']
-      runas     'root'
-      nopasswd  true
-      commands  ["/bin/systemctl restart #{service_name_worker}"]
-
-      action :nothing
-    end
-
-    template monit_file_worker do
-      cookbook 'rails'
-      source "etc/monit.d/#{worker_type}.monitrc.erb"
-      owner 'root'
-      group 'root'
-      mode 0o0755
-      variables path: app_path,
-                num_workers: 1,
-                service_name: service_worker,
-                mem_limit: 500
-
-      action :nothing
-    end
-
-    execute "#{service_worker}-monit" do
-      command "monit reload"
-      action :nothing
-    end
-
-    execute "#{service_worker}-restart" do
-      command "monit -g #{service_worker} restart all"
-      action :nothing
-    end
-
     template init_file_worker do
       cookbook 'rails'
       source "server/#{service_type_worker}.erb"
@@ -293,12 +260,53 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
       notifies :run, 'execute[systemctl daemon-reload]', :immediately if rhel7x?
       notifies :enable, "service[#{service_name_worker}]", :immediately
       notifies :restart, "service[#{service_name_worker}]", :delayed unless with_monit?
-      notifies :create, "template[#{monit_file_worker}]", :immediately if rhel7x? && with_monit?
-      notifies :run, "execute[#{service_worker}-monit]", :immediately if with_monit?
-      notifies :run, "execute[#{service_worker}-restart]", :delayed if with_monit?
-      notifies :install, "sudo[#{service_worker}]", :delayed if rhel7x?
+      notifies :create, "template[#{monit_file_worker}]", :immediately
+      notifies :run, "execute[#{service_worker}-monit]", :immediately
+      notifies :run, "execute[#{service_worker}-restart]", :delayed
+      notifies :install, "sudo[#{service_worker}]", :delayed
 
       only_if { a['ruby_server']['worker'] }
+    end
+
+    sudo service_worker do
+      user      a['user']
+      runas     'root'
+      nopasswd  true
+      commands  ["/bin/systemctl restart #{service_name_worker}"]
+
+      action :nothing
+
+      only_if { rhel7x? }
+    end
+
+    template monit_file_worker do
+      cookbook 'rails'
+      source "etc/monit.d/#{worker_type}.monitrc.erb"
+      owner 'root'
+      group 'root'
+      mode 0o0755
+      variables path: app_path,
+                num_workers: 1,
+                service_name: service_worker,
+                mem_limit: 500
+
+      action :nothing
+
+      only_if { with_monit? && rhel7x? }
+    end
+
+    execute "#{service_worker}-monit" do
+      command "monit reload"
+      action :nothing
+
+      only_if { with_monit? }
+    end
+
+    execute "#{service_worker}-restart" do
+      command "monit -g #{service_worker} restart all"
+      action :nothing
+
+      only_if { with_monit? }
     end
   else
     file rbenv_vars_file do
