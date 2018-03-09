@@ -271,9 +271,9 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
     sudo service_worker do
       user      a['user']
       nopasswd  true
-      commands  ["/bin/systemctl restart #{service_name_worker}",
-                 "/bin/systemctl stop #{service_name_worker}",
-                 "/bin/systemctl start #{service_name_worker}"]
+      commands  [["/bin/systemctl restart #{service_name_worker}",
+                  "/bin/systemctl stop #{service_name_worker}",
+                  "/bin/systemctl start #{service_name_worker}"].join(",")]
 
       action :nothing
 
