@@ -176,6 +176,14 @@ def service_name(name)
   end
 end
 
+def with_monit?
+  node['packages-cookbook']&.include?("monit")
+end
+
+def monit_name(name)
+  "/etc/monit.d/#{name}.monitrc"
+end
+
 def service_base_name(name)
   if rhel7x?
     "#{name}.service"
@@ -188,9 +196,12 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
   service_type = service_base_name(a['ruby_server']['type'])
   service_type_worker = service_base_name(a['ruby_server']['worker_type'])
   service_name = service_base_name("#{a['ruby_server']['type']}_#{a['name']}")
-  service_name_worker = service_base_name("#{a['ruby_server']['worker_type']}_#{a['name']}")
+  service_worker = "#{a['ruby_server']['worker_type']}_#{a['name']}"
+  service_name_worker = service_base_name(service_worker)
   init_file = service_name(service_name)
   init_file_worker = service_name(service_name_worker)
+  monit_file_worker = monit_name(service_worker)
+
   rbenv_vars_file  = "#{app_path}/.rbenv-vars"
 
   service service_name do
@@ -234,6 +245,41 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
       notifies :restart, "service[#{service_name}]", :delayed
     end
 
+    sudo service_worker do
+      user      a['user']
+      runas     'root'
+      nopasswd  true
+      commands  ["/bin/systemctl restart #{service_name_worker}"]
+
+      action :nothing
+    end
+
+    template monit_file_worker do
+      cookbook 'rails'
+      source "etc/monit.d/#{service_type_worker}.monitrc.erb"
+      owner 'root'
+      group 'root'
+      mode 0o0755
+      variables path: app_path,
+                num_workers: 1,
+                service_name: service_worker,
+                mem_limit: 500
+
+      action :nothing
+    end
+
+    execute "#{service_worker}-monit" do
+      command "monit reload"
+      action :nothing
+    end
+
+    execute "#{service_worker}-restart" do
+      command %Q{
+        echo "sleep 20 && monit -g #{app}_sidekiq restart all" | at now
+      }
+      action :nothing
+    end
+
     template init_file_worker do
       cookbook 'rails'
       source "server/#{service_type_worker}.erb"
@@ -247,7 +293,11 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
                 environment: a['ruby_server']['environment']
       notifies :run, 'execute[systemctl daemon-reload]', :immediately if rhel7x?
       notifies :enable, "service[#{service_name_worker}]", :immediately
-      notifies :restart, "service[#{service_name_worker}]", :delayed
+      notifies :restart, "service[#{service_name_worker}]", :delayed unless with_monit?
+      notifies :create, "template[#{monit_file_worker}]", :immediately if rhel7x? && with_monit?
+      notifies :run, "execute[#{service_worker}-monit]", :immediately if with_monit?
+      notifies :run, "execute[#{service_worker}-restart]", :delayed if with_monit?
+      notifies :install, "sudo[#{service_worker}]", :delayed if rhel7x?
 
       only_if { a['ruby_server']['worker'] }
     end

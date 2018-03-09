@@ -3,10 +3,6 @@ Group=<%= @user %>
 WorkingDirectory=<%= @path %>/current
 EnvironmentFile=<%= @path %>/.rbenv-vars
 Environment=RAILS_ENV=<%= @environment || 'production' %>
-TimeoutSec=<%= @opts['timeout'] || 15 %>
-StandardInput=null
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=%n
-KillMode=process
-TimeoutStopSec=<%= @opts['stop_timeout'] || 5 %>

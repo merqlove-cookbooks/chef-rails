@@ -4,6 +4,10 @@
 [Service]
 Type=forking
 <%= render 'server/service/service.erb' %>
+StandardInput=null
+KillMode=process
+TimeoutSec=<%= @opts['timeout'] || 15 %>
+TimeoutStopSec=<%= @opts['stop_timeout'] || 5 %>
 Restart=always
 PIDFile=<%= @path %>/shared/tmp/pids/puma.pid
 Environment=PUMA_CONFIG_FILE=<%= @path %>/shared/config/puma.rb
