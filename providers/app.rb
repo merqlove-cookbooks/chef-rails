@@ -194,7 +194,8 @@ end
 
 def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   service_type = service_base_name(a['ruby_server']['type'])
-  service_type_worker = service_base_name(a['ruby_server']['worker_type'])
+  worker_type = a['ruby_server']['worker_type']
+  service_type_worker = service_base_name(worker_type)
   service_name = service_base_name("#{a['ruby_server']['type']}_#{a['name']}")
   service_worker = "#{a['ruby_server']['worker_type']}_#{a['name']}"
   service_name_worker = service_base_name(service_worker)
@@ -256,7 +257,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
 
     template monit_file_worker do
       cookbook 'rails'
-      source "etc/monit.d/#{service_type_worker}.monitrc.erb"
+      source "etc/monit.d/#{worker_type}.monitrc.erb"
       owner 'root'
       group 'root'
       mode 0o0755
