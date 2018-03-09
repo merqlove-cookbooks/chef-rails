@@ -5,5 +5,5 @@ check process <%= @service_name %><%= worker_suffix %>
   start program = "/bin/systemctl start <%= @service_name %><%= worker_suffix %>" with timeout 90 seconds
   stop program = "/bin/systemctl stop <%= @service_name %><%= worker_suffix %>" with timeout 90 seconds
   if totalmem is greater than <%= @mem_limit || 300 %> MB for 2 cycles then restart # eating up memory?
-  group <%= @app_name %>_sidekiq
+  group <%= @service_name %>
 <% end %>
