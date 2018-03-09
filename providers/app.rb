@@ -275,9 +275,7 @@ def setup_ruby_server_init(a, app_path) # rubocop:disable Metrics/MethodLength, 
     end
 
     execute "#{service_worker}-restart" do
-      command %Q{
-        echo "sleep 20 && monit -g #{service_worker} restart all" | at now
-      }
+      command "monit -g #{service_worker} restart all"
       action :nothing
     end
 
