@@ -177,7 +177,7 @@ def service_name(name)
 end
 
 def with_monit?
-  node['packages-cookbook']&.include?("monit")
+  node['packages-cookbook'] && node['packages-cookbook'].include?("monit")
 end
 
 def monit_name(name)
