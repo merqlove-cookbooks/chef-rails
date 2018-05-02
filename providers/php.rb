@@ -84,8 +84,8 @@ def install_modules
 end
 
 def php_ubuntu_modules
-  return %w(php5-gd php5-memcached php-apcu) unless ubuntu16x?
-  %w(php-gd php-memcached php-apc)  
+  return %w(php5-gd php5-memcached php-apc) unless ubuntu16x?
+  %w(php-gd php-memcached php-apcu)  
 end
 
 def php_rhel_modules
