@@ -84,7 +84,7 @@ def install_modules
 end
 
 def php_ubuntu_modules
-  return %w(php5-gd php5-memcached php-apc)if ubuntu16x?
+  return %w(php5-gd php5-memcached php-apc) unless ubuntu16x?
   %w(php-gd php-memcached php-apc)  
 end
 
