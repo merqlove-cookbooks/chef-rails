@@ -40,7 +40,7 @@ depends 'vim', '~> 2.0.1'
 depends 'curl', '~> 2.0.1'
 depends 'packages', '~> 1.0.0'
 
-depends 'database', '~> 4.0.3'
+depends 'database', '~> 6.1.1'
 depends 'memcached', '~> 2.1.0'
 depends 'mongodb3-objects', '~> 0.4.5'
 # depends 'postfix', '~> 3.4.0'
