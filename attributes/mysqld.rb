@@ -35,5 +35,6 @@ if platform_family?('rhel') && node['mysql']
   end
 end
 
+default['mysql']['gem_version'] = "0.4.9"
 default['rails']['mysqld']['service_name'] = service_name
 default['rails']['mysqld']['include_dir']  = "#{base_dir}/etc/mysql/conf.d"

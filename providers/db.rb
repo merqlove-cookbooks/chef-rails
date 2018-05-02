@@ -126,6 +126,7 @@ def install_mysql # rubocop:disable Metrics/MethodLength
 
   mysql2_chef_gem 'default' do
     action :install
+    gem_version node['mysql']['gem_version']
     client_version node['mysql']['version']
   end
 
