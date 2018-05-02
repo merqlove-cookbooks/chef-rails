@@ -53,7 +53,7 @@ def install_php
     components   ['main']
     keyserver    'keyserver.ubuntu.com'
     key          'E5267A6C'
-    only_if { debian? }
+    not_if { ubuntu16x? }
   end
 end
 
@@ -84,7 +84,8 @@ def install_modules
 end
 
 def php_ubuntu_modules
-  %w(php5-gd php5-memcached php-apc)
+  return %w(php5-gd php5-memcached php-apc)if ubuntu16x?
+  %w(php-gd php-memcached php-apc)  
 end
 
 def php_rhel_modules
