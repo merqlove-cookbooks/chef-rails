@@ -1,0 +1,12 @@
+location /verify {
+  rewrite ^/verify-existence$ /verify.php break;
+}
+
+location /api {
+  rewrite ^/api/v([0-9]*)/(.*)/?$ /api.php?path_info=$2&api_version=$1 break;
+}
+
+location / {
+  rewrite ^/$ /router.php break;
+  rewrite ^/(.*) /router.php?path_info=$1 break;
+}
