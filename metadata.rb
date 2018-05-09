@@ -42,7 +42,7 @@ depends 'packages', '~> 1.0.0'
 
 depends 'database', '~> 6.1.1'
 depends 'memcached', '~> 2.1.0'
-depends 'mongodb3-objects', '~> 0.4.5'
+depends 'mongodb3-objects', '0.4.5'
 # depends 'postfix', '~> 3.4.0'
 
 # App
