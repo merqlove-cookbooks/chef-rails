@@ -15,5 +15,9 @@ location / {
   try_files $uri $uri/ /index.php?$args;
 }
 
+location @php_fallback {
+  try_files $uri =404;
+}
+
 location @engine_file_rewrite {
 }

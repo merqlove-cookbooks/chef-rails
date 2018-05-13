@@ -14,5 +14,9 @@ location /bitrix/admin/ {
   try_files $uri $uri/ =404;
 }
 
+location @php_fallback {
+  try_files $uri =404;
+}
+
 location @engine_file_rewrite {
 }

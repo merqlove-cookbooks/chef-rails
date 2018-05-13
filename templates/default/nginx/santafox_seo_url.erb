@@ -59,5 +59,9 @@ location @website {
   fastcgi_param  SCRIPT_FILENAME  $document_root/index.php;
 }
 
+location @php_fallback {
+  try_files $uri =404;
+}
+
 location @engine_file_rewrite {
 }
