@@ -1,10 +1,22 @@
-if (!-e $request_filename) {
-  rewrite ^/assets/(.*)$ /assets/$1 last;
-  rewrite ^/avatars/(.*)$ /avatars/$1 last;
-  rewrite ^/wallpapers/(.*)$ /wallpapers/$1 last;
-  rewrite ^/verify-existence$ /verify.php last;
-  rewrite ^/proxy.php$ /proxy.php last;
-  rewrite ^/api/v([0-9]*)/(.*)$ /api.php?path_info=$2&api_version=$1 last;
-  rewrite ^$ /router.php last;
-  rewrite ^(.*) /router.php?path_info=$1 last;
+location / {
+  index index.php;
+
+  if (!-e $request_filename) {
+     rewrite ^/assets/(.*)$ /public/assets/$1 last; 
+     rewrite ^/avatars/(.*)$ /public/avatars/$1 last; 
+     rewrite ^/wallpapers/(.*)$ /public/wallpapers/$1 last; 
+     rewrite ^/proxy.php$ /public/proxy.php last; 
+     rewrite ^/verify-existence$ /public/verify.php last;
+     rewrite ^/api/v([0-9]*)/(.*)$ /public/api.php?path_info=$2&api_version=$1 last;
+     rewrite ^$ /public/router.php last;
+     rewrite ^(.*) /public/router.php?path_info=$1 last;
+  }
+  try_files $uri /public/router.php?path_info=$uri&$args;
+}
+
+location @engine_file_rewrite {
+}
+
+location @php_fallback {
+  try_files $uri /public/router.php?path_info=$uri&$args;
 }

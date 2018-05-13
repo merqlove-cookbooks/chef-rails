@@ -85,7 +85,7 @@
       <% end -%>
 
     location ~ \.php$ {
-      try_files $uri =404;
+      try_files $uri @php_fallback;
       fastcgi_split_path_info ^(.+\.php)(/.+)$;
       include fastcgi_params;
       fastcgi_pass  php_<%= @user %>_<%= @name %>;

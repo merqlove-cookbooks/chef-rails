@@ -9,6 +9,10 @@ location = / {
 location @engine_file_rewrite {
 }
 
+location @php_fallback {
+  try_files $uri =404;
+}
+
 location @website {
   include fastcgi_params;
   fastcgi_pass  php_<%= @user %>_<%= @name %>;
