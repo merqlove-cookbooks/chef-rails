@@ -22,11 +22,11 @@ use_inline_resources
 ::Chef::Provider.send(:include, Rails::Helpers)
 
 action :create do
-  if rhel?
-    run_context.include_recipe('chef-yum-docker::default')
-  else
-    run_context.include_recipe('chef-apt-docker::default')
-  end 
+  # if rhel?
+  #   run_context.include_recipe('chef-yum-docker::default')
+  # else
+  #   run_context.include_recipe('chef-apt-docker::default')
+  # end 
 
   if thin_enabled?
     lvm(new_resource)

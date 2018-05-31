@@ -23,6 +23,17 @@ module Rails
   # include Chef::
   # Helpers for cookbook
   module Helpers
+    def print_json(new_resource, opts)
+      opts.reduce("\n") do |acc, key|
+        acc << "#{key}: #{new_resource.send(key)}\n"
+        acc
+      end
+    end
+
+    def debug_resource(new_resource, opts = [])
+      log print_json(new_resource, opts)
+    end
+
     def load_secret
       ::Chef::EncryptedDataBagItem.load_secret(node['rails']['secrets']['default']) if File.exist?(node['rails']['secrets']['default'])
     end
