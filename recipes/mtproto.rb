@@ -19,6 +19,7 @@
 
 rails_mtproto node['rails']['mtproto']['name'] do
   restart node['rails']['mtproto']['restart']
+  network_mode node['rails']['mtproto']['network_mode']
   data_volume node['rails']['mtproto']['data_volume']
   image node['rails']['mtproto']['image']
   version node['rails']['mtproto']['version']
