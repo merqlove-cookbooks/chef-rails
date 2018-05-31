@@ -5,4 +5,4 @@ default['rails']['mtproto']['image'] = 'telegrammessenger/proxy'
 default['rails']['mtproto']['version'] = '1.0'
 default['rails']['mtproto']['port'] = '443'
 default['rails']['mtproto']['secret'] = nil
-default['rails']['mtproto']['secret_count'] = 2
+default['rails']['mtproto']['secret_count'] = nil

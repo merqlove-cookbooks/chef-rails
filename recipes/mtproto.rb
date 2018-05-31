@@ -22,8 +22,8 @@ rails_mtproto node['rails']['mtproto']['name'] do
   data_volume node['rails']['mtproto']['data_volume']
   image node['rails']['mtproto']['image']
   version node['rails']['mtproto']['version']
-  secret node['rails']['mtproto']['secret']
-  secret_count node['rails']['mtproto']['secret_count']
+  secret node['rails']['mtproto']['secret'] if node['rails']['mtproto']['secret']
+  secret_count node['rails']['mtproto']['secret_count'] if node['rails']['mtproto']['secret_count']
   port node['rails']['mtproto']['port']
 
   action :create
