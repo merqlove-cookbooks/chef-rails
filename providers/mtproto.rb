@@ -39,7 +39,7 @@ def mtproto_create(new_resource)
     action :pull
   end
 
-  docker_network 'docker-mtproto' do
+  docker_network new_resource.network_mode do
     driver 'bridge'
     action :create
   end
@@ -50,7 +50,6 @@ def mtproto_create(new_resource)
     dns ['8.8.8.8', '8.8.4.4']
     dns_search ['core.telegram.org']
     network_mode new_resource.network_mode
-    network_aliases ['docker-mtproto']
     port "#{new_resource.port}:443"
     volumes ["proxy-config:#{new_resource.data_volume}"]
     env "SECRET=#{new_resource.secret}" if new_resource.secret
