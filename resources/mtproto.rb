@@ -30,5 +30,6 @@ attribute :network_mode, kind_of: String, default: nil
 attribute :image, kind_of: String, default: 'telegrammessenger/proxy'
 attribute :version, kind_of: String, default: '1.0'
 attribute :port, kind_of: String, default: '443'
+attribute :tag, kind_of: String, default: nil
 attribute :secret, kind_of: String, default: nil
 attribute :secret_count, kind_of: Integer, default: nil
