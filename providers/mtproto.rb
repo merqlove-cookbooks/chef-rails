@@ -58,6 +58,5 @@ end
 def mtproto_delete(new_resource)
   docker_container new_resource.name do
     action :delete
-    if "docker inspect #{new_resource.name}"
   end
 end
