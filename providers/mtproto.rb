@@ -39,7 +39,7 @@ def mtproto_create(new_resource)
     action :pull
   end
 
-  docker_container title(new_resource) do
+  docker_container new_resource.name do
     image new_resource.image
     tag new_resource.version
     volumes ["proxy-config:#{new_resource.data_volume}"]
