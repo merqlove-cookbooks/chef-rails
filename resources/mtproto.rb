@@ -26,7 +26,7 @@ attribute :cookbook, kind_of: String, default: 'rails'
 
 attribute :restart, kind_of: String, default: 'always'
 attribute :data_volume, kind_of: String, default: '/data'
-attribute :image, kind_of: String, default: 'telegrammessenger/proxy:latest'
+attribute :image, kind_of: String, default: 'telegrammessenger/proxy'
 attribute :version, kind_of: String, default: '1.0'
 attribute :port, kind_of: String, default: '443'
 attribute :secret, kind_of: String, default: nil
