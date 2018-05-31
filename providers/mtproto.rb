@@ -38,6 +38,7 @@ def env_vars(new_resource)
   vars << "SECRET=#{new_resource.secret}" if new_resource.secret
   vars << "TAG=#{new_resource.tag}" if new_resource.tag
   vars << "SECRET_COUNT=#{new_resource.secret_count}" if new_resource.secret_count
+  vars
 end
 
 def mtproto_create(new_resource)
