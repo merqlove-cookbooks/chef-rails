@@ -33,6 +33,13 @@ action :delete do
   new_resource.updated_by_last_action(true)
 end
 
+def env_vars(new_resource)
+  vars = []
+  vars << "SECRET=#{new_resource.secret}" if new_resource.secret
+  vars << "TAG=#{new_resource.tag}" if new_resource.tag
+  vars << "SECRET_COUNT=#{new_resource.secret_count}" if new_resource.secret_count
+end
+
 def mtproto_create(new_resource)
   docker_image new_resource.image do
     tag new_resource.version
@@ -45,9 +52,7 @@ def mtproto_create(new_resource)
     network_mode new_resource.network_mode if new_resource.network_mode
     port "#{new_resource.port}:443"
     volumes ["proxy-config:#{new_resource.data_volume}"]
-    env "SECRET=#{new_resource.secret}" if new_resource.secret
-    env "TAG=#{new_resource.tag}" if new_resource.tag
-    env "SECRET_COUNT=#{new_resource.secret_count}" if new_resource.secret_count
+    env env_vars(new_resource)
 
     action :run
     not_if "docker inspect #{new_resource.name}"
