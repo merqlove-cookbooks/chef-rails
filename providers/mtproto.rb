@@ -42,6 +42,7 @@ def mtproto_create(new_resource)
   docker_container new_resource.name do
     image new_resource.image
     tag new_resource.version
+    port "443:#{new_resource.port}"
     volumes ["proxy-config:#{new_resource.data_volume}"]
     env "SECRET=#{new_resource.secret}" if new_resource.secret
     env "SECRET_COUNT=#{new_resource.secret_count}" if new_resource.secret_count
