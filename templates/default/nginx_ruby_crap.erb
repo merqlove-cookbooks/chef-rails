@@ -24,10 +24,12 @@ server {
   server_name <%= Array(@server_name).join(' ') %>;
   root   <%= @path %>/current/public;
 
+  <% if @tunes['rewrites'] %>
   <% @tunes['rewrites'].each do |rewrites| %>
     <% rewrites.each do |rewrite| %>
     rewrite <%= rewrite['query'] %> <%= rewrite['uri'] %> <%= rewrite['options'] %>;
     <% end -%>
+  <% end -%>
   <% end -%>
 
   <%= render 'ssl.erb', :variables => { :with_defaults => true, :with_ssl_on => true, :ssl => @ssl, :server_name => @server_name, :tunes => @tunes, :nginx => node['rails']['nginx'] } %>
