@@ -25,10 +25,8 @@ server {
   root   <%= @path %>/current/public;
 
   <% if @tunes['rewrites'] %>
-  <% @tunes['rewrites'].each do |rewrites| %>
-    <% rewrites.each do |rewrite| %>
+  <% @tunes['rewrites'].each do |rewrite| %>
     rewrite <%= rewrite['query'] %> <%= rewrite['uri'] %> <%= rewrite['options'] %>;
-    <% end -%>
   <% end -%>
   <% end -%>
 
