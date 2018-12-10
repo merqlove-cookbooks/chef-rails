@@ -47,7 +47,7 @@ depends 'mongodb3-objects', '0.4.5'
 
 # App
 
-depends 'python', '~> 1.4.6'
+depends 'poise-python', '~> 1.7.0'
 depends 'yum-mysql-community', '~> 2.1.0'
 depends 'composer', '~> 2.3.0'
 depends 'mysql', '~> 7.2.0'
