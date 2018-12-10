@@ -18,8 +18,8 @@
 #
 
 python_runtime 'system' do
-  get_pip_url 'https://github.com/pypa/get-pip/raw/f88ab195ecdf2f0001ed21443e247fb32265cabb/get-pip.py'
-  pip_version '18.0'
+  get_pip_url node['rails']['python']['pip_url']
+  pip_version node['rails']['python']['pip_version']
 
   provider :system
   version '2'
