@@ -22,6 +22,6 @@ python_runtime 'system' do
   pip_version node['rails']['python']['pip_version']
 
   provider :system
-  version '2'
-  options dev_package: true
+  version node['rails']['python']['version']
+  options dev_package: node['rails']['python']['dev_package']
 end
